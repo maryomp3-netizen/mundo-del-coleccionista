@@ -216,6 +216,9 @@
   .ob-skip { flex:1; padding:13px; background:var(--card); border:1.5px solid #2e2b45; border-radius:13px; color:var(--muted); font-family:"Fredoka One",cursive; font-size:15px; cursor:pointer; }
   .ob-next { flex:2; padding:13px; background:linear-gradient(135deg,var(--accent2),var(--accent1)); border:none; border-radius:13px; color:#1a1200; font-family:"Fredoka One",cursive; font-size:16px; cursor:pointer; transition:transform 0.2s; }
   .ob-next:hover { transform:translateY(-2px); }
+  /* RETRO GAME */
+  #game-canvas { background:#0a0612; border-radius:0; }
+  #game-touch-left, #game-touch-right { opacity:0; }
 </style>
 </head>
 <body>
@@ -589,6 +592,7 @@
     </div>
     <div style="font-size:14px;font-weight:800;margin-bottom:10px">Mis aportes recientes</div>
     <div id="my-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+    <button class="submit-btn" style="margin-bottom:10px;background:linear-gradient(135deg,#ff6b9d,#845ec2)" onclick="openGame()">🕹️ Jugar Atrapa Coleccionables</button>
     <button class="submit-btn" style="margin-bottom:10px" onclick="showScreen('screen-planes')">⭐ Ver planes Premium</button>
     <button class="logout-btn" onclick="logout()">Cerrar sesión 👋</button>
   </div>
@@ -636,6 +640,53 @@
   <div class="chat-input-bar">
     <input class="chat-input" id="chat-msg-input" placeholder="Escribe un mensaje…" onkeydown="if(event.key==='Enter')sendChatMsg()">
     <button class="chat-send-btn" onclick="sendChatMsg()">➤</button>
+  </div>
+</div>
+
+<!-- RETRO GAME -->
+<div class="screen" id="screen-game" style="background:#0a0612">
+  <div class="back-row" style="padding-bottom:6px">
+    <button class="back-btn" onclick="exitGame()">←</button>
+    <span style="font-weight:800;font-size:15px;font-family:'Fredoka One',cursive;color:var(--accent2)">Atrapa Coleccionables</span>
+  </div>
+
+  <!-- START SCREEN -->
+  <div id="game-start" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center">
+    <div style="font-size:64px">🕹️</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:24px;background:linear-gradient(135deg,#ff6b9d,#845ec2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Atrapa Coleccionables</div>
+    <div style="color:var(--muted);font-size:13px;font-weight:600;max-width:280px;line-height:1.7">
+      Inclina tu celular ← → para mover la canasta y atrapar canicas, tazos y cartas que caen.<br><br>
+      ¡No dejes caer ninguna! Tienes <b style="color:var(--accent1)">3 vidas</b> ❤️❤️❤️
+    </div>
+    <div id="game-motion-status" style="font-size:11px;color:var(--accent3);font-weight:700">📱 Listo para detectar movimiento</div>
+    <button class="submit-btn" style="max-width:240px;background:linear-gradient(135deg,#ff6b9d,#845ec2)" onclick="startGame()">¡Jugar! 🚀</button>
+    <div id="game-high-score" style="font-size:12px;color:var(--accent2);font-weight:800">🏆 Mejor puntaje: 0</div>
+  </div>
+
+  <!-- PLAYING SCREEN -->
+  <div id="game-playing" style="display:none;flex:1;flex-direction:column;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 20px 10px">
+      <div style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--accent2)" id="game-score">0</div>
+      <div id="game-lives" style="font-size:18px">❤️❤️❤️</div>
+    </div>
+    <canvas id="game-canvas" style="flex:1;width:100%;display:block;touch-action:none"></canvas>
+    <div id="game-touch-controls" style="display:none;position:absolute;bottom:0;left:0;right:0;height:30%;display:flex">
+      <div id="game-touch-left" style="flex:1"></div>
+      <div id="game-touch-right" style="flex:1"></div>
+    </div>
+  </div>
+
+  <!-- GAME OVER SCREEN -->
+  <div id="game-over" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
+    <div style="font-size:64px">💔</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--accent1)">¡Juego terminado!</div>
+    <div style="font-size:15px;font-weight:700">Puntaje: <span id="game-final-score" style="color:var(--accent2);font-family:'Fredoka One',cursive;font-size:22px">0</span></div>
+    <div id="game-bonus-msg" style="font-size:13px;color:var(--accent3);font-weight:700;display:none">🎉 ¡Nuevo récord!</div>
+    <div id="game-points-earned" style="font-size:12px;color:var(--muted);font-weight:600"></div>
+    <div style="display:flex;gap:10px;width:100%;max-width:280px;margin-top:8px">
+      <button class="submit-btn" style="background:linear-gradient(135deg,#ff6b9d,#845ec2)" onclick="startGame()">🔄 Reintentar</button>
+    </div>
+    <button class="ob-skip" style="max-width:280px;width:100%" onclick="exitGame()">Salir</button>
   </div>
 </div>
 
@@ -1628,6 +1679,236 @@ window.finishOnboarding = () => {
   localStorage.setItem('mdc_onboarding_done', '1');
   showScreen('screen-home');
 };
+
+// ══════════════ RETRO GAME: ATRAPA COLECCIONABLES ══════════════
+let gameCanvas, gameCtx;
+let gameRunning = false;
+let gameAnimFrame = null;
+let gameState = {
+  basketX: 0, basketW: 56, basketH: 36,
+  items: [], score: 0, lives: 3,
+  spawnTimer: 0, spawnInterval: 70, speed: 2.2,
+  tilt: 0
+};
+const GAME_EMOJIS = ['🔵','⭕','🃏','🚗','🧸','⚡','🦕','🌱'];
+let gameOrientationHandler = null;
+let gameKeyState = { left: false, right: false };
+
+window.openGame = () => {
+  showScreen('screen-game');
+  resetGameToStart();
+};
+
+window.exitGame = () => {
+  stopGameLoop();
+  removeOrientationListener();
+  showScreen('screen-profile');
+};
+
+function resetGameToStart() {
+  document.getElementById('game-start').style.display = 'flex';
+  document.getElementById('game-playing').style.display = 'none';
+  document.getElementById('game-over').style.display = 'none';
+  const best = localStorage.getItem('mdc_game_highscore') || 0;
+  document.getElementById('game-high-score').textContent = `🏆 Mejor puntaje: ${best}`;
+  // Check if device orientation is available
+  const statusEl = document.getElementById('game-motion-status');
+  if (typeof DeviceOrientationEvent !== 'undefined') {
+    statusEl.textContent = '📱 Listo para detectar movimiento';
+  } else {
+    statusEl.textContent = '👆 Usa los controles táctiles';
+  }
+}
+
+window.startGame = async () => {
+  document.getElementById('game-start').style.display = 'none';
+  document.getElementById('game-over').style.display = 'none';
+  document.getElementById('game-playing').style.display = 'flex';
+
+  // Request motion permission on iOS
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const perm = await DeviceOrientationEvent.requestPermission();
+      if (perm !== 'granted') {
+        document.getElementById('game-touch-controls').style.display = 'flex';
+      }
+    } catch(e) {
+      document.getElementById('game-touch-controls').style.display = 'flex';
+    }
+  }
+
+  gameCanvas = document.getElementById('game-canvas');
+  gameCtx = gameCanvas.getContext('2d');
+  const resizeCanvas = () => {
+    gameCanvas.width = gameCanvas.clientWidth;
+    gameCanvas.height = gameCanvas.clientHeight;
+  };
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  gameState = {
+    basketX: gameCanvas.width / 2 - 28, basketW: 56, basketH: 36,
+    items: [], score: 0, lives: 3,
+    spawnTimer: 0, spawnInterval: 70, speed: 2.2,
+    tilt: 0
+  };
+  updateGameHUD();
+  setupOrientationListener();
+  setupTouchControls();
+  gameRunning = true;
+  gameLoop();
+};
+
+function setupOrientationListener() {
+  removeOrientationListener();
+  gameOrientationHandler = (e) => {
+    if (e.gamma !== null) {
+      // gamma: -90 (tilt left) to 90 (tilt right)
+      gameState.tilt = Math.max(-1, Math.min(1, e.gamma / 30));
+    }
+  };
+  window.addEventListener('deviceorientation', gameOrientationHandler);
+}
+
+function removeOrientationListener() {
+  if (gameOrientationHandler) {
+    window.removeEventListener('deviceorientation', gameOrientationHandler);
+    gameOrientationHandler = null;
+  }
+}
+
+function setupTouchControls() {
+  const left = document.getElementById('game-touch-left');
+  const right = document.getElementById('game-touch-right');
+  left.ontouchstart = () => gameKeyState.left = true;
+  left.ontouchend = () => gameKeyState.left = false;
+  right.ontouchstart = () => gameKeyState.right = true;
+  right.ontouchend = () => gameKeyState.right = false;
+}
+
+function spawnItem() {
+  const x = Math.random() * (gameCanvas.width - 30) + 15;
+  const emoji = GAME_EMOJIS[Math.floor(Math.random() * GAME_EMOJIS.length)];
+  gameState.items.push({ x, y: -20, emoji, speed: gameState.speed + Math.random() * 1.2 });
+}
+
+function updateGameHUD() {
+  document.getElementById('game-score').textContent = gameState.score;
+  document.getElementById('game-lives').textContent = '❤️'.repeat(gameState.lives) + '🖤'.repeat(3 - gameState.lives);
+}
+
+function gameLoop() {
+  if (!gameRunning) return;
+  const w = gameCanvas.width, h = gameCanvas.height;
+  gameCtx.clearRect(0, 0, w, h);
+
+  // Background gradient
+  const grad = gameCtx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, '#1a0f2e');
+  grad.addColorStop(1, '#0a0612');
+  gameCtx.fillStyle = grad;
+  gameCtx.fillRect(0, 0, w, h);
+
+  // Move basket via tilt or touch
+  let move = 0;
+  if (gameKeyState.left) move = -4.5;
+  else if (gameKeyState.right) move = 4.5;
+  else move = gameState.tilt * 6;
+  gameState.basketX += move;
+  gameState.basketX = Math.max(0, Math.min(w - gameState.basketW, gameState.basketX));
+
+  // Draw basket (retro style)
+  const bx = gameState.basketX, by = h - 50, bw = gameState.basketW, bh = gameState.basketH;
+  gameCtx.fillStyle = '#ffd93d';
+  gameCtx.fillRect(bx, by, bw, bh * 0.3);
+  gameCtx.fillStyle = '#ff6b6b';
+  gameCtx.beginPath();
+  gameCtx.moveTo(bx - 4, by + bh * 0.3);
+  gameCtx.lineTo(bx + bw + 4, by + bh * 0.3);
+  gameCtx.lineTo(bx + bw - 6, by + bh);
+  gameCtx.lineTo(bx + 6, by + bh);
+  gameCtx.closePath();
+  gameCtx.fill();
+  gameCtx.strokeStyle = '#0a0612';
+  gameCtx.lineWidth = 2;
+  gameCtx.stroke();
+
+  // Spawn items
+  gameState.spawnTimer++;
+  if (gameState.spawnTimer >= gameState.spawnInterval) {
+    spawnItem();
+    gameState.spawnTimer = 0;
+    if (gameState.spawnInterval > 35) gameState.spawnInterval -= 0.5;
+    gameState.speed += 0.02;
+  }
+
+  // Update + draw items
+  gameCtx.font = '26px sans-serif';
+  gameCtx.textAlign = 'center';
+  for (let i = gameState.items.length - 1; i >= 0; i--) {
+    const it = gameState.items[i];
+    it.y += it.speed;
+    gameCtx.fillText(it.emoji, it.x, it.y);
+
+    // Collision with basket
+    if (it.y > by - 10 && it.y < by + 20 && it.x > bx - 10 && it.x < bx + bw + 10) {
+      gameState.items.splice(i, 1);
+      gameState.score += 10;
+      updateGameHUD();
+      continue;
+    }
+    // Missed (fell to bottom)
+    if (it.y > h + 10) {
+      gameState.items.splice(i, 1);
+      gameState.lives--;
+      updateGameHUD();
+      if (gameState.lives <= 0) {
+        endGame();
+        return;
+      }
+    }
+  }
+
+  gameAnimFrame = requestAnimationFrame(gameLoop);
+}
+
+function stopGameLoop() {
+  gameRunning = false;
+  if (gameAnimFrame) cancelAnimationFrame(gameAnimFrame);
+  gameAnimFrame = null;
+}
+
+async function endGame() {
+  stopGameLoop();
+  removeOrientationListener();
+  document.getElementById('game-playing').style.display = 'none';
+  document.getElementById('game-over').style.display = 'flex';
+  document.getElementById('game-final-score').textContent = gameState.score;
+
+  const best = parseInt(localStorage.getItem('mdc_game_highscore') || '0');
+  const bonusMsg = document.getElementById('game-bonus-msg');
+  if (gameState.score > best) {
+    localStorage.setItem('mdc_game_highscore', gameState.score);
+    bonusMsg.style.display = 'block';
+  } else {
+    bonusMsg.style.display = 'none';
+  }
+
+  // Award points to user account (every 300 game points = 1 app point, simplified)
+  const earnedPoints = Math.floor(gameState.score / 10);
+  document.getElementById('game-points-earned').textContent = currentUser 
+    ? `+${earnedPoints} puntos de coleccionista 🌟` 
+    : 'Inicia sesión para guardar tus puntos';
+
+  if (currentUser && earnedPoints > 0) {
+    try {
+      await setDoc(doc(db, 'usuarios', currentUser.uid), {
+        gamePoints: increment(earnedPoints),
+        gameHighScore: Math.max(gameState.score, best)
+      }, { merge: true });
+    } catch(e) {}
+  }
+}
 
 // ── INIT ──
 buildPills();
