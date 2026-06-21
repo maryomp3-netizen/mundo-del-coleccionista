@@ -343,12 +343,13 @@
       <button class="like-btn" id="btn-like" onclick="toggleLike()">❤️ <span id="like-label">Me gusta</span></button>
     </div>
     <div style="font-size:14px;font-weight:800;margin-bottom:8px">Aportado por</div>
-    <div class="owner-box">
-      <div class="owner-avatar">😊</div>
-      <div>
+    <div class="owner-box" id="owner-box-link" onclick="openPublicProfile()" style="cursor:pointer">
+      <div class="owner-avatar" id="d-owner-avatar" onclick="openPublicProfile()">😊</div>
+      <div onclick="openPublicProfile()" style="flex:1">
         <div style="font-size:13px;font-weight:800" id="d-owner">—</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600" id="d-date">—</div>
       </div>
+      <span onclick="openPublicProfile()" style="margin-left:auto;color:var(--muted);font-size:18px;padding:8px">›</span>
     </div>
     <div class="comments-wrap">
       <div style="font-size:14px;font-weight:800;margin-bottom:10px">Comentarios</div>
@@ -688,6 +689,37 @@
   </nav>
 </div>
 
+<!-- PUBLIC PROFILE -->
+<div class="screen" id="screen-public-profile">
+  <div class="back-row">
+    <button class="back-btn" onclick="showScreen('screen-detail')">←</button>
+    <span style="font-weight:800;font-size:15px">Perfil del coleccionista</span>
+  </div>
+  <div class="profile-wrap">
+    <div class="profile-hero">
+      <div class="profile-avatar" id="pp-avatar">😎</div>
+      <div class="profile-name" id="pp-name">—</div>
+      <div class="plan-chip" id="pp-plan-chip" style="background:#2e2b45;color:var(--muted)">🆓 Plan Gratis</div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-box"><div class="stat-val" id="pp-aportes">0</div><div class="stat-lbl">Aportes</div></div>
+      <div class="stat-box"><div class="stat-val" id="pp-likes">0</div><div class="stat-lbl">Likes totales</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px" id="pp-action-btns">
+      <button class="msg-btn" id="pp-btn-msg" onclick="msgFromProfile()">💬 Enviar mensaje</button>
+    </div>
+    <div style="font-size:14px;font-weight:800;margin-bottom:10px">Catálogo público</div>
+    <div class="grid" id="pp-items-grid" style="padding:0 0 100px"></div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
+    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-planes')"><span>⭐</span><span>Planes</span></button>
+    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
+  </nav>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -955,6 +987,15 @@ window.openDetail = async (id) => {
   document.getElementById('d-desc').textContent = item.descripcion||'Sin descripción.';
   document.getElementById('d-owner').textContent = item.autorNombre||'Anónimo';
   document.getElementById('d-date').textContent = item.createdAt?.toDate ? timeAgo(item.createdAt.toDate()) : 'Recientemente';
+  // Load owner avatar
+  document.getElementById('d-owner-avatar').innerHTML = (item.autorNombre||'?')[0]?.toUpperCase() || '😊';
+  if (item.autorId) {
+    getDoc(doc(db, 'usuarios', item.autorId)).then(uDoc => {
+      if (uDoc.exists() && uDoc.data().avatarUrl) {
+        document.getElementById('d-owner-avatar').innerHTML = `<img src="${uDoc.data().avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      }
+    }).catch(()=>{});
+  }
   document.getElementById('d-tags').innerHTML = `
     <span class="tag" style="background:#1e1e2e;color:${COLORS[item.categoria]||'#4d96ff'}">${item.categoria||'otro'}</span>
     <span class="tag" style="background:#1e1e2e;color:var(--accent2)">${item.rareza||'—'}</span>`;
@@ -1336,6 +1377,71 @@ window.msgOwner = () => {
   const item = allItems.find(i => i.id === currentDetailId);
   if (!item) return;
   openChat(item.autorId, item.autorNombre, null);
+};
+
+// ── PUBLIC PROFILE ──
+let publicProfileUid = null;
+let publicProfileName = null;
+
+window.openPublicProfile = async () => {
+  const item = allItems.find(i => i.id === currentDetailId);
+  if (!item) { showToast('No se pudo cargar el perfil'); return; }
+  if (!item.autorId) { showToast('Este aporte no tiene autor registrado'); return; }
+  publicProfileUid = item.autorId;
+  publicProfileName = item.autorNombre || 'Anónimo';
+
+  document.getElementById('pp-name').textContent = publicProfileName;
+  document.getElementById('pp-avatar').innerHTML = publicProfileName[0]?.toUpperCase() || '😎';
+
+  // Hide message button if it's your own profile
+  document.getElementById('pp-action-btns').style.display = (currentUser && currentUser.uid === publicProfileUid) ? 'none' : '';
+
+  // Load user data (plan + avatar)
+  try {
+    const uDoc = await getDoc(doc(db, 'usuarios', publicProfileUid));
+    if (uDoc.exists()) {
+      const udata = uDoc.data();
+      const plan = udata.plan || 'free';
+      const chip = document.getElementById('pp-plan-chip');
+      if (plan === 'pro') { chip.style.background='#2d1b69'; chip.style.color='#c77dff'; chip.textContent='👑 Plan Pro'; }
+      else if (plan === 'premium') { chip.style.background='#1a2a1a'; chip.style.color='#6bcb77'; chip.textContent='⭐ Plan Premium'; }
+      else { chip.style.background='#2e2b45'; chip.style.color='var(--muted)'; chip.textContent='🆓 Plan Gratis'; }
+      if (udata.avatarUrl) {
+        document.getElementById('pp-avatar').innerHTML = `<img src="${udata.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+      }
+    }
+  } catch(e) {}
+
+  // Load this user's items
+  const userItems = allItems.filter(i => i.autorId === publicProfileUid);
+  document.getElementById('pp-aportes').textContent = userItems.length;
+  const totalLikes = userItems.reduce((sum, i) => sum + (i.likes || 0), 0);
+  document.getElementById('pp-likes').textContent = totalLikes;
+
+  const grid = document.getElementById('pp-items-grid');
+  if (!userItems.length) {
+    grid.innerHTML = '<div class="empty"><div class="big">📦</div><p>Sin aportes públicos aún</p></div>';
+  } else {
+    grid.innerHTML = userItems.map(it => `
+      <div class="col-card" onclick="openDetail('${it.id}')">
+        <div class="col-card-img" style="background:linear-gradient(135deg,#1a1828,#221f35)">
+          ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : `<span style="font-size:48px">${EMOJIS[it.categoria]||'🎴'}</span>`}
+          <div class="col-badge" style="background:${COLORS[it.categoria]||'#4d96ff'}">${it.categoria||'otro'}</div>
+        </div>
+        <div class="col-card-info">
+          <div class="col-card-name">${it.nombre}</div>
+          <div class="col-card-meta"><span class="rdot" style="background:${COLORS[it.categoria]||'#4d96ff'}"></span>${it.rareza||'—'}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  showScreen('screen-public-profile');
+};
+
+window.msgFromProfile = () => {
+  if (!currentUser) { showToast('Inicia sesión para enviar mensajes'); showScreen('screen-auth'); return; }
+  if (currentUser.uid === publicProfileUid) { showToast('No puedes enviarte mensajes a ti mismo'); return; }
+  openChat(publicProfileUid, publicProfileName, null);
 };
 
 // ── CHAT FUNCTIONS ──
