@@ -290,7 +290,10 @@
 <div class="screen" id="screen-home">
   <div class="topbar">
     <div class="logo">Mundo del <span>Coleccionista</span></div>
-    <button class="user-btn" onclick="goProfile()">😎</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onclick="startGame()" style="background:#2d1b69;border:none;border-radius:10px;padding:6px 12px;font-size:13px;font-weight:800;color:#c77dff;cursor:pointer">🕹️ Jugar</button>
+      <button class="user-btn" onclick="goProfile()">😎</button>
+    </div>
   </div>
   <div class="search-wrap">
     <div class="search-bar">
@@ -299,12 +302,22 @@
     </div>
   </div>
   <div class="pills" id="cat-pills"></div>
+  <div id="descubre-section" style="margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:8px">
+      <div style="font-size:16px;font-weight:800">✨ Descubre Hoy</div>
+      <div id="racha-badge" style="display:none;background:#1a2a1a;border:1px solid #6bcb77;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:#6bcb77">🔥 Racha: 1 día</div>
+    </div>
+    <div id="descubre-scroll" style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none"></div>
+  </div>
   <div class="section-title">
     <span id="items-count">Cargando…</span>
     <span style="font-size:12px;color:var(--accent4);cursor:pointer" onclick="showScreen('screen-planes')">✨ Premium</span>
   </div>
   <div class="grid" id="items-grid">
     <div class="loading"><div class="spinner"></div></div>
+  </div>
+  <div id="duelo-fab" style="position:fixed;bottom:75px;left:16px;z-index:100;display:none">
+    <button onclick="showDuelo()" style="background:linear-gradient(135deg,#ff6b6b,#c77dff);border:none;border-radius:50px;padding:10px 16px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 15px rgba(199,125,255,.4)">⚔️ Duelo</button>
   </div>
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
@@ -625,6 +638,19 @@
     <div style="font-size:14px;font-weight:800;margin-bottom:10px">Mis aportes recientes</div>
     <div id="my-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
     <button class="submit-btn" style="margin-bottom:10px" onclick="showScreen('screen-planes')">⭐ Ver planes Premium</button>
+    <div id="admin-panel" style="display:none;background:#1a1040;border:2px dashed #6b3fa0;border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:800;color:#c77dff;margin-bottom:10px">🛠️ PANEL ADMIN</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:700">Ver como usuario Gratis</span>
+        <label style="position:relative;display:inline-block;width:44px;height:24px">
+          <input type="checkbox" id="modo-gratis-toggle" onchange="toggleModoGratis(this.checked)" style="opacity:0;width:0;height:0">
+          <span id="modo-gratis-slider" style="position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#2e2b45;border-radius:24px;transition:.3s">
+            <span style="position:absolute;content:'';height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s;display:block" id="slider-dot"></span>
+          </span>
+        </label>
+      </div>
+      <div id="modo-gratis-status" style="font-size:11px;color:#888">Modo real activo</div>
+    </div>
     <button class="logout-btn" onclick="logout()">Cerrar sesión 👋</button>
   </div>
   <nav class="bottom-nav">
@@ -724,9 +750,44 @@
   </nav>
 </div>
 
+<!-- DUELO MODAL -->
+<div id="duelo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+  <div style="font-size:20px;font-weight:800;margin-bottom:6px;text-align:center">⚔️ ¿Cuál está más chida?</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Vota por tu favorita</div>
+  <div id="duelo-cards" style="display:flex;gap:12px;width:100%"></div>
+  <button onclick="document.getElementById('duelo-modal').style.display='none'" style="margin-top:20px;background:#2e2b45;border:none;border-radius:10px;padding:10px 24px;color:var(--muted);font-weight:700;cursor:pointer">Cerrar</button>
+</div>
+
+<!-- GAME SCREEN -->
+<div class="screen" id="screen-game" style="background:#0d0a1a;display:flex;flex-direction:column">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#0d0a1a">
+    <button onclick="stopGame()" style="background:#1e1840;border:none;border-radius:10px;padding:6px 12px;color:#c77dff;font-size:13px;font-weight:700;cursor:pointer">✕ Salir</button>
+    <div style="display:flex;gap:16px;align-items:center">
+      <div id="g-lives" style="font-size:18px">❤️❤️❤️</div>
+      <div style="font-size:16px;font-weight:800;color:#ffd93d">⭐ <span id="g-score">0</span></div>
+    </div>
+  </div>
+  <div id="g-powerup-banner" style="display:none;text-align:center;background:#2d1b69;padding:4px;font-size:12px;font-weight:800;color:#c77dff">⚡ x2 PUNTOS — <span id="g-powerup-time">5</span>s</div>
+  <canvas id="game-canvas" style="flex:1;display:block;width:100%;touch-action:none"></canvas>
+  <div id="g-gameover" style="display:none;position:absolute;inset:0;background:rgba(13,10,26,.95);flex-direction:column;align-items:center;justify-content:center;z-index:50">
+    <div style="font-size:48px;margin-bottom:8px">💀</div>
+    <div style="font-size:28px;font-weight:900;color:#ffd93d;margin-bottom:4px">GAME OVER</div>
+    <div style="font-size:16px;color:#c77dff;margin-bottom:4px">Puntaje: <span id="g-final-score">0</span></div>
+    <div id="g-bonus-msg" style="font-size:13px;color:#6bcb77;margin-bottom:16px;text-align:center"></div>
+    <div id="g-ranking-list" style="background:#1e1840;border-radius:14px;padding:14px;width:280px;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:800;color:#c77dff;margin-bottom:8px">🏆 Top 5 — <span id="g-city-label">Tu ciudad</span></div>
+      <div id="g-ranking-rows" style="font-size:12px;color:#a7a9be;line-height:1.8">Cargando...</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="startGame()" style="background:#c77dff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:800;color:#0d0a1a;cursor:pointer">🔄 Otra vez</button>
+      <button onclick="stopGame()" style="background:#2e2b45;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:800;color:#a7a9be;cursor:pointer">Salir</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -822,6 +883,8 @@ const COLORS = {canica:'#4d96ff',tazo:'#6bcb77',carta:'#c77dff',auto_escala:'#ff
 // ── STATE ──
 let currentUser = null;
 let userPlan = 'free'; // free | premium | pro
+let realUserPlan = 'free'; // stores real plan when in test mode
+let modoGratis = false;
 let allItems = [];
 let currentCat = 'todos';
 let isRegister = false;
@@ -865,6 +928,10 @@ onAuthStateChanged(auth, async user => {
       if (uDoc.exists()) userPlan = uDoc.data().plan || 'free';
       else userPlan = 'free';
     } catch(e) { userPlan = 'free'; }
+    realUserPlan = userPlan;
+    // Show admin panel if admin
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel) adminPanel.style.display = user.email === 'maryo.mp3@gmail.com' ? '' : 'none';
     document.getElementById('p-name').textContent = user.displayName || 'Coleccionista';
     document.getElementById('p-email').textContent = user.email;
     // Load avatar
@@ -1491,6 +1558,21 @@ window.showScreen = (id) => {
     screenHistory.push(id);
     history.pushState({screen: id}, '', window.location.href);
   }
+  // Show/hide duelo FAB
+  const dueloFab = document.getElementById('duelo-fab');
+  if (dueloFab) dueloFab.style.display = (id === 'screen-home' && currentUser ? '' : 'none');
+  // Resize game canvas after transition
+  if (id === 'screen-game') {
+    setTimeout(() => {
+      if (gCanvas) {
+        const rect = gCanvas.getBoundingClientRect();
+        gCanvas.width = rect.width || window.innerWidth;
+        gCanvas.height = window.innerHeight - 140;
+        gBasketY = gCanvas.height - 50;
+        gBasketX = Math.max(0, Math.min(gCanvas.width - gBasketW, gBasketX));
+      }
+    }, 50);
+  }
 };
 window.showToast = (msg) => {
   const t = document.getElementById('toast');
@@ -1558,10 +1640,431 @@ window.finishOnboarding = () => {
   showScreen('screen-home');
 };
 
+// ── ADMIN MODO GRATIS ──
+window.toggleModoGratis = (active) => {
+  modoGratis = active;
+  const dot = document.getElementById('slider-dot');
+  const slider = document.getElementById('modo-gratis-slider');
+  const status = document.getElementById('modo-gratis-status');
+  if (active) {
+    userPlan = 'free';
+    dot.style.transform = 'translateX(20px)';
+    slider.style.background = '#6b3fa0';
+    status.textContent = '⚠️ Simulando usuario Gratis';
+    status.style.color = '#ffd93d';
+  } else {
+    userPlan = realUserPlan;
+    dot.style.transform = '';
+    slider.style.background = '#2e2b45';
+    status.textContent = 'Modo real activo';
+    status.style.color = '#888';
+  }
+  buildPills();
+  buildUploadSelect();
+  updatePlanChip();
+  showToast(active ? '🧪 Modo prueba Gratis activado' : '✅ Volviste a tu plan real');
+};
+
+// ── RACHA DIARIA ──
+function checkRachaDaily() {
+  if (!currentUser) return;
+  const key = 'racha_' + currentUser.uid;
+  const today = new Date().toDateString();
+  const data = JSON.parse(localStorage.getItem(key) || '{"dias":0,"lastDate":""}');
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+
+  if (data.lastDate === today) {
+    // Already checked in today
+  } else if (data.lastDate === yesterday) {
+    data.dias += 1;
+    data.lastDate = today;
+    localStorage.setItem(key, JSON.stringify(data));
+    if (data.dias === 7) showToast('🎉 ¡7 días seguidos! Ganaste 1 aporte extra 🎁');
+  } else {
+    data.dias = 1;
+    data.lastDate = today;
+    localStorage.setItem(key, JSON.stringify(data));
+  }
+
+  const badge = document.getElementById('racha-badge');
+  if (badge && data.dias > 0) {
+    badge.style.display = '';
+    badge.textContent = `🔥 Racha: ${data.dias} día${data.dias > 1 ? 's' : ''}`;
+  }
+}
+
+// ── DESCUBRE HOY ──
+async function loadDescubreHoy() {
+  try {
+    const snap = await getDocs(query(collection(db, 'piezas'), orderBy('createdAt', 'desc'), limit(20)));
+    const items = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const shuffled = items.sort(() => Math.random() - 0.5).slice(0, 10);
+    const scroll = document.getElementById('descubre-scroll');
+    if (!scroll) return;
+    if (shuffled.length === 0) {
+      const sec = document.getElementById('descubre-section');
+      if (sec) sec.style.display = 'none';
+      return;
+    }
+    scroll.innerHTML = shuffled.map(item => {
+      const emoji = EMOJIS[item.categoria] || '🎴';
+      const img = item.fotos?.[0] || item.imageUrls?.[0] || item.imageUrl || '';
+      return `<div onclick="openDetail('${item.id}')" style="flex-shrink:0;width:120px;border-radius:12px;background:var(--card);overflow:hidden;cursor:pointer;border:1.5px solid #2e2b45">
+        <div style="height:100px;background:#1e1c30;display:flex;align-items:center;justify-content:center;font-size:${img?'0':'40'}px;overflow:hidden">
+          ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover">` : emoji}
+        </div>
+        <div style="padding:6px 8px">
+          <div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.nombre||'Sin nombre'}</div>
+          <div style="font-size:10px;color:var(--muted)">${emoji} ${item.categoria||''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { console.log('descubre error', e); }
+}
+
+// ── DUELO ──
+let dueloItems = [];
+window.showDuelo = async () => {
+  const modal = document.getElementById('duelo-modal');
+  modal.style.display = 'flex';
+  const cards = document.getElementById('duelo-cards');
+  cards.innerHTML = '<div style="color:var(--muted);text-align:center;width:100%">Cargando...</div>';
+
+  try {
+    const snap = await getDocs(query(collection(db, 'piezas'), limit(30)));
+    const items = snap.docs.map(d=>({id:d.id,...d.data()})).filter(i=>i.imageUrls?.[0]||i.imageUrl||i.fotos?.[0]);
+    if (items.length < 2) { cards.innerHTML = '<div style="color:var(--muted)">No hay suficientes piezas aún</div>'; return; }
+    const shuffled = items.sort(()=>Math.random()-.5);
+    dueloItems = [shuffled[0], shuffled[1]];
+    renderDuelo();
+  } catch(e) { cards.innerHTML = '<div style="color:var(--muted)">Error cargando</div>'; }
+};
+
+function renderDuelo() {
+  const cards = document.getElementById('duelo-cards');
+  cards.innerHTML = dueloItems.map((item, idx) => {
+    const img = item.imageUrls?.[0] || item.imageUrl || item.fotos?.[0] || '';
+    const emoji = EMOJIS[item.categoria] || '🎴';
+    return `<div onclick="votarDuelo(${idx})" style="flex:1;border-radius:14px;background:var(--card);overflow:hidden;cursor:pointer;border:2px solid #2e2b45;transition:transform .15s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform=''">
+      <div style="height:150px;background:#1e1c30;display:flex;align-items:center;justify-content:center;font-size:${img?'0':'50'}px;overflow:hidden">
+        ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover">` : emoji}
+      </div>
+      <div style="padding:8px;text-align:center">
+        <div style="font-size:13px;font-weight:700">${item.nombre||'Sin nombre'}</div>
+        <div style="font-size:11px;color:var(--muted)">${emoji} ${item.categoria||''}</div>
+        <div id="duelo-pct-${idx}" style="font-size:22px;font-weight:900;margin-top:4px;display:none"></div>
+      </div>
+    </div>`;
+  }).join('<div style="display:flex;align-items:center;font-size:24px;font-weight:900;color:var(--accent1)">VS</div>');
+}
+
+window.votarDuelo = async (idx) => {
+  const winner = dueloItems[idx];
+  document.getElementById('duelo-pct-0').style.display = '';
+  document.getElementById('duelo-pct-1').style.display = '';
+  document.getElementById('duelo-pct-0').textContent = idx === 0 ? '🏆 +1' : '';
+  document.getElementById('duelo-pct-1').textContent = idx === 1 ? '🏆 +1' : '';
+
+  try {
+    await setDoc(doc(db, 'duelos', winner.id), {
+      likes: (allItems.find(i=>i.id===winner.id)?.dueloLikes||0) + 1,
+      nombre: winner.nombre
+    }, {merge: true});
+  } catch(e) {}
+
+  showToast('✅ ¡Voto registrado!');
+  setTimeout(() => showDuelo(), 1500);
+};
+
+// ═══════════════════════════════════════
+// JUEGO RETRO: ATRAPA COLECCIONABLES
+// ═══════════════════════════════════════
+const GAME_CATS = [
+  {id:'canica', emoji:'🔵'}, {id:'tazo', emoji:'⭕'}, {id:'carta', emoji:'🃏'},
+  {id:'auto_escala', emoji:'🚗'}, {id:'dinosaurio', emoji:'🦕'}, {id:'peluche', emoji:'🧸'},
+  {id:'muneca', emoji:'👧'}, {id:'figura', emoji:'🦸'}, {id:'funko', emoji:'🎭'},
+  {id:'lego', emoji:'🧱'}, {id:'moneda', emoji:'🪙'}, {id:'tenis', emoji:'👟'},
+  {id:'reloj', emoji:'⌚'}, {id:'videojuego', emoji:'🎮'}, {id:'taza', emoji:'☕'},
+  {id:'planta', emoji:'🌱'}, {id:'arte', emoji:'🎨'}, {id:'mineral', emoji:'💎'},
+  {id:'bebida', emoji:'🍺'}, {id:'perfume', emoji:'🌸'}, {id:'gorra', emoji:'🧢'},
+  {id:'ropa', emoji:'👕'}, {id:'mascara', emoji:'😷'}, {id:'encendedor', emoji:'🔥'},
+  {id:'automovil', emoji:'🚘'}
+];
+
+let gCanvas, gCtx, gAnimId;
+let gRunning = false, gScore = 0, gLives = 3, gPowerup = false, gPowerupTimer = 0;
+let gBasketX = 0, gBasketW = 70, gBasketY = 0;
+let gFalling = [], gStars = [];
+let gTiltX = 0, gSpeed = 1.5, gSpawnTimer = 0;
+let gPowerupInterval = null;
+
+function getUserMainCat() {
+  const myCats = allItems.filter(i => i.userId === currentUser?.uid || i.autorId === currentUser?.uid).map(i => i.categoria);
+  if (!myCats.length) return null;
+  const freq = {};
+  myCats.forEach(c => freq[c] = (freq[c]||0)+1);
+  return Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]?.[0];
+}
+
+window.startGame = () => {
+  showScreen('screen-game');
+  gScore = 0; gLives = 3; gRunning = true; gFalling = []; gSpawnTimer = 0;
+  gPowerup = false; gSpeed = 1.5;
+  document.getElementById('g-score').textContent = '0';
+  document.getElementById('g-lives').textContent = '❤️❤️❤️';
+  document.getElementById('g-gameover').style.display = 'none';
+  document.getElementById('g-powerup-banner').style.display = 'none';
+
+  gCanvas = document.getElementById('game-canvas');
+  gCtx = gCanvas.getContext('2d');
+
+  setTimeout(() => {
+    const rect = gCanvas.getBoundingClientRect();
+    gCanvas.width = rect.width || window.innerWidth;
+    gCanvas.height = window.innerHeight - 140;
+    gBasketX = gCanvas.width / 2 - gBasketW / 2;
+    gBasketY = gCanvas.height - 50;
+
+    gStars = Array.from({length:60}, () => ({
+      x: Math.random() * gCanvas.width,
+      y: Math.random() * gCanvas.height,
+      r: Math.random() * 1.5 + 0.3,
+      a: Math.random()
+    }));
+
+    window.addEventListener('deviceorientation', handleTilt);
+    gCanvas.addEventListener('touchmove', handleTouch, {passive:false});
+    gCanvas.addEventListener('mousemove', handleMouse);
+
+    if (gAnimId) cancelAnimationFrame(gAnimId);
+    gameLoop();
+  }, 100);
+};
+
+window.stopGame = () => {
+  gRunning = false;
+  if (gAnimId) cancelAnimationFrame(gAnimId);
+  window.removeEventListener('deviceorientation', handleTilt);
+  if (gPowerupInterval) clearInterval(gPowerupInterval);
+  showScreen('screen-home');
+};
+
+function handleTilt(e) {
+  if (!gRunning) return;
+  const tilt = e.gamma || 0;
+  gTiltX = Math.max(-1, Math.min(1, tilt / 30));
+}
+function handleTouch(e) {
+  e.preventDefault();
+  if (!gRunning || !gCanvas) return;
+  const touch = e.touches[0];
+  const rect = gCanvas.getBoundingClientRect();
+  gBasketX = touch.clientX - rect.left - gBasketW / 2;
+  gBasketX = Math.max(0, Math.min(gCanvas.width - gBasketW, gBasketX));
+  gTiltX = 0;
+}
+function handleMouse(e) {
+  if (!gRunning || !gCanvas) return;
+  const rect = gCanvas.getBoundingClientRect();
+  gBasketX = e.clientX - rect.left - gBasketW / 2;
+  gBasketX = Math.max(0, Math.min(gCanvas.width - gBasketW, gBasketX));
+  gTiltX = 0;
+}
+
+function spawnObject() {
+  const mainCat = getUserMainCat();
+  let pool = [...GAME_CATS];
+  if (mainCat) {
+    const fav = GAME_CATS.find(c=>c.id===mainCat);
+    if (fav) pool = [...pool, fav, fav, fav];
+  }
+  const isPowerup = Math.random() < 0.08;
+  const cat = pool[Math.floor(Math.random() * pool.length)];
+  gFalling.push({
+    x: Math.random() * (gCanvas.width - 30) + 15,
+    y: -20,
+    emoji: isPowerup ? '⚡' : cat.emoji,
+    isPowerup,
+    size: 24,
+    speed: gSpeed + Math.random() * 0.8
+  });
+}
+
+function activatePowerup() {
+  gPowerup = true;
+  let t = 5;
+  document.getElementById('g-powerup-banner').style.display = '';
+  document.getElementById('g-powerup-time').textContent = t;
+  if (gPowerupInterval) clearInterval(gPowerupInterval);
+  gPowerupInterval = setInterval(() => {
+    t--;
+    document.getElementById('g-powerup-time').textContent = t;
+    if (t <= 0) {
+      clearInterval(gPowerupInterval);
+      gPowerup = false;
+      document.getElementById('g-powerup-banner').style.display = 'none';
+    }
+  }, 1000);
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'square'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.start(); osc.stop(ctx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+function gameLoop() {
+  if (!gRunning) return;
+  const W = gCanvas.width, H = gCanvas.height;
+
+  if (Math.abs(gTiltX) > 0.05) {
+    gBasketX += gTiltX * 8;
+    gBasketX = Math.max(0, Math.min(W - gBasketW, gBasketX));
+  }
+
+  gSpawnTimer++;
+  const spawnRate = Math.max(25, 60 - gScore * 0.1);
+  if (gSpawnTimer >= spawnRate) { spawnObject(); gSpawnTimer = 0; }
+
+  gSpeed = 1.5 + gScore * 0.005;
+
+  gCtx.fillStyle = '#0d0a1a';
+  gCtx.fillRect(0, 0, W, H);
+
+  gStars.forEach(s => {
+    s.a += 0.01;
+    const alpha = 0.3 + Math.sin(s.a) * 0.3;
+    gCtx.fillStyle = `rgba(199,125,255,${alpha})`;
+    gCtx.fillRect(s.x, s.y, s.r * 2, s.r * 2);
+  });
+
+  gCtx.strokeStyle = 'rgba(45,27,105,0.3)';
+  gCtx.lineWidth = 1;
+  for (let x = 0; x < W; x += 20) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
+  for (let y = 0; y < H; y += 20) { gCtx.beginPath(); gCtx.moveTo(0,y); gCtx.lineTo(W,y); gCtx.stroke(); }
+
+  const mainCat = getUserMainCat();
+  const basketEmoji = mainCat ? (GAME_CATS.find(c=>c.id===mainCat)?.emoji || '🧺') : '🧺';
+  gCtx.font = '32px serif';
+  gCtx.textAlign = 'center';
+  gCtx.fillText(basketEmoji, gBasketX + gBasketW/2, gBasketY + 20);
+  gCtx.strokeStyle = gPowerup ? '#ffd93d' : '#c77dff';
+  gCtx.lineWidth = gPowerup ? 3 : 2;
+  gCtx.shadowBlur = gPowerup ? 15 : 8;
+  gCtx.shadowColor = gPowerup ? '#ffd93d' : '#c77dff';
+  gCtx.strokeRect(gBasketX, gBasketY - 10, gBasketW, 35);
+  gCtx.shadowBlur = 0;
+
+  for (let i = gFalling.length - 1; i >= 0; i--) {
+    const obj = gFalling[i];
+    obj.y += obj.speed;
+
+    gCtx.font = `${obj.size}px serif`;
+    gCtx.textAlign = 'center';
+    gCtx.shadowBlur = obj.isPowerup ? 12 : 0;
+    gCtx.shadowColor = '#ffd93d';
+    gCtx.fillText(obj.emoji, obj.x, obj.y);
+    gCtx.shadowBlur = 0;
+
+    const caught = obj.x > gBasketX - 10 && obj.x < gBasketX + gBasketW + 10 && obj.y >= gBasketY - 10 && obj.y <= gBasketY + 30;
+    if (caught) {
+      gFalling.splice(i, 1);
+      if (obj.isPowerup) {
+        activatePowerup();
+        showToast('⚡ ¡Poder activado! x2 puntos por 5s');
+      } else {
+        const pts = gPowerup ? 12 : 6;
+        gScore += pts;
+        document.getElementById('g-score').textContent = gScore;
+        gCtx.fillStyle = 'rgba(255,217,61,0.2)';
+        gCtx.fillRect(0,0,W,H);
+      }
+      continue;
+    }
+
+    if (obj.y > H + 10) {
+      if (!obj.isPowerup) {
+        gFalling.splice(i, 1);
+        gLives--;
+        const livesEl = document.getElementById('g-lives');
+        livesEl.textContent = '❤️'.repeat(gLives) + '🖤'.repeat(3-gLives);
+        gCtx.fillStyle = 'rgba(255,107,107,0.3)';
+        gCtx.fillRect(0,0,W,H);
+        if (gLives <= 0) { gameOver(); return; }
+      } else {
+        gFalling.splice(i, 1);
+      }
+    }
+  }
+
+  gAnimId = requestAnimationFrame(gameLoop);
+}
+
+async function gameOver() {
+  gRunning = false;
+  cancelAnimationFrame(gAnimId);
+  window.removeEventListener('deviceorientation', handleTilt);
+  if (gPowerupInterval) clearInterval(gPowerupInterval);
+  document.getElementById('g-powerup-banner').style.display = 'none';
+
+  const finalScore = gScore;
+  document.getElementById('g-final-score').textContent = finalScore;
+
+  let bonusMsg = '';
+  if (finalScore >= 100) {
+    const extras = Math.floor(finalScore / 100);
+    bonusMsg = `🎁 ¡${extras} aporte${extras>1?'s':''} extra ganado${extras>1?'s':''}! (próximo mes)`;
+  }
+  document.getElementById('g-bonus-msg').textContent = bonusMsg;
+
+  const ciudad = 'Tijuana';
+  document.getElementById('g-city-label').textContent = ciudad;
+
+  if (currentUser) {
+    try {
+      await setDoc(doc(db, 'puntuaciones_juego', currentUser.uid + '_' + Date.now()), {
+        userId: currentUser.uid,
+        nombre: currentUser.displayName || 'Coleccionista',
+        puntaje: finalScore,
+        ciudad,
+        fecha: new Date().toDateString()
+      });
+    } catch(e) {}
+
+    try {
+      const rankSnap = await getDocs(query(
+        collection(db, 'puntuaciones_juego'),
+        orderBy('puntaje', 'desc'),
+        limit(5)
+      ));
+      const rows = rankSnap.docs.map((d,i) => {
+        const data = d.data();
+        const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+        const isMe = data.userId === currentUser.uid;
+        return `<div style="display:flex;justify-content:space-between;${isMe?'color:#ffd93d;font-weight:800':''}">
+          <span>${medals[i]} ${data.nombre||'Coleccionista'}</span>
+          <span>${data.puntaje} pts</span>
+        </div>`;
+      }).join('');
+      document.getElementById('g-ranking-rows').innerHTML = rows || '<div>Sé el primero 🏆</div>';
+    } catch(e) {
+      document.getElementById('g-ranking-rows').innerHTML = '<div style="color:#888">Sin conexión</div>';
+    }
+  }
+
+  document.getElementById('g-gameover').style.display = 'flex';
+}
+
 // ── INIT ──
 buildPills();
 buildUploadSelect();
 loadItems();
+loadDescubreHoy();
+checkRachaDaily();
 initApp();
 </script>
 </body>
