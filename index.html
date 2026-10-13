@@ -216,9 +216,6 @@
   .ob-skip { flex:1; padding:13px; background:var(--card); border:1.5px solid #2e2b45; border-radius:13px; color:var(--muted); font-family:"Fredoka One",cursive; font-size:15px; cursor:pointer; }
   .ob-next { flex:2; padding:13px; background:linear-gradient(135deg,var(--accent2),var(--accent1)); border:none; border-radius:13px; color:#1a1200; font-family:"Fredoka One",cursive; font-size:16px; cursor:pointer; transition:transform 0.2s; }
   .ob-next:hover { transform:translateY(-2px); }
-  /* RETRO GAME */
-  #game-canvas { background:#0a0612; border-radius:0; }
-  #game-touch-left, #game-touch-right { opacity:0; }
 </style>
 </head>
 <body>
@@ -346,13 +343,12 @@
       <button class="like-btn" id="btn-like" onclick="toggleLike()">❤️ <span id="like-label">Me gusta</span></button>
     </div>
     <div style="font-size:14px;font-weight:800;margin-bottom:8px">Aportado por</div>
-    <div class="owner-box" id="owner-box-link" onclick="openPublicProfile()" style="cursor:pointer">
-      <div class="owner-avatar" id="d-owner-avatar" onclick="openPublicProfile()">😊</div>
-      <div onclick="openPublicProfile()" style="flex:1">
+    <div class="owner-box">
+      <div class="owner-avatar">😊</div>
+      <div>
         <div style="font-size:13px;font-weight:800" id="d-owner">—</div>
         <div style="font-size:11px;color:var(--muted);font-weight:600" id="d-date">—</div>
       </div>
-      <span onclick="openPublicProfile()" style="margin-left:auto;color:var(--muted);font-size:18px;padding:8px">›</span>
     </div>
     <div class="comments-wrap">
       <div style="font-size:14px;font-weight:800;margin-bottom:10px">Comentarios</div>
@@ -462,7 +458,7 @@
 
     <div class="plan-card plan-free">
       <div class="plan-badge" style="background:#2e2b45;color:var(--muted)">GRATIS</div>
-      <div class="plan-title">Gratis — Para empezar</div>
+      <div class="plan-title">Plan Gratis</div>
       <div class="plan-price">$0 <span>/mes</span></div>
       <ul class="plan-features">
         <li>✅ 3 aportes a la colección al mes</li>
@@ -470,42 +466,75 @@
         <li>✅ 1 foto por aporte</li>
         <li>❌ Sin chat con coleccionistas</li>
       </ul>
-      <button class="plan-btn" style="background:var(--card);color:var(--muted);border:1.5px solid #2e2b45" onclick="showToast('Ya tienes el plan gratis ✅')">Empezar gratis</button>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Categorías incluidas</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🔵 Canicas</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">⭕ Tazos</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🃏 Cartas</div><div style="font-size:10px;color:#888;margin-top:1px">TCG / Cartofilia</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🚗 Autos a Escala</div><div style="font-size:10px;color:#888;margin-top:1px">Diecast</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🦕 Dinosaurios</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🧸 Peluches</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">👧 Muñecas</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🦸 Figuras de Acción</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🎭 Funkos</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🧱 Legos</div></div>
+        </div>
+      </div>
+      <button class="plan-btn" style="background:var(--card);color:var(--muted);border:1.5px solid #2e2b45" onclick="showToast('Ya tienes el plan gratis ✅')">Plan actual</button>
     </div>
 
     <div class="plan-card plan-premium">
       <div class="plan-badge" style="background:var(--accent3);color:#0a1a0a">🔥 MÁS POPULAR</div>
-      <div class="plan-title" style="color:var(--accent3)">Premium — Para Coleccionistas</div>
+      <div class="plan-title" style="color:var(--accent3)">Plan Premium</div>
       <div class="plan-price" style="color:var(--accent3)">$39 <span>MXN / mes</span></div>
       <ul class="plan-features">
         <li>✅ Hasta 100 aportes al mes</li>
-        <li>✅ Sube: Tenis, Gorras, Funkos, Lego, Figuras</li>
         <li>✅ Hasta 5 fotos en HD por aporte</li>
         <li>✅ Chat privado con coleccionistas de tu Estado</li>
         <li>✅ Sin anuncios</li>
       </ul>
-      <button class="plan-btn" style="background:var(--accent3);color:#0a1a0a;display:flex;align-items:center;justify-content:center;gap:8px" onclick="window.open('https://wa.me/526643065176?text=Hola%20quiero%20activar%20el%20Premium%20de%20%2439%20MXN','_blank')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Activar por WhatsApp
-      </button>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Categorías extra que desbloquea</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🌱 Plantas</div><div style="font-size:10px;color:#888;margin-top:1px">Botánica</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🪙 Monedas</div><div style="font-size:10px;color:#888;margin-top:1px">Numismática</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">👟 Tenis</div><div style="font-size:10px;color:#888;margin-top:1px">Sneakerhead</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🧢 Gorras</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">👕 Ropa</div><div style="font-size:10px;color:#888;margin-top:1px">Streetwear</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🌸 Perfumes</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">⌚ Relojes</div><div style="font-size:10px;color:#888;margin-top:1px">Relojería</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🎮 Videojuegos</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">☕ Tazas</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🎭 Máscaras</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🔥 Encendedores</div></div>
+        </div>
+      </div>
+      <button class="plan-btn" style="background:var(--accent3);color:#0a1a0a" onclick="window.open('https://wa.me/526643065176?text=Hola%20quiero%20activar%20el%20Premium%20de%20%2439%20MXN','_blank')">Activar por WhatsApp ⭐</button>
     </div>
 
     <div class="plan-card plan-pro">
       <div class="plan-badge" style="background:var(--accent5);color:#fff">👑 PRO</div>
-      <div class="plan-title" style="color:var(--accent5)">Pro — Para Negocio</div>
+      <div class="plan-title" style="color:var(--accent5)">Plan Pro</div>
       <div class="plan-price" style="color:var(--accent5)">$99 <span>MXN / mes</span></div>
       <ul class="plan-features">
         <li>✅ Hasta 300 aportes al mes</li>
         <li>✅ TODO lo de Premium +</li>
-        <li>✅ Sube: Carros, Joyas, Arte, Relojes, Oro, Piedras</li>
         <li>✅ Puedes VENDER y poner precio a tus piezas</li>
         <li>✅ Apareces primero en el catálogo</li>
         <li>✅ Exportar tu colección en PDF</li>
+        <li>✅ Foro por región (Tijuana, Ensenada, CDMX, etc)</li>
       </ul>
-      <button class="plan-btn" style="background:var(--accent5);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px" onclick="window.open('https://wa.me/526643065176?text=Hola%20quiero%20activar%20el%20Pro%20de%20%2499%20MXN','_blank')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        Activar por WhatsApp
-      </button>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Categorías exclusivas PRO</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🚘 Automóviles</div><div style="font-size:10px;color:#888;margin-top:1px">Automovilismo</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🎨 Arte</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">💎 Piedras / Minerales</div><div style="font-size:10px;color:#888;margin-top:1px">Mineralogía</div></div>
+          <div style="background:#1e1c30;border-radius:8px;padding:6px 10px;text-align:center"><div style="font-size:13px;font-weight:700">🍺 Bebidas</div></div>
+        </div>
+      </div>
+      <button class="plan-btn" style="background:var(--accent5);color:#fff" onclick="window.open('https://wa.me/526643065176?text=Hola%20quiero%20activar%20el%20Pro%20de%20%2499%20MXN','_blank')">Activar por WhatsApp 👑</button>
     </div>
 
   </div>
@@ -595,7 +624,6 @@
     </div>
     <div style="font-size:14px;font-weight:800;margin-bottom:10px">Mis aportes recientes</div>
     <div id="my-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
-    <button class="submit-btn" style="margin-bottom:10px;background:linear-gradient(135deg,#ff6b9d,#845ec2)" onclick="openGame()">🕹️ Jugar Atrapa Coleccionables</button>
     <button class="submit-btn" style="margin-bottom:10px" onclick="showScreen('screen-planes')">⭐ Ver planes Premium</button>
     <button class="logout-btn" onclick="logout()">Cerrar sesión 👋</button>
   </div>
@@ -643,53 +671,6 @@
   <div class="chat-input-bar">
     <input class="chat-input" id="chat-msg-input" placeholder="Escribe un mensaje…" onkeydown="if(event.key==='Enter')sendChatMsg()">
     <button class="chat-send-btn" onclick="sendChatMsg()">➤</button>
-  </div>
-</div>
-
-<!-- RETRO GAME -->
-<div class="screen" id="screen-game" style="background:#0a0612">
-  <div class="back-row" style="padding-bottom:6px">
-    <button class="back-btn" onclick="exitGame()">←</button>
-    <span style="font-weight:800;font-size:15px;font-family:'Fredoka One',cursive;color:var(--accent2)">Atrapa Coleccionables</span>
-  </div>
-
-  <!-- START SCREEN -->
-  <div id="game-start" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center">
-    <div style="font-size:64px">🕹️</div>
-    <div style="font-family:'Fredoka One',cursive;font-size:24px;background:linear-gradient(135deg,#ff6b9d,#845ec2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Atrapa Coleccionables</div>
-    <div style="color:var(--muted);font-size:13px;font-weight:600;max-width:280px;line-height:1.7">
-      Inclina tu celular ← → para mover la canasta y atrapar canicas, tazos y cartas que caen.<br><br>
-      ¡No dejes caer ninguna! Tienes <b style="color:var(--accent1)">3 vidas</b> ❤️❤️❤️
-    </div>
-    <div id="game-motion-status" style="font-size:11px;color:var(--accent3);font-weight:700">📱 Listo para detectar movimiento</div>
-    <button class="submit-btn" style="max-width:240px;background:linear-gradient(135deg,#ff6b9d,#845ec2)" onclick="startGame()">¡Jugar! 🚀</button>
-    <div id="game-high-score" style="font-size:12px;color:var(--accent2);font-weight:800">🏆 Mejor puntaje: 0</div>
-  </div>
-
-  <!-- PLAYING SCREEN -->
-  <div id="game-playing" style="display:none;flex:1;flex-direction:column;position:relative">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 20px 10px">
-      <div style="font-family:'Fredoka One',cursive;font-size:20px;color:var(--accent2)" id="game-score">0</div>
-      <div id="game-lives" style="font-size:18px">❤️❤️❤️</div>
-    </div>
-    <canvas id="game-canvas" style="flex:1;width:100%;display:block;touch-action:none"></canvas>
-    <div id="game-touch-controls" style="display:none;position:absolute;bottom:0;left:0;right:0;height:30%;display:flex">
-      <div id="game-touch-left" style="flex:1"></div>
-      <div id="game-touch-right" style="flex:1"></div>
-    </div>
-  </div>
-
-  <!-- GAME OVER SCREEN -->
-  <div id="game-over" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
-    <div style="font-size:64px">💔</div>
-    <div style="font-family:'Fredoka One',cursive;font-size:26px;color:var(--accent1)">¡Juego terminado!</div>
-    <div style="font-size:15px;font-weight:700">Puntaje: <span id="game-final-score" style="color:var(--accent2);font-family:'Fredoka One',cursive;font-size:22px">0</span></div>
-    <div id="game-bonus-msg" style="font-size:13px;color:var(--accent3);font-weight:700;display:none">🎉 ¡Nuevo récord!</div>
-    <div id="game-points-earned" style="font-size:12px;color:var(--muted);font-weight:600"></div>
-    <div style="display:flex;gap:10px;width:100%;max-width:280px;margin-top:8px">
-      <button class="submit-btn" style="background:linear-gradient(135deg,#ff6b9d,#845ec2)" onclick="startGame()">🔄 Reintentar</button>
-    </div>
-    <button class="ob-skip" style="max-width:280px;width:100%" onclick="exitGame()">Salir</button>
   </div>
 </div>
 
@@ -743,37 +724,6 @@
   </nav>
 </div>
 
-<!-- PUBLIC PROFILE -->
-<div class="screen" id="screen-public-profile">
-  <div class="back-row">
-    <button class="back-btn" onclick="showScreen('screen-detail')">←</button>
-    <span style="font-weight:800;font-size:15px">Perfil del coleccionista</span>
-  </div>
-  <div class="profile-wrap">
-    <div class="profile-hero">
-      <div class="profile-avatar" id="pp-avatar">😎</div>
-      <div class="profile-name" id="pp-name">—</div>
-      <div class="plan-chip" id="pp-plan-chip" style="background:#2e2b45;color:var(--muted)">🆓 Plan Gratis</div>
-    </div>
-    <div class="profile-stats">
-      <div class="stat-box"><div class="stat-val" id="pp-aportes">0</div><div class="stat-lbl">Aportes</div></div>
-      <div class="stat-box"><div class="stat-val" id="pp-likes">0</div><div class="stat-lbl">Likes totales</div></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:16px" id="pp-action-btns">
-      <button class="msg-btn" id="pp-btn-msg" onclick="msgFromProfile()">💬 Enviar mensaje</button>
-    </div>
-    <div style="font-size:14px;font-weight:800;margin-bottom:10px">Catálogo público</div>
-    <div class="grid" id="pp-items-grid" style="padding:0 0 100px"></div>
-  </div>
-  <nav class="bottom-nav">
-    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
-    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
-    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
-    <button class="nav-btn" onclick="showScreen('screen-planes')"><span>⭐</span><span>Planes</span></button>
-    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
-  </nav>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -799,25 +749,24 @@ const CATS_FREE = [
   {id:'todos', label:'🌟 Todos'},
   {id:'canica', label:'🔵 Canicas'},
   {id:'tazo', label:'⭕ Tazos'},
-  {id:'carta', label:'🃏 Cartas TCG'},
-  {id:'auto_escala', label:'🚗 Autos a Escala'},
+  {id:'carta', label:'🃏 Cartas', sub:'TCG / Cartofilia'},
+  {id:'auto_escala', label:'🚗 Autos a Escala', sub:'Diecast'},
   {id:'dinosaurio', label:'🦕 Dinosaurios'},
   {id:'peluche', label:'🧸 Peluches'},
-  {id:'muneca', label:'👧 Muñecas/Figuras'},
+  {id:'muneca', label:'👧 Muñecas'},
   {id:'figura', label:'🦸 Figuras de Acción'},
-  {id:'tazo', label:'⭕ Tazos'},
-  {id:'planta', label:'🌱 Plantas'},
+  {id:'funko', label:'🎭 Funkos'},
+  {id:'lego', label:'🧱 Legos'},
 ];
 
 const CATS_PREMIUM = [
-  {id:'moneda', label:'🪙 Monedas Coleccionables'},
-  {id:'tenis', label:'👟 Tenis/Zapatos'},
+  {id:'planta', label:'🌱 Plantas', sub:'Botánica'},
+  {id:'moneda', label:'🪙 Monedas', sub:'Numismática'},
+  {id:'tenis', label:'👟 Tenis', sub:'Sneakerhead'},
   {id:'gorra', label:'🧢 Gorras'},
-  {id:'ropa', label:'👕 Ropa'},
+  {id:'ropa', label:'👕 Ropa', sub:'Streetwear'},
   {id:'perfume', label:'🌸 Perfumes'},
-  {id:'reloj', label:'⌚ Relojes'},
-  {id:'funko', label:'🎭 Funkos'},
-  {id:'lego', label:'🧱 Legos'},
+  {id:'reloj', label:'⌚ Relojes', sub:'Relojería'},
   {id:'videojuego', label:'🎮 Videojuegos'},
   {id:'taza', label:'☕ Tazas'},
   {id:'mascara', label:'🎭 Máscaras'},
@@ -825,10 +774,10 @@ const CATS_PREMIUM = [
 ];
 
 const CATS_PRO = [
-  {id:'automovil', label:'🚘 Automóviles'},
+  {id:'automovil', label:'🚘 Automóviles', sub:'Automovilismo'},
   {id:'arte', label:'🎨 Arte'},
-  {id:'mineral', label:'💎 Piedras/Minerales'},
-  {id:'bebida', label:'🍺 Bebidas coleccionables'},
+  {id:'mineral', label:'💎 Piedras / Minerales', sub:'Mineralogía'},
+  {id:'bebida', label:'🍺 Bebidas'},
 ];
 
 const ALL_CATS = [...CATS_FREE, ...CATS_PREMIUM, ...CATS_PRO];
@@ -883,14 +832,14 @@ let currentDetailId = null;
 function buildPills() {
   const wrap = document.getElementById('cat-pills');
   const cats = userPlan === 'pro' ? ALL_CATS : userPlan === 'premium' ? [...CATS_FREE, ...CATS_PREMIUM] : CATS_FREE;
-  wrap.innerHTML = cats.map(c => `<button class="pill${c.id===currentCat?' sel':''}" onclick="filterCat('${c.id}',this)">${c.label}</button>`).join('');
+  wrap.innerHTML = cats.map(c => `<button class="pill${c.id===currentCat?' sel':''}" onclick="filterCat('${c.id}',this)" style="display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 12px">${c.label}${c.sub ? `<span style="font-size:9px;color:#888;font-weight:500;line-height:1">${c.sub}</span>` : ''}</button>`).join('');
 }
 
 // ── BUILD UPLOAD SELECT ──
 function buildUploadSelect() {
   const sel = document.getElementById('f-categoria');
   const cats = userPlan === 'pro' ? ALL_CATS.slice(1) : userPlan === 'premium' ? [...CATS_FREE, ...CATS_PREMIUM].slice(1) : CATS_FREE.slice(1);
-  sel.innerHTML = cats.map(c => `<option value="${c.id}">${c.label}</option>`).join('');
+  sel.innerHTML = cats.map(c => `<option value="${c.id}">${c.label}${c.sub ? ` – ${c.sub}` : ''}</option>`).join('');
   updateMarcas();
 }
 
@@ -1041,15 +990,6 @@ window.openDetail = async (id) => {
   document.getElementById('d-desc').textContent = item.descripcion||'Sin descripción.';
   document.getElementById('d-owner').textContent = item.autorNombre||'Anónimo';
   document.getElementById('d-date').textContent = item.createdAt?.toDate ? timeAgo(item.createdAt.toDate()) : 'Recientemente';
-  // Load owner avatar
-  document.getElementById('d-owner-avatar').innerHTML = (item.autorNombre||'?')[0]?.toUpperCase() || '😊';
-  if (item.autorId) {
-    getDoc(doc(db, 'usuarios', item.autorId)).then(uDoc => {
-      if (uDoc.exists() && uDoc.data().avatarUrl) {
-        document.getElementById('d-owner-avatar').innerHTML = `<img src="${uDoc.data().avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      }
-    }).catch(()=>{});
-  }
   document.getElementById('d-tags').innerHTML = `
     <span class="tag" style="background:#1e1e2e;color:${COLORS[item.categoria]||'#4d96ff'}">${item.categoria||'otro'}</span>
     <span class="tag" style="background:#1e1e2e;color:var(--accent2)">${item.rareza||'—'}</span>`;
@@ -1433,71 +1373,6 @@ window.msgOwner = () => {
   openChat(item.autorId, item.autorNombre, null);
 };
 
-// ── PUBLIC PROFILE ──
-let publicProfileUid = null;
-let publicProfileName = null;
-
-window.openPublicProfile = async () => {
-  const item = allItems.find(i => i.id === currentDetailId);
-  if (!item) { showToast('No se pudo cargar el perfil'); return; }
-  if (!item.autorId) { showToast('Este aporte no tiene autor registrado'); return; }
-  publicProfileUid = item.autorId;
-  publicProfileName = item.autorNombre || 'Anónimo';
-
-  document.getElementById('pp-name').textContent = publicProfileName;
-  document.getElementById('pp-avatar').innerHTML = publicProfileName[0]?.toUpperCase() || '😎';
-
-  // Hide message button if it's your own profile
-  document.getElementById('pp-action-btns').style.display = (currentUser && currentUser.uid === publicProfileUid) ? 'none' : '';
-
-  // Load user data (plan + avatar)
-  try {
-    const uDoc = await getDoc(doc(db, 'usuarios', publicProfileUid));
-    if (uDoc.exists()) {
-      const udata = uDoc.data();
-      const plan = udata.plan || 'free';
-      const chip = document.getElementById('pp-plan-chip');
-      if (plan === 'pro') { chip.style.background='#2d1b69'; chip.style.color='#c77dff'; chip.textContent='👑 Plan Pro'; }
-      else if (plan === 'premium') { chip.style.background='#1a2a1a'; chip.style.color='#6bcb77'; chip.textContent='⭐ Plan Premium'; }
-      else { chip.style.background='#2e2b45'; chip.style.color='var(--muted)'; chip.textContent='🆓 Plan Gratis'; }
-      if (udata.avatarUrl) {
-        document.getElementById('pp-avatar').innerHTML = `<img src="${udata.avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
-      }
-    }
-  } catch(e) {}
-
-  // Load this user's items
-  const userItems = allItems.filter(i => i.autorId === publicProfileUid);
-  document.getElementById('pp-aportes').textContent = userItems.length;
-  const totalLikes = userItems.reduce((sum, i) => sum + (i.likes || 0), 0);
-  document.getElementById('pp-likes').textContent = totalLikes;
-
-  const grid = document.getElementById('pp-items-grid');
-  if (!userItems.length) {
-    grid.innerHTML = '<div class="empty"><div class="big">📦</div><p>Sin aportes públicos aún</p></div>';
-  } else {
-    grid.innerHTML = userItems.map(it => `
-      <div class="col-card" onclick="openDetail('${it.id}')">
-        <div class="col-card-img" style="background:linear-gradient(135deg,#1a1828,#221f35)">
-          ${it.imageUrl ? `<img src="${it.imageUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : `<span style="font-size:48px">${EMOJIS[it.categoria]||'🎴'}</span>`}
-          <div class="col-badge" style="background:${COLORS[it.categoria]||'#4d96ff'}">${it.categoria||'otro'}</div>
-        </div>
-        <div class="col-card-info">
-          <div class="col-card-name">${it.nombre}</div>
-          <div class="col-card-meta"><span class="rdot" style="background:${COLORS[it.categoria]||'#4d96ff'}"></span>${it.rareza||'—'}</div>
-        </div>
-      </div>`).join('');
-  }
-
-  showScreen('screen-public-profile');
-};
-
-window.msgFromProfile = () => {
-  if (!currentUser) { showToast('Inicia sesión para enviar mensajes'); showScreen('screen-auth'); return; }
-  if (currentUser.uid === publicProfileUid) { showToast('No puedes enviarte mensajes a ti mismo'); return; }
-  openChat(publicProfileUid, publicProfileName, null);
-};
-
 // ── CHAT FUNCTIONS ──
 let currentChatId = null;
 let currentChatUserId = null;
@@ -1682,236 +1557,6 @@ window.finishOnboarding = () => {
   localStorage.setItem('mdc_onboarding_done', '1');
   showScreen('screen-home');
 };
-
-// ══════════════ RETRO GAME: ATRAPA COLECCIONABLES ══════════════
-let gameCanvas, gameCtx;
-let gameRunning = false;
-let gameAnimFrame = null;
-let gameState = {
-  basketX: 0, basketW: 56, basketH: 36,
-  items: [], score: 0, lives: 3,
-  spawnTimer: 0, spawnInterval: 70, speed: 2.2,
-  tilt: 0
-};
-const GAME_EMOJIS = ['🔵','⭕','🃏','🚗','🧸','⚡','🦕','🌱'];
-let gameOrientationHandler = null;
-let gameKeyState = { left: false, right: false };
-
-window.openGame = () => {
-  showScreen('screen-game');
-  resetGameToStart();
-};
-
-window.exitGame = () => {
-  stopGameLoop();
-  removeOrientationListener();
-  showScreen('screen-profile');
-};
-
-function resetGameToStart() {
-  document.getElementById('game-start').style.display = 'flex';
-  document.getElementById('game-playing').style.display = 'none';
-  document.getElementById('game-over').style.display = 'none';
-  const best = localStorage.getItem('mdc_game_highscore') || 0;
-  document.getElementById('game-high-score').textContent = `🏆 Mejor puntaje: ${best}`;
-  // Check if device orientation is available
-  const statusEl = document.getElementById('game-motion-status');
-  if (typeof DeviceOrientationEvent !== 'undefined') {
-    statusEl.textContent = '📱 Listo para detectar movimiento';
-  } else {
-    statusEl.textContent = '👆 Usa los controles táctiles';
-  }
-}
-
-window.startGame = async () => {
-  document.getElementById('game-start').style.display = 'none';
-  document.getElementById('game-over').style.display = 'none';
-  document.getElementById('game-playing').style.display = 'flex';
-
-  // Request motion permission on iOS
-  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-    try {
-      const perm = await DeviceOrientationEvent.requestPermission();
-      if (perm !== 'granted') {
-        document.getElementById('game-touch-controls').style.display = 'flex';
-      }
-    } catch(e) {
-      document.getElementById('game-touch-controls').style.display = 'flex';
-    }
-  }
-
-  gameCanvas = document.getElementById('game-canvas');
-  gameCtx = gameCanvas.getContext('2d');
-  const resizeCanvas = () => {
-    gameCanvas.width = gameCanvas.clientWidth;
-    gameCanvas.height = gameCanvas.clientHeight;
-  };
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-
-  gameState = {
-    basketX: gameCanvas.width / 2 - 28, basketW: 56, basketH: 36,
-    items: [], score: 0, lives: 3,
-    spawnTimer: 0, spawnInterval: 70, speed: 2.2,
-    tilt: 0
-  };
-  updateGameHUD();
-  setupOrientationListener();
-  setupTouchControls();
-  gameRunning = true;
-  gameLoop();
-};
-
-function setupOrientationListener() {
-  removeOrientationListener();
-  gameOrientationHandler = (e) => {
-    if (e.gamma !== null) {
-      // gamma: -90 (tilt left) to 90 (tilt right)
-      gameState.tilt = Math.max(-1, Math.min(1, e.gamma / 30));
-    }
-  };
-  window.addEventListener('deviceorientation', gameOrientationHandler);
-}
-
-function removeOrientationListener() {
-  if (gameOrientationHandler) {
-    window.removeEventListener('deviceorientation', gameOrientationHandler);
-    gameOrientationHandler = null;
-  }
-}
-
-function setupTouchControls() {
-  const left = document.getElementById('game-touch-left');
-  const right = document.getElementById('game-touch-right');
-  left.ontouchstart = () => gameKeyState.left = true;
-  left.ontouchend = () => gameKeyState.left = false;
-  right.ontouchstart = () => gameKeyState.right = true;
-  right.ontouchend = () => gameKeyState.right = false;
-}
-
-function spawnItem() {
-  const x = Math.random() * (gameCanvas.width - 30) + 15;
-  const emoji = GAME_EMOJIS[Math.floor(Math.random() * GAME_EMOJIS.length)];
-  gameState.items.push({ x, y: -20, emoji, speed: gameState.speed + Math.random() * 1.2 });
-}
-
-function updateGameHUD() {
-  document.getElementById('game-score').textContent = gameState.score;
-  document.getElementById('game-lives').textContent = '❤️'.repeat(gameState.lives) + '🖤'.repeat(3 - gameState.lives);
-}
-
-function gameLoop() {
-  if (!gameRunning) return;
-  const w = gameCanvas.width, h = gameCanvas.height;
-  gameCtx.clearRect(0, 0, w, h);
-
-  // Background gradient
-  const grad = gameCtx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, '#1a0f2e');
-  grad.addColorStop(1, '#0a0612');
-  gameCtx.fillStyle = grad;
-  gameCtx.fillRect(0, 0, w, h);
-
-  // Move basket via tilt or touch
-  let move = 0;
-  if (gameKeyState.left) move = -4.5;
-  else if (gameKeyState.right) move = 4.5;
-  else move = gameState.tilt * 6;
-  gameState.basketX += move;
-  gameState.basketX = Math.max(0, Math.min(w - gameState.basketW, gameState.basketX));
-
-  // Draw basket (retro style)
-  const bx = gameState.basketX, by = h - 50, bw = gameState.basketW, bh = gameState.basketH;
-  gameCtx.fillStyle = '#ffd93d';
-  gameCtx.fillRect(bx, by, bw, bh * 0.3);
-  gameCtx.fillStyle = '#ff6b6b';
-  gameCtx.beginPath();
-  gameCtx.moveTo(bx - 4, by + bh * 0.3);
-  gameCtx.lineTo(bx + bw + 4, by + bh * 0.3);
-  gameCtx.lineTo(bx + bw - 6, by + bh);
-  gameCtx.lineTo(bx + 6, by + bh);
-  gameCtx.closePath();
-  gameCtx.fill();
-  gameCtx.strokeStyle = '#0a0612';
-  gameCtx.lineWidth = 2;
-  gameCtx.stroke();
-
-  // Spawn items
-  gameState.spawnTimer++;
-  if (gameState.spawnTimer >= gameState.spawnInterval) {
-    spawnItem();
-    gameState.spawnTimer = 0;
-    if (gameState.spawnInterval > 35) gameState.spawnInterval -= 0.5;
-    gameState.speed += 0.02;
-  }
-
-  // Update + draw items
-  gameCtx.font = '26px sans-serif';
-  gameCtx.textAlign = 'center';
-  for (let i = gameState.items.length - 1; i >= 0; i--) {
-    const it = gameState.items[i];
-    it.y += it.speed;
-    gameCtx.fillText(it.emoji, it.x, it.y);
-
-    // Collision with basket
-    if (it.y > by - 10 && it.y < by + 20 && it.x > bx - 10 && it.x < bx + bw + 10) {
-      gameState.items.splice(i, 1);
-      gameState.score += 10;
-      updateGameHUD();
-      continue;
-    }
-    // Missed (fell to bottom)
-    if (it.y > h + 10) {
-      gameState.items.splice(i, 1);
-      gameState.lives--;
-      updateGameHUD();
-      if (gameState.lives <= 0) {
-        endGame();
-        return;
-      }
-    }
-  }
-
-  gameAnimFrame = requestAnimationFrame(gameLoop);
-}
-
-function stopGameLoop() {
-  gameRunning = false;
-  if (gameAnimFrame) cancelAnimationFrame(gameAnimFrame);
-  gameAnimFrame = null;
-}
-
-async function endGame() {
-  stopGameLoop();
-  removeOrientationListener();
-  document.getElementById('game-playing').style.display = 'none';
-  document.getElementById('game-over').style.display = 'flex';
-  document.getElementById('game-final-score').textContent = gameState.score;
-
-  const best = parseInt(localStorage.getItem('mdc_game_highscore') || '0');
-  const bonusMsg = document.getElementById('game-bonus-msg');
-  if (gameState.score > best) {
-    localStorage.setItem('mdc_game_highscore', gameState.score);
-    bonusMsg.style.display = 'block';
-  } else {
-    bonusMsg.style.display = 'none';
-  }
-
-  // Award points to user account (every 300 game points = 1 app point, simplified)
-  const earnedPoints = Math.floor(gameState.score / 10);
-  document.getElementById('game-points-earned').textContent = currentUser 
-    ? `+${earnedPoints} puntos de coleccionista 🌟` 
-    : 'Inicia sesión para guardar tus puntos';
-
-  if (currentUser && earnedPoints > 0) {
-    try {
-      await setDoc(doc(db, 'usuarios', currentUser.uid), {
-        gamePoints: increment(earnedPoints),
-        gameHighScore: Math.max(gameState.score, best)
-      }, { merge: true });
-    } catch(e) {}
-  }
-}
 
 // ── INIT ──
 buildPills();
