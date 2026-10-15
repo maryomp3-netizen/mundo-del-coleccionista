@@ -304,7 +304,14 @@
   <div class="pills" id="cat-pills"></div>
   <div id="descubre-section" style="margin-bottom:16px">
     <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:8px">
-      <div style="font-size:16px;font-weight:800">✨ Descubre Hoy</div>
+      <!-- LEYENDA TJ 2026 banner -->
+    <div id="home-ranking-wrap" style="display:none;background:linear-gradient(135deg,#1a1400,#2a2000);border:2px solid #ffd93d;border-radius:14px;padding:12px;margin-bottom:8px">
+      <div id="home-legend"></div>
+      <div style="font-family:'Fredoka One',cursive;font-size:12px;color:#c77dff;margin:8px 0 4px">🏆 Top Semanal Tijuana</div>
+      <div id="home-ranking-rows"></div>
+    </div>
+
+    <div style="font-size:16px;font-weight:800">✨ Descubre Hoy</div>
       <div id="racha-badge" style="display:none;background:#1a2a1a;border:1px solid #6bcb77;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;color:#6bcb77">🔥 Racha: 1 día</div>
     </div>
     <div id="descubre-scroll" style="display:flex;gap:10px;overflow-x:auto;padding:0 16px 8px;scrollbar-width:none"></div>
@@ -651,6 +658,14 @@
       </div>
       <div id="modo-gratis-status" style="font-size:11px;color:#888">Modo real activo</div>
     </div>
+
+      <!-- ══ MIS ESQUINAS (SKINS) ══ -->
+      <div style="margin:16px 0 8px;background:#12102a;border:1.5px solid #7c5cff;border-radius:14px;padding:14px">
+        <div style="font-family:'Fredoka One',cursive;font-size:16px;color:#ffd93d;margin-bottom:10px">🎮 Mis Esquinas <span id="skin-count" style="font-size:13px;color:#888">0/6</span></div>
+        <div id="skin-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;"></div>
+        <button onclick="startGame()" style="width:100%;margin-top:12px;padding:10px;background:linear-gradient(135deg,#7c5cff,#c77dff);border:none;border-radius:10px;color:#fff;font-weight:800;font-size:14px;cursor:pointer">🕹️ ¡JUGAR AHORA!</button>
+      </div>
+
     <button class="logout-btn" onclick="logout()">Cerrar sesión 👋</button>
   </div>
   <nav class="bottom-nav">
@@ -759,29 +774,88 @@
 </div>
 
 <!-- GAME SCREEN -->
-<div class="screen" id="screen-game" style="background:#0d0a1a;display:flex;flex-direction:column">
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#0d0a1a">
-    <button onclick="stopGame()" style="background:#1e1840;border:none;border-radius:10px;padding:6px 12px;color:#c77dff;font-size:13px;font-weight:700;cursor:pointer">✕ Salir</button>
-    <div style="display:flex;gap:16px;align-items:center">
-      <div id="g-lives" style="font-size:18px">❤️❤️❤️</div>
-      <div style="font-size:16px;font-weight:800;color:#ffd93d">⭐ <span id="g-score">0</span></div>
+<!-- ARCADE GAME SCREEN -->
+<div class="screen" id="screen-game" style="background:#0d0a1a;display:flex;flex-direction:column;overflow:hidden;position:relative">
+
+  <!-- HUD superior -->
+  <div id="g-hud" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#0d0a1a;border-bottom:1px solid #7c5cff;flex-shrink:0;z-index:10">
+    <button onclick="stopGame()" style="background:#1e1840;border:1px solid #7c5cff;border-radius:8px;padding:5px 10px;color:#c77dff;font-size:12px;font-weight:700;cursor:pointer">✕ SALIR</button>
+    <div id="g-level-title" style="font-family:'Fredoka One',cursive;font-size:13px;color:#ffd93d;letter-spacing:1px;text-align:center">ARCADE CAPTURE — LVL 1</div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div id="g-lives" style="font-size:16px;letter-spacing:2px">❤️❤️❤️</div>
+      <div style="font-size:15px;font-weight:900;color:#ffd93d;min-width:52px;text-align:right">⭐<span id="g-score">0</span></div>
     </div>
   </div>
-  <div id="g-powerup-banner" style="display:none;text-align:center;background:#2d1b69;padding:4px;font-size:12px;font-weight:800;color:#c77dff">⚡ x2 PUNTOS — <span id="g-powerup-time">5</span>s</div>
-  <canvas id="game-canvas" style="flex:1;display:block;width:100%;touch-action:none"></canvas>
-  <div id="g-gameover" style="display:none;position:absolute;inset:0;background:rgba(13,10,26,.95);flex-direction:column;align-items:center;justify-content:center;z-index:50">
-    <div style="font-size:48px;margin-bottom:8px">💀</div>
-    <div style="font-size:28px;font-weight:900;color:#ffd93d;margin-bottom:4px">GAME OVER</div>
-    <div style="font-size:16px;color:#c77dff;margin-bottom:4px">Puntaje: <span id="g-final-score">0</span></div>
-    <div id="g-bonus-msg" style="font-size:13px;color:#6bcb77;margin-bottom:16px;text-align:center"></div>
-    <div id="g-ranking-list" style="background:#1e1840;border-radius:14px;padding:14px;width:280px;margin-bottom:16px">
-      <div style="font-size:13px;font-weight:800;color:#c77dff;margin-bottom:8px">🏆 Top 5 — <span id="g-city-label">Tu ciudad</span></div>
-      <div id="g-ranking-rows" style="font-size:12px;color:#a7a9be;line-height:1.8">Cargando...</div>
+
+  <!-- ÁREA DE JUEGO 65% -->
+  <div id="g-arena" style="flex:1;position:relative;border:3px double #7c5cff;border-left:none;border-right:none;overflow:hidden;min-height:0">
+    <canvas id="game-canvas" style="display:block;width:100%;height:100%;touch-action:none"></canvas>
+    <!-- Scanlines CRT overlay -->
+    <div style="position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.18) 2px,rgba(0,0,0,.18) 4px);z-index:5"></div>
+    <!-- Powerup banner -->
+    <div id="g-powerup-banner" style="display:none;position:absolute;top:6px;left:50%;transform:translateX(-50%);background:#2d1b69;border:1px solid #ffd93d;border-radius:20px;padding:3px 14px;font-size:11px;font-weight:800;color:#ffd93d;z-index:10;white-space:nowrap">⚡ x2 PTS — <span id="g-powerup-time">5</span>s</div>
+  </div>
+
+  <!-- PANEL DE CONTROL 35% -->
+  <div id="g-panel" style="flex-shrink:0;height:35%;min-height:130px;max-height:200px;background:#1a1828;border-top:2px dashed #ffd93d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;z-index:10">
+    <!-- Skin label -->
+    <div id="g-skin-label" style="font-size:10px;font-weight:800;letter-spacing:2px;color:#ffd93d;text-transform:uppercase;margin-bottom:2px">BASE</div>
+    <!-- Botones y joystick -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;width:100%">
+      <!-- Botón IZQUIERDA -->
+      <button id="g-btn-left" onpointerdown="gMoveDir=-1" onpointerup="gMoveDir=0" onpointercancel="gMoveDir=0"
+        style="width:56px;height:56px;border-radius:50%;background:#ffd93d;border:none;font-size:22px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 4px 0 #b89a00,0 6px 12px rgba(255,217,61,.3);active:transform:translateY(2px);touch-action:none;user-select:none">←</button>
+      <!-- Joystick central -->
+      <div id="g-joystick-base" style="width:70px;height:70px;border-radius:50%;background:#2e2b45;border:3px solid #7c5cff;display:flex;align-items:center;justify-content:center;position:relative;touch-action:none">
+        <div id="g-joystick-knob" style="width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#9b7dff,#5c3db0);border:2px solid #c77dff;position:absolute;cursor:grab;touch-action:none;box-shadow:0 2px 8px rgba(124,92,255,.5)"></div>
+      </div>
+      <!-- Botón DERECHA -->
+      <button id="g-btn-right" onpointerdown="gMoveDir=1" onpointerup="gMoveDir=0" onpointercancel="gMoveDir=0"
+        style="width:56px;height:56px;border-radius:50%;background:#ffd93d;border:none;font-size:22px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 4px 0 #b89a00,0 6px 12px rgba(255,217,61,.3);touch-action:none;user-select:none">→</button>
+    </div>
+    <!-- Créditos restantes -->
+    <div style="font-size:10px;color:#4a4870;font-weight:700;letter-spacing:1px">CREDIT 00 — COLECCIONISTA</div>
+  </div>
+
+  <!-- GAME OVER OVERLAY -->
+  <div id="g-gameover" style="display:none;position:absolute;inset:0;background:rgba(10,8,22,.97);flex-direction:column;align-items:center;justify-content:flex-start;z-index:50;overflow-y:auto;padding:16px">
+    <div style="font-size:36px;margin-bottom:4px">💀</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:28px;color:#ff6b6b;margin-bottom:2px;letter-spacing:2px">GAME OVER</div>
+    <!-- Scores -->
+    <div style="display:flex;gap:16px;margin:10px 0;text-align:center">
+      <div style="background:#1e1840;border-radius:10px;padding:8px 14px">
+        <div style="font-size:10px;color:#888;font-weight:700">PARTIDA</div>
+        <div style="font-size:22px;font-weight:900;color:#ffd93d" id="g-final-score">0</div>
+      </div>
+      <div style="background:#1e1840;border-radius:10px;padding:8px 14px">
+        <div style="font-size:10px;color:#888;font-weight:700">RÉCORD</div>
+        <div style="font-size:22px;font-weight:900;color:#c77dff" id="g-best-score">0</div>
+      </div>
+      <div style="background:#1e1840;border-radius:10px;padding:8px 14px">
+        <div style="font-size:10px;color:#888;font-weight:700">TOTAL</div>
+        <div style="font-size:22px;font-weight:900;color:#6bcb77" id="g-total-score">0</div>
+      </div>
+    </div>
+    <div id="g-bonus-msg" style="font-size:12px;color:#6bcb77;margin-bottom:8px;text-align:center;font-weight:700"></div>
+    <!-- Ranking -->
+    <div id="g-ranking-list" style="background:#1e1840;border-radius:12px;padding:12px;width:100%;max-width:300px;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:800;color:#c77dff;margin-bottom:6px">🏆 TOP SEMANAL TIJUANA</div>
+      <div id="g-ranking-rows" style="font-size:11px;color:#a7a9be;line-height:2">Cargando...</div>
     </div>
     <div style="display:flex;gap:10px">
-      <button onclick="startGame()" style="background:#c77dff;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:800;color:#0d0a1a;cursor:pointer">🔄 Otra vez</button>
-      <button onclick="stopGame()" style="background:#2e2b45;border:none;border-radius:12px;padding:12px 24px;font-size:15px;font-weight:800;color:#a7a9be;cursor:pointer">Salir</button>
+      <button onclick="startGame()" style="background:#7c5cff;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:800;color:#fff;cursor:pointer">🔄 INSERT COIN</button>
+      <button onclick="stopGame()" style="background:#2e2b45;border:none;border-radius:10px;padding:11px 22px;font-size:14px;font-weight:800;color:#a7a9be;cursor:pointer">SALIR</button>
     </div>
+  </div>
+
+  <!-- MODAL NUEVA SKIN DESBLOQUEADA -->
+  <div id="g-skin-modal" style="display:none;position:absolute;inset:0;background:rgba(10,8,22,.97);flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:24px;text-align:center">
+    <div id="g-skin-confetti" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
+    <div style="font-size:48px;margin-bottom:8px" id="g-skin-unlock-icon">🎮</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:22px;color:#ffd93d;margin-bottom:4px">¡NUEVA ESQUINA<br>DESBLOQUEADA!</div>
+    <div style="font-size:16px;font-weight:800;color:#c77dff;margin-bottom:4px" id="g-skin-unlock-name">BLOQUE-BOY</div>
+    <div style="font-size:12px;color:#a7a9be;margin-bottom:20px" id="g-skin-unlock-desc">Actívala en tu Perfil</div>
+    <button onclick="document.getElementById('g-skin-modal').style.display='none'" style="background:#7c5cff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:800;color:#fff;cursor:pointer">¡GENIAL! 🎉</button>
   </div>
 </div>
 
@@ -1573,6 +1647,20 @@ window.showScreen = (id) => {
       }
     }, 50);
   }
+  // Skin grid when showing profile
+  if (id === 'screen-profile') {
+    setTimeout(() => {
+      buildSkinGrid();
+      const d = gGetData();
+      const unlocked = (d.skinsDesbloqueadas || ['base']).length;
+      const el = document.getElementById('skin-count');
+      if (el) el.textContent = `${unlocked}/6`;
+    }, 80);
+  }
+  // Home ranking
+  if (id === 'screen-home') {
+    loadHomeRanking();
+  }
 };
 window.showToast = (msg) => {
   const t = document.getElementById('toast');
@@ -1791,105 +1879,256 @@ const GAME_CATS = [
   {id:'automovil', emoji:'🚘'}
 ];
 
+// ══════════════════════════════════════════════════
+// SKINS COLECCIONABLES
+// ══════════════════════════════════════════════════
+const SKINS = [
+  {
+    id:'base', name:'BASE', desc:'Esquina inicial', ptsReq:0, icon:'🕹️',
+    panel:'#1a1828', panelBorder:'#ffd93d',
+    btnColor:'#ffd93d', btnShadow:'#b89a00', btnText:'#0d0a1a',
+    joystickBase:'#2e2b45', joystickBorder:'#7c5cff', joystickKnob:'radial-gradient(circle at 35% 35%,#9b7dff,#5c3db0)',
+    labelColor:'#ffd93d'
+  },
+  {
+    id:'bloque_boy', name:'BLOQUE-BOY', desc:'50 pts en 1 partida', ptsReq:50, icon:'🎮',
+    panel:'#2a2a2a', panelBorder:'#b5b5b5',
+    btnColor:'#cc2222', btnShadow:'#880000', btnText:'#fff',
+    joystickBase:'#3a3a3a', joystickBorder:'#b5b5b5', joystickKnob:'radial-gradient(circle at 35% 35%,#d0d0d0,#888)',
+    labelColor:'#b5b5b5'
+  },
+  {
+    id:'super_16', name:'SUPER-16', desc:'100 pts en 1 partida', ptsReq:100, icon:'🟣',
+    panel:'#2a1a4a', panelBorder:'#8a5cf0',
+    btnColor:'#4488ff', btnShadow:'#2255cc', btnText:'#fff',
+    joystickBase:'#3a1a6a', joystickBorder:'#8a5cf0', joystickKnob:'radial-gradient(circle at 35% 35%,#b07aff,#6a2fd0)',
+    labelColor:'#8a5cf0'
+  },
+  {
+    id:'stick_pro', name:'STICK-PRO', desc:'200 pts en 1 partida', ptsReq:200, icon:'🕹️',
+    panel:'#080810', panelBorder:'#00d9ff',
+    btnColor:'#00d9ff', btnShadow:'#008899', btnText:'#000',
+    joystickBase:'#0a0a20', joystickBorder:'#00d9ff', joystickKnob:'radial-gradient(circle at 35% 35%,#60f0ff,#00aacc)',
+    labelColor:'#00d9ff'
+  },
+  {
+    id:'golden_tj', name:'GOLDEN-TJ', desc:'350 pts en 1 partida', ptsReq:350, icon:'👑',
+    panel:'#1a1400', panelBorder:'#ffd93d',
+    btnColor:'#ffd93d', btnShadow:'#c8a800', btnText:'#000',
+    joystickBase:'#2a2000', joystickBorder:'#ffd93d', joystickKnob:'radial-gradient(circle at 35% 35%,#ffe880,#c8a800)',
+    labelColor:'#ffd93d', glitter:true
+  },
+  {
+    id:'platinum_tj', name:'PLATINUM-TJ', desc:'⚡ EXCLUSIVA — #1 Anual TJ', ptsReq:9999, icon:'💠',
+    panel:'#c8c8c8', panelBorder:'#ffffff',
+    btnColor:'#e8e8e8', btnShadow:'#aaaaaa', btnText:'#333',
+    joystickBase:'#d0d0d0', joystickBorder:'#ffffff', joystickKnob:'radial-gradient(circle at 35% 35%,#ffffff,#c0c0c0)',
+    labelColor:'#7c5cff', platinum:true, rainbow:true
+  }
+];
+
+// ══════════════════════════════════════════════════
+// GAME STATE
+// ══════════════════════════════════════════════════
 let gCanvas, gCtx, gAnimId;
-let gRunning = false, gScore = 0, gLives = 3, gPowerup = false, gPowerupTimer = 0;
-let gBasketX = 0, gBasketW = 70, gBasketY = 0;
-let gFalling = [], gStars = [];
-let gTiltX = 0, gSpeed = 1.5, gSpawnTimer = 0;
+let gRunning = false, gScore = 0, gLives = 3, gPowerup = false;
+let gBasketX = 0, gBasketW = 72, gBasketY = 0;
+let gFalling = [], gStars = [], gParticles = [];
+let gMoveDir = 0;  // -1 left, 0 stop, 1 right  (joystick/buttons)
+let gJoyActive = false, gJoyStartX = 0, gJoyCurrentX = 0;
+let gSpeed = 1.5, gSpawnTimer = 0, gFrame = 0;
 let gPowerupInterval = null;
+let gLevel = 1;
+
+// ── Skin & Scores (localStorage) ──
+function gGetData() {
+  try { return JSON.parse(localStorage.getItem('arcade_data') || '{}'); } catch(e) { return {}; }
+}
+function gSaveData(d) {
+  try { localStorage.setItem('arcade_data', JSON.stringify(d)); } catch(e) {}
+}
+function gGetActiveSkin() {
+  const d = gGetData();
+  const id = d.activeSkin || 'base';
+  return SKINS.find(s=>s.id===id) || SKINS[0];
+}
+
+// ── Apply skin to panel DOM ──
+function applyPanelSkin(skin) {
+  const panel = document.getElementById('g-panel');
+  if (!panel) return;
+  panel.style.background = skin.panel;
+  panel.style.borderTopColor = skin.panelBorder;
+  panel.style.borderTopStyle = skin.rainbow ? 'none' : 'dashed';
+
+  // Rainbow border for platinum
+  if (skin.rainbow) {
+    panel.style.borderTop = '3px solid transparent';
+    panel.style.borderImage = 'linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff,#ff6b6b) 1';
+  }
+
+  // Buttons
+  ['g-btn-left','g-btn-right'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.style.background = skin.btnColor;
+    btn.style.boxShadow = `0 4px 0 ${skin.btnShadow},0 6px 12px rgba(0,0,0,.3)`;
+    btn.style.color = skin.btnText;
+    if (skin.rainbow) btn.style.background = 'linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff)';
+  });
+
+  // Joystick
+  const jBase = document.getElementById('g-joystick-base');
+  const jKnob = document.getElementById('g-joystick-knob');
+  if (jBase) { jBase.style.background = skin.joystickBase; jBase.style.borderColor = skin.joystickBorder; }
+  if (jKnob) { jKnob.style.background = skin.joystickKnob; jKnob.style.borderColor = skin.joystickBorder; }
+
+  // Label
+  const lbl = document.getElementById('g-skin-label');
+  if (lbl) { lbl.textContent = skin.name; lbl.style.color = skin.labelColor; }
+}
+
+// ── Glitter animation for golden ──
+let glitterAnim = null;
+function startGlitter(panel, skin) {
+  if (glitterAnim) cancelAnimationFrame(glitterAnim);
+  if (!skin.glitter && !skin.rainbow) return;
+  let hue = 0;
+  const tick = () => {
+    if (!gRunning && !document.getElementById('screen-game').classList.contains('active')) return;
+    hue = (hue + 2) % 360;
+    if (skin.glitter) panel.style.boxShadow = `inset 0 0 20px hsla(${hue},100%,60%,.15)`;
+    if (skin.rainbow) {
+      const btns = [document.getElementById('g-btn-left'), document.getElementById('g-btn-right')];
+      btns.forEach(b => { if (b) b.style.background = `hsl(${hue},90%,75%)`; });
+    }
+    glitterAnim = requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+// ══════════════════════════════════════════════════
+// JOYSTICK TOUCH CONTROLS
+// ══════════════════════════════════════════════════
+function initJoystick() {
+  const knob = document.getElementById('g-joystick-knob');
+  const base = document.getElementById('g-joystick-base');
+  if (!knob || !base) return;
+
+  const onStart = (e) => {
+    e.preventDefault();
+    gJoyActive = true;
+    const touch = e.touches ? e.touches[0] : e;
+    gJoyStartX = touch.clientX;
+    gJoyCurrentX = touch.clientX;
+  };
+  const onMove = (e) => {
+    e.preventDefault();
+    if (!gJoyActive) return;
+    const touch = e.touches ? e.touches[0] : e;
+    gJoyCurrentX = touch.clientX;
+    const dx = gJoyCurrentX - gJoyStartX;
+    const clamp = Math.max(-24, Math.min(24, dx));
+    knob.style.transform = `translateX(${clamp}px)`;
+    gMoveDir = dx < -8 ? -1 : dx > 8 ? 1 : 0;
+  };
+  const onEnd = () => {
+    gJoyActive = false;
+    gMoveDir = 0;
+    knob.style.transform = '';
+  };
+
+  knob.addEventListener('touchstart', onStart, {passive:false});
+  knob.addEventListener('touchmove', onMove, {passive:false});
+  knob.addEventListener('touchend', onEnd);
+  knob.addEventListener('mousedown', onStart);
+  window.addEventListener('mousemove', (e) => { if (gJoyActive) onMove(e); });
+  window.addEventListener('mouseup', onEnd);
+}
 
 function getUserMainCat() {
-  const myCats = allItems.filter(i => i.userId === currentUser?.uid || i.autorId === currentUser?.uid).map(i => i.categoria);
+  const myCats = allItems.filter(i=>i.userId===currentUser?.uid).map(i=>i.categoria);
   if (!myCats.length) return null;
   const freq = {};
-  myCats.forEach(c => freq[c] = (freq[c]||0)+1);
+  myCats.forEach(c=>freq[c]=(freq[c]||0)+1);
   return Object.entries(freq).sort((a,b)=>b[1]-a[1])[0]?.[0];
 }
 
+// ══════════════════════════════════════════════════
+// START / STOP
+// ══════════════════════════════════════════════════
 window.startGame = () => {
   showScreen('screen-game');
-  gScore = 0; gLives = 3; gRunning = true; gFalling = []; gSpawnTimer = 0;
-  gPowerup = false; gSpeed = 1.5;
+  const skin = gGetActiveSkin();
+  applyPanelSkin(skin);
+  startGlitter(document.getElementById('g-panel'), skin);
+
+  gScore = 0; gLives = 3; gRunning = true; gFalling = []; gParticles = [];
+  gSpawnTimer = 0; gPowerup = false; gSpeed = 1.5; gFrame = 0; gLevel = 1; gMoveDir = 0;
   document.getElementById('g-score').textContent = '0';
   document.getElementById('g-lives').textContent = '❤️❤️❤️';
+  document.getElementById('g-level-title').textContent = 'ARCADE CAPTURE — LVL 1';
   document.getElementById('g-gameover').style.display = 'none';
+  document.getElementById('g-skin-modal').style.display = 'none';
   document.getElementById('g-powerup-banner').style.display = 'none';
 
   gCanvas = document.getElementById('game-canvas');
   gCtx = gCanvas.getContext('2d');
 
-  setTimeout(() => {
-    const rect = gCanvas.getBoundingClientRect();
-    gCanvas.width = rect.width || window.innerWidth;
-    gCanvas.height = window.innerHeight - 140;
+  const resizeCanvas = () => {
+    const arena = document.getElementById('g-arena');
+    const rect = arena.getBoundingClientRect();
+    gCanvas.width = rect.width;
+    gCanvas.height = rect.height;
     gBasketX = gCanvas.width / 2 - gBasketW / 2;
-    gBasketY = gCanvas.height - 50;
-
-    gStars = Array.from({length:60}, () => ({
+    gBasketY = gCanvas.height - 55;
+    gStars = Array.from({length:70}, () => ({
       x: Math.random() * gCanvas.width,
       y: Math.random() * gCanvas.height,
-      r: Math.random() * 1.5 + 0.3,
-      a: Math.random()
+      r: Math.random() * 1.2 + 0.3,
+      a: Math.random() * Math.PI * 2
     }));
-
-    window.addEventListener('deviceorientation', handleTilt);
-    gCanvas.addEventListener('touchmove', handleTouch, {passive:false});
-    gCanvas.addEventListener('mousemove', handleMouse);
-
-    if (gAnimId) cancelAnimationFrame(gAnimId);
-    gameLoop();
-  }, 100);
+  };
+  setTimeout(resizeCanvas, 80);
+  initJoystick();
+  if (gAnimId) cancelAnimationFrame(gAnimId);
+  setTimeout(() => { if (gRunning) gameLoop(); }, 100);
 };
 
 window.stopGame = () => {
   gRunning = false;
   if (gAnimId) cancelAnimationFrame(gAnimId);
-  window.removeEventListener('deviceorientation', handleTilt);
   if (gPowerupInterval) clearInterval(gPowerupInterval);
+  if (glitterAnim) cancelAnimationFrame(glitterAnim);
   showScreen('screen-home');
 };
 
-function handleTilt(e) {
-  if (!gRunning) return;
-  const tilt = e.gamma || 0;
-  gTiltX = Math.max(-1, Math.min(1, tilt / 30));
-}
-function handleTouch(e) {
-  e.preventDefault();
-  if (!gRunning || !gCanvas) return;
-  const touch = e.touches[0];
-  const rect = gCanvas.getBoundingClientRect();
-  gBasketX = touch.clientX - rect.left - gBasketW / 2;
-  gBasketX = Math.max(0, Math.min(gCanvas.width - gBasketW, gBasketX));
-  gTiltX = 0;
-}
-function handleMouse(e) {
-  if (!gRunning || !gCanvas) return;
-  const rect = gCanvas.getBoundingClientRect();
-  gBasketX = e.clientX - rect.left - gBasketW / 2;
-  gBasketX = Math.max(0, Math.min(gCanvas.width - gBasketW, gBasketX));
-  gTiltX = 0;
-}
-
+// ══════════════════════════════════════════════════
+// SPAWN
+// ══════════════════════════════════════════════════
 function spawnObject() {
+  if (!gCanvas) return;
   const mainCat = getUserMainCat();
   let pool = [...GAME_CATS];
   if (mainCat) {
     const fav = GAME_CATS.find(c=>c.id===mainCat);
     if (fav) pool = [...pool, fav, fav, fav];
   }
-  const isPowerup = Math.random() < 0.08;
+  const isPowerup = Math.random() < 0.07;
   const cat = pool[Math.floor(Math.random() * pool.length)];
   gFalling.push({
-    x: Math.random() * (gCanvas.width - 30) + 15,
-    y: -20,
+    x: 20 + Math.random() * (gCanvas.width - 40),
+    y: -22,
     emoji: isPowerup ? '⚡' : cat.emoji,
     isPowerup,
-    size: 24,
-    speed: gSpeed + Math.random() * 0.8
+    speed: gSpeed + Math.random() * 0.7,
+    rot: (Math.random() - 0.5) * 0.06
   });
 }
 
+// ══════════════════════════════════════════════════
+// POWERUP
+// ══════════════════════════════════════════════════
 function activatePowerup() {
   gPowerup = true;
   let t = 5;
@@ -1899,164 +2138,343 @@ function activatePowerup() {
   gPowerupInterval = setInterval(() => {
     t--;
     document.getElementById('g-powerup-time').textContent = t;
-    if (t <= 0) {
-      clearInterval(gPowerupInterval);
-      gPowerup = false;
-      document.getElementById('g-powerup-banner').style.display = 'none';
-    }
+    if (t <= 0) { clearInterval(gPowerupInterval); gPowerup = false; document.getElementById('g-powerup-banner').style.display = 'none'; }
   }, 1000);
   try {
-    const ctx = new AudioContext();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.type = 'square'; osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.15, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.start(); osc.stop(ctx.currentTime + 0.3);
+    const ac = new AudioContext();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type = 'square'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.12, ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
+    o.start(); o.stop(ac.currentTime + 0.4);
   } catch(e) {}
 }
 
+// ══════════════════════════════════════════════════
+// GAME LOOP — 60fps canvas
+// ══════════════════════════════════════════════════
 function gameLoop() {
-  if (!gRunning) return;
+  if (!gRunning || !gCanvas) return;
+  gFrame++;
   const W = gCanvas.width, H = gCanvas.height;
+  const skin = gGetActiveSkin();
 
-  if (Math.abs(gTiltX) > 0.05) {
-    gBasketX += gTiltX * 8;
+  // Move basket from dir buttons / joystick
+  if (gMoveDir !== 0) {
+    gBasketX += gMoveDir * 8;
     gBasketX = Math.max(0, Math.min(W - gBasketW, gBasketX));
   }
 
+  // Level up
+  const newLevel = 1 + Math.floor(gScore / 50);
+  if (newLevel !== gLevel) {
+    gLevel = newLevel;
+    gSpeed = 1.5 + gScore * 0.004;
+    document.getElementById('g-level-title').textContent = `ARCADE CAPTURE — LVL ${gLevel}`;
+  }
+
+  // Spawn
   gSpawnTimer++;
-  const spawnRate = Math.max(25, 60 - gScore * 0.1);
+  const spawnRate = Math.max(22, 58 - gLevel * 3);
   if (gSpawnTimer >= spawnRate) { spawnObject(); gSpawnTimer = 0; }
 
-  gSpeed = 1.5 + gScore * 0.005;
-
-  gCtx.fillStyle = '#0d0a1a';
+  // ── DRAW BACKGROUND ──
+  gCtx.fillStyle = '#0a0818';
   gCtx.fillRect(0, 0, W, H);
 
+  // Grid floor (rejilla amarilla en piso)
+  const floorY = H - 18;
+  gCtx.strokeStyle = 'rgba(255,217,61,0.18)';
+  gCtx.lineWidth = 1;
+  for (let x = 0; x < W; x += 18) {
+    gCtx.beginPath(); gCtx.moveTo(x, floorY); gCtx.lineTo(x - 30, H); gCtx.stroke();
+  }
+  gCtx.fillStyle = 'rgba(255,217,61,0.06)';
+  gCtx.fillRect(0, floorY, W, H - floorY);
+
+  // Grid lines (pixel art)
+  gCtx.strokeStyle = 'rgba(45,27,105,0.22)';
+  for (let x = 0; x < W; x += 22) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
+  for (let y = 0; y < H; y += 22) { gCtx.beginPath(); gCtx.moveTo(0,y); gCtx.lineTo(W,y); gCtx.stroke(); }
+
+  // Stars
   gStars.forEach(s => {
-    s.a += 0.01;
-    const alpha = 0.3 + Math.sin(s.a) * 0.3;
+    s.a += 0.018;
+    const alpha = 0.25 + Math.sin(s.a) * 0.25;
     gCtx.fillStyle = `rgba(199,125,255,${alpha})`;
-    gCtx.fillRect(s.x, s.y, s.r * 2, s.r * 2);
+    gCtx.fillRect(s.x|0, s.y|0, Math.ceil(s.r*2), Math.ceil(s.r*2));
   });
 
-  gCtx.strokeStyle = 'rgba(45,27,105,0.3)';
-  gCtx.lineWidth = 1;
-  for (let x = 0; x < W; x += 20) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
-  for (let y = 0; y < H; y += 20) { gCtx.beginPath(); gCtx.moveTo(0,y); gCtx.lineTo(W,y); gCtx.stroke(); }
-
-  const mainCat = getUserMainCat();
-  const basketEmoji = mainCat ? (GAME_CATS.find(c=>c.id===mainCat)?.emoji || '🧺') : '🧺';
-  gCtx.font = '32px serif';
-  gCtx.textAlign = 'center';
-  gCtx.fillText(basketEmoji, gBasketX + gBasketW/2, gBasketY + 20);
-  gCtx.strokeStyle = gPowerup ? '#ffd93d' : '#c77dff';
-  gCtx.lineWidth = gPowerup ? 3 : 2;
-  gCtx.shadowBlur = gPowerup ? 15 : 8;
-  gCtx.shadowColor = gPowerup ? '#ffd93d' : '#c77dff';
-  gCtx.strokeRect(gBasketX, gBasketY - 10, gBasketW, 35);
-  gCtx.shadowBlur = 0;
-
+  // ── FALLING OBJECTS ──
   for (let i = gFalling.length - 1; i >= 0; i--) {
     const obj = gFalling[i];
     obj.y += obj.speed;
 
-    gCtx.font = `${obj.size}px serif`;
+    gCtx.save();
+    gCtx.font = '22px serif';
     gCtx.textAlign = 'center';
-    gCtx.shadowBlur = obj.isPowerup ? 12 : 0;
-    gCtx.shadowColor = '#ffd93d';
-    gCtx.fillText(obj.emoji, obj.x, obj.y);
-    gCtx.shadowBlur = 0;
+    if (obj.isPowerup) { gCtx.shadowBlur = 14; gCtx.shadowColor = '#ffd93d'; }
+    gCtx.fillText(obj.emoji, obj.x|0, obj.y|0);
+    gCtx.restore();
 
-    const caught = obj.x > gBasketX - 10 && obj.x < gBasketX + gBasketW + 10 && obj.y >= gBasketY - 10 && obj.y <= gBasketY + 30;
-    if (caught) {
+    // Catch detection
+    const inX = obj.x > gBasketX - 8 && obj.x < gBasketX + gBasketW + 8;
+    const inY = obj.y >= gBasketY - 8 && obj.y <= gBasketY + 32;
+    if (inX && inY) {
       gFalling.splice(i, 1);
       if (obj.isPowerup) {
         activatePowerup();
-        showToast('⚡ ¡Poder activado! x2 puntos por 5s');
+        showToast('⚡ ¡Poder x2! 5 segundos');
       } else {
         const pts = gPowerup ? 12 : 6;
         gScore += pts;
         document.getElementById('g-score').textContent = gScore;
-        gCtx.fillStyle = 'rgba(255,217,61,0.2)';
-        gCtx.fillRect(0,0,W,H);
+        // Catch particle burst
+        for (let p = 0; p < 5; p++) {
+          gParticles.push({ x: obj.x, y: gBasketY, vx:(Math.random()-0.5)*3, vy:-Math.random()*2-1, life:18, color: gPowerup?'#ffd93d':'#c77dff' });
+        }
       }
       continue;
     }
 
-    if (obj.y > H + 10) {
+    // Missed
+    if (obj.y > H + 12) {
+      gFalling.splice(i, 1);
       if (!obj.isPowerup) {
-        gFalling.splice(i, 1);
         gLives--;
-        const livesEl = document.getElementById('g-lives');
-        livesEl.textContent = '❤️'.repeat(gLives) + '🖤'.repeat(3-gLives);
-        gCtx.fillStyle = 'rgba(255,107,107,0.3)';
+        const lv = document.getElementById('g-lives');
+        lv.textContent = '❤️'.repeat(Math.max(0,gLives)) + '🖤'.repeat(Math.max(0,3-gLives));
+        // Screen shake flash
+        gCtx.fillStyle = 'rgba(255,107,107,0.22)';
         gCtx.fillRect(0,0,W,H);
         if (gLives <= 0) { gameOver(); return; }
-      } else {
-        gFalling.splice(i, 1);
       }
     }
   }
 
+  // ── PARTICLES ──
+  for (let i = gParticles.length - 1; i >= 0; i--) {
+    const p = gParticles[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life--;
+    if (p.life <= 0) { gParticles.splice(i,1); continue; }
+    gCtx.globalAlpha = p.life / 18;
+    gCtx.fillStyle = p.color;
+    gCtx.fillRect(p.x|0, p.y|0, 4, 4);
+    gCtx.globalAlpha = 1;
+  }
+
+  // ── BASKET ──
+  const mainCat = getUserMainCat();
+  const basketEmoji = mainCat ? (GAME_CATS.find(c=>c.id===mainCat)?.emoji || '🧺') : '🧺';
+
+  // Platinum trail particles
+  if (skin.id === 'platinum_tj' && gFrame % 3 === 0) {
+    gParticles.push({ x: gBasketX + gBasketW/2 + (Math.random()-0.5)*gBasketW, y: gBasketY+10, vx:(Math.random()-0.5)*1.5, vy:-Math.random()*1.5, life:20, color:`hsl(${(gFrame*7)%360},80%,80%)` });
+  }
+
+  // Basket glow
+  gCtx.save();
+  gCtx.shadowBlur = gPowerup ? 18 : 10;
+  gCtx.shadowColor = gPowerup ? '#ffd93d' : skin.joystickBorder;
+  gCtx.strokeStyle = gPowerup ? '#ffd93d' : skin.joystickBorder;
+  gCtx.lineWidth = 2.5;
+  gCtx.strokeRect(gBasketX, gBasketY - 6, gBasketW, 28);
+  gCtx.restore();
+
+  // Basket emoji
+  gCtx.font = '26px serif';
+  gCtx.textAlign = 'center';
+  gCtx.fillText(basketEmoji, gBasketX + gBasketW/2, gBasketY + 16);
+
   gAnimId = requestAnimationFrame(gameLoop);
 }
 
+// ══════════════════════════════════════════════════
+// GAME OVER + PUNTUACIONES
+// ══════════════════════════════════════════════════
 async function gameOver() {
   gRunning = false;
   cancelAnimationFrame(gAnimId);
-  window.removeEventListener('deviceorientation', handleTilt);
   if (gPowerupInterval) clearInterval(gPowerupInterval);
   document.getElementById('g-powerup-banner').style.display = 'none';
 
   const finalScore = gScore;
-  document.getElementById('g-final-score').textContent = finalScore;
 
+  // Update localStorage scores
+  const d = gGetData();
+  const prevBest = d.mejorPuntuacion || 0;
+  const prevTotal = d.puntuacionTotalAcumulada || 0;
+  const prevAnual = d.puntuacionTotalAnual2026 || 0;
+  const prevSkins = d.skinsDesbloqueadas || ['base'];
+
+  d.puntuacionTotalAcumulada = prevTotal + finalScore;
+  d.puntuacionTotalAnual2026 = prevAnual + finalScore;
+  if (finalScore > prevBest) d.mejorPuntuacion = finalScore;
+  const newBest = d.mejorPuntuacion;
+
+  // Check skin unlocks (only by best score in one game)
+  let newSkinUnlocked = null;
+  SKINS.forEach(skin => {
+    if (skin.ptsReq < 9999 && newBest >= skin.ptsReq && !prevSkins.includes(skin.id)) {
+      if (!d.skinsDesbloqueadas) d.skinsDesbloqueadas = ['base'];
+      d.skinsDesbloqueadas.push(skin.id);
+      newSkinUnlocked = skin;
+    }
+  });
+  gSaveData(d);
+
+  // Update DOM
+  document.getElementById('g-final-score').textContent = finalScore;
+  document.getElementById('g-best-score').textContent = newBest;
+  document.getElementById('g-total-score').textContent = d.puntuacionTotalAcumulada;
+
+  // Bonus message
   let bonusMsg = '';
-  if (finalScore >= 100) {
-    const extras = Math.floor(finalScore / 100);
-    bonusMsg = `🎁 ¡${extras} aporte${extras>1?'s':''} extra ganado${extras>1?'s':''}! (próximo mes)`;
-  }
+  if (finalScore >= 100) bonusMsg = `🎁 ¡${Math.floor(finalScore/100)} aporte(s) extra ganado(s)!`;
   document.getElementById('g-bonus-msg').textContent = bonusMsg;
 
-  const ciudad = 'Tijuana';
-  document.getElementById('g-city-label').textContent = ciudad;
+  // Show game over
+  document.getElementById('g-gameover').style.display = 'flex';
 
+  // Show skin unlock modal with confetti
+  if (newSkinUnlocked) {
+    setTimeout(() => showSkinUnlockModal(newSkinUnlocked), 400);
+  }
+
+  // Save to Firestore + load ranking
   if (currentUser) {
     try {
-      await setDoc(doc(db, 'puntuaciones_juego', currentUser.uid + '_' + Date.now()), {
+      await setDoc(doc(db, 'puntuaciones_juego', currentUser.uid), {
         userId: currentUser.uid,
         nombre: currentUser.displayName || 'Coleccionista',
-        puntaje: finalScore,
-        ciudad,
-        fecha: new Date().toDateString()
-      });
+        puntaje: newBest,
+        total: d.puntuacionTotalAcumulada,
+        anual2026: d.puntuacionTotalAnual2026,
+        ciudad: 'Tijuana',
+        updatedAt: new Date().toISOString()
+      }, {merge:true});
     } catch(e) {}
 
     try {
-      const rankSnap = await getDocs(query(
-        collection(db, 'puntuaciones_juego'),
-        orderBy('puntaje', 'desc'),
-        limit(5)
-      ));
-      const rows = rankSnap.docs.map((d,i) => {
-        const data = d.data();
-        const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
-        const isMe = data.userId === currentUser.uid;
-        return `<div style="display:flex;justify-content:space-between;${isMe?'color:#ffd93d;font-weight:800':''}">
-          <span>${medals[i]} ${data.nombre||'Coleccionista'}</span>
+      const snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('puntaje','desc'), limit(5)));
+      const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+      const rows = snap.docs.map((dd,i) => {
+        const data = dd.data();
+        const isMe = data.userId === currentUser?.uid;
+        return `<div style="display:flex;justify-content:space-between;${isMe?'color:#ffd93d;font-weight:900':''}">
+          <span>${medals[i]||'·'} ${(data.nombre||'').substring(0,14)}</span>
           <span>${data.puntaje} pts</span>
         </div>`;
       }).join('');
-      document.getElementById('g-ranking-rows').innerHTML = rows || '<div>Sé el primero 🏆</div>';
+      document.getElementById('g-ranking-rows').innerHTML = rows || '<div>¡Sé el primero! 🏆</div>';
     } catch(e) {
       document.getElementById('g-ranking-rows').innerHTML = '<div style="color:#888">Sin conexión</div>';
     }
   }
+}
 
-  document.getElementById('g-gameover').style.display = 'flex';
+// ══════════════════════════════════════════════════
+// SKIN UNLOCK MODAL + CONFETTI
+// ══════════════════════════════════════════════════
+function showSkinUnlockModal(skin) {
+  document.getElementById('g-skin-unlock-icon').textContent = skin.icon;
+  document.getElementById('g-skin-unlock-name').textContent = skin.name;
+  document.getElementById('g-skin-unlock-desc').textContent = skin.desc;
+  document.getElementById('g-skin-modal').style.display = 'flex';
+
+  // Confetti
+  const container = document.getElementById('g-skin-confetti');
+  container.innerHTML = '';
+  const colors = ['#ffd93d','#c77dff','#6bcb77','#ff6b6b','#4d96ff'];
+  for (let i = 0; i < 40; i++) {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:8px;height:8px;background:${colors[i%5]};border-radius:2px;
+      left:${Math.random()*100}%;top:-10px;
+      animation:confettiFall ${1.2+Math.random()*1.2}s linear ${Math.random()*0.5}s forwards`;
+    container.appendChild(el);
+  }
+  // Add confetti animation if not already added
+  if (!document.getElementById('confetti-style')) {
+    const s = document.createElement('style');
+    s.id = 'confetti-style';
+    s.textContent = `@keyframes confettiFall{to{top:110%;transform:rotate(${Math.random()>0.5?'':'−'}720deg)}}`;
+    document.head.appendChild(s);
+  }
+}
+
+// ══════════════════════════════════════════════════
+// SKIN SELECTOR — para la pantalla de Perfil
+// ══════════════════════════════════════════════════
+function buildSkinGrid() {
+  const container = document.getElementById('skin-grid');
+  if (!container) return;
+  const d = gGetData();
+  const unlocked = d.skinsDesbloqueadas || ['base'];
+  const active = d.activeSkin || 'base';
+
+  container.innerHTML = SKINS.map(skin => {
+    const isUnlocked = unlocked.includes(skin.id);
+    const isActive = skin.id === active;
+    return `<div onclick="${isUnlocked?`selectSkin('${skin.id}')`:'void(0)'}"
+      style="background:${isUnlocked?skin.panel:'#1a1828'};border:2px solid ${isActive?'#ffd93d':isUnlocked?skin.panelBorder:'#2e2b45'};
+      border-radius:10px;padding:8px;text-align:center;cursor:${isUnlocked?'pointer':'default'};position:relative;min-width:80px;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <div style="font-size:24px">${skin.icon}</div>
+      <div style="font-size:10px;font-weight:800;color:${isUnlocked?skin.labelColor:'#444'}">${skin.name}</div>
+      ${!isUnlocked ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,.6);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:16px">🔒</div>
+        <div style="font-size:9px;color:#888;font-weight:700">${skin.ptsReq>=9999?'EXCLUSIVA':skin.ptsReq+' pts'}</div>
+      </div>` : ''}
+      ${isActive ? `<div style="position:absolute;top:4px;right:4px;background:#ffd93d;border-radius:50%;width:14px;height:14px;font-size:8px;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900">✓</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+window.selectSkin = (id) => {
+  const d = gGetData();
+  d.activeSkin = id;
+  gSaveData(d);
+  buildSkinGrid();
+  showToast('✅ Esquina activada: ' + (SKINS.find(s=>s.id===id)?.name || id));
+};
+
+// ══════════════════════════════════════════════════
+// RANKING HOME — Top Semanal + Leyenda TJ
+// ══════════════════════════════════════════════════
+async function loadHomeRanking() {
+  const wrap = document.getElementById('home-ranking-wrap');
+  if (!wrap) return;
+  try {
+    const snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('puntaje','desc'), limit(5)));
+    if (snap.empty) { wrap.style.display='none'; return; }
+    wrap.style.display = '';
+
+    // #1 anual (leyenda)
+    const topDoc = snap.docs[0]?.data();
+    const legendEl = document.getElementById('home-legend');
+    if (legendEl && topDoc) {
+      legendEl.innerHTML = `<div style="font-family:'Fredoka One',cursive;font-size:13px;color:#ffd93d;margin-bottom:4px">👑 LEYENDA TJ 2026</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:28px">🏅</div>
+          <div>
+            <div style="font-size:14px;font-weight:800">${topDoc.nombre||'Coleccionista'}</div>
+            <div style="font-size:11px;color:#c77dff">${topDoc.anual2026||topDoc.total||0} pts acumulados 2026</div>
+          </div>
+        </div>`;
+    }
+
+    // Top 5 tabla
+    const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+    const rowsEl = document.getElementById('home-ranking-rows');
+    if (rowsEl) rowsEl.innerHTML = snap.docs.map((dd,i)=>{
+      const data = dd.data();
+      const isMe = currentUser && data.userId===currentUser.uid;
+      return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1e1840;${isMe?'color:#ffd93d;font-weight:800':''}">
+        <span>${medals[i]||'·'} ${(data.nombre||'').substring(0,16)}</span>
+        <span style="color:${isMe?'#ffd93d':'#c77dff'}">${data.puntaje}</span>
+      </div>`;
+    }).join('');
+  } catch(e) { if(wrap) wrap.style.display='none'; }
 }
 
 // ── INIT ──
