@@ -862,7 +862,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCRdeRJWOC-Cf2CGqd4mqEO8s7_8cHF79g",
@@ -991,6 +991,19 @@ window.updateMarcas = () => {
     custom.style.display = sel.value === 'Otra marca' || sel.value === 'Otro' ? '' : 'none';
   };
 };
+
+// ── REDIRECT RESULT (móvil Google login) ──
+getRedirectResult(auth).then(result => {
+  if (result && result.user) {
+    showToast('¡Bienvenido! 🎉');
+    showScreen('screen-home');
+  }
+}).catch(e => {
+  if (e && e.code !== 'auth/no-current-user') {
+    console.error('Redirect error:', e);
+    showToast('Error Google: ' + (e.code || ''));
+  }
+});
 
 // ── AUTH STATE ──
 onAuthStateChanged(auth, async user => {
@@ -1297,8 +1310,19 @@ window.activarPlan = async (plan) => {
 
 // ── AUTH ──
 window.loginGoogle = async () => {
-  try { await signInWithPopup(auth, provider); showToast('¡Bienvenido! 🎉'); showScreen('screen-home'); }
-  catch(e) { showToast('Error al iniciar con Google'); }
+  try {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      await signInWithRedirect(auth, provider);
+    } else {
+      await signInWithPopup(auth, provider);
+      showToast('¡Bienvenido! 🎉');
+      showScreen('screen-home');
+    }
+  } catch(e) {
+    console.error('Google login error:', e);
+    showToast('Error al iniciar con Google: ' + (e.code || e.message));
+  }
 };
 window.authAction = async () => {
   const email = document.getElementById('auth-email').value.trim();
