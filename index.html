@@ -866,7 +866,7 @@ import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, Google
 
 const firebaseConfig = {
   apiKey: "AIzaSyArx7IYJFcOx67x50X6p_Op_-kaV9YDFNY",
-  authDomain: "mundo-del-coleccionista.vercel.app",
+  authDomain: "mundo-del-coleccionista.firebaseapp.com",
   projectId: "mundo-del-coleccionista",
   storageBucket: "mundo-del-coleccionista.firebasestorage.app",
   messagingSenderId: "590307203433",
@@ -1311,15 +1311,9 @@ window.activarPlan = async (plan) => {
 // ── AUTH ──
 window.loginGoogle = async () => {
   try {
-    const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    if (isMobile) {
-      showToast('Redirigiendo a Google…');
-      await signInWithRedirect(auth, provider);
-    } else {
-      await signInWithPopup(auth, provider);
-      showToast('¡Bienvenido! 🎉');
-      showScreen('screen-home');
-    }
+    await signInWithPopup(auth, provider);
+    showToast('¡Bienvenido! 🎉');
+    showScreen('screen-home');
   } catch(e) {
     console.error('Google login error:', e);
     showToast('Error al iniciar con Google: ' + (e.code || e.message));
