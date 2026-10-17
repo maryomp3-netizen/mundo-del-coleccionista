@@ -1304,7 +1304,7 @@ window.activarPlan = async (plan) => {
 
 // ── AUTH ──
 window.loginGoogle = async () => {
-  try { await signInWithPopup(auth, provider); showToast('¡Bienvenido! 🎉'); showScreen('screen-home'); }
+  try { await signInWithRedirect(auth, provider); showToast('¡Bienvenido! 🎉'); showScreen('screen-home'); }
   catch(e) { showToast('Error al iniciar con Google'); }
 };
 window.authAction = async () => {
