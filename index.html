@@ -862,10 +862,10 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getAuth, signInWithRedirect, getRedirectResult, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyArx7IYJFcOx67x50X6p_Op_-kaV9YDFNY",
+  apiKey: "AIzaSyCRdeRJWOC-Cf2CGqd4mqEO8s7_8cHF79g",
   authDomain: "mundo-del-coleccionista.firebaseapp.com",
   projectId: "mundo-del-coleccionista",
   storageBucket: "mundo-del-coleccionista.firebasestorage.app",
@@ -877,13 +877,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
-  getRedirectResult(auth).then((result)=>{
-    if(result && result.user){
-      console.log(¨Login OK:¨, result.user.email);
-    }
-  }).catch((e)=>{
-    alert(¨Error Google: ¨+e.message);
-  });
 const provider = new GoogleAuthProvider();
 
 // ── CATEGORÍAS ──
@@ -1304,7 +1297,7 @@ window.activarPlan = async (plan) => {
 
 // ── AUTH ──
 window.loginGoogle = async () => {
-  try { await signInWithRedirect(auth, provider); showToast('¡Bienvenido! 🎉'); showScreen('screen-home'); }
+  try { await signInWithPopup(auth, provider); showToast('¡Bienvenido! 🎉'); showScreen('screen-home'); }
   catch(e) { showToast('Error al iniciar con Google'); }
 };
 window.authAction = async () => {
