@@ -2467,10 +2467,12 @@ window.startGame = () => {
   const resizeCanvas = () => {
     const arena = document.getElementById('g-arena');
     const rect = arena.getBoundingClientRect();
-    gCanvas.width = rect.width;
-    gCanvas.height = rect.height;
-    gBasketX = gCanvas.width / 2 - gBasketW / 2;
-    gBasketY = gCanvas.height - 55;
+    const W = rect.width || window.innerWidth;
+    const H = rect.height > 50 ? rect.height : (window.innerHeight - 200);
+    gCanvas.width = W;
+    gCanvas.height = H;
+    gBasketX = W / 2 - gBasketW / 2;
+    gBasketY = H - 55;
     gStars = Array.from({length:80}, () => ({
       x: Math.random() * gCanvas.width,
       y: Math.random() * gCanvas.height,
@@ -2480,10 +2482,12 @@ window.startGame = () => {
     }));
     buildBuildings(gCanvas.width, gCanvas.height);
   };
-  setTimeout(resizeCanvas, 80);
+  resizeCanvas(); // run immediately
+  setTimeout(resizeCanvas, 120); // re-run after layout settles
   initJoystick();
   if (gAnimId) cancelAnimationFrame(gAnimId);
-  setTimeout(() => { if (gRunning) gameLoop(); }, 100);
+  gAnimId = null;
+  setTimeout(() => { if (gRunning) gameLoop(); }, 150);
 };
 
 window.stopGame = () => {
@@ -2739,6 +2743,12 @@ function drawCyberpunkBuildings(W, H, skin, alpha) {
 // ══════════════════════════════════════════════════
 function gameLoop() {
   if (!gRunning || !gCanvas) return;
+  // Guard: if canvas has no size yet, retry next frame
+  if (gCanvas.width < 10 || gCanvas.height < 10) {
+    gAnimId = requestAnimationFrame(gameLoop);
+    return;
+  }
+  try {
   gFrame++;
   const W = gCanvas.width, H = gCanvas.height;
   const skin = gGetActiveSkin();
@@ -2995,6 +3005,14 @@ function gameLoop() {
 
   gCtx.restore(); // end shake
 
+  } catch(err) {
+    // Draw error message on canvas so we can debug
+    try {
+      gCtx.fillStyle = '#ff6b6b';
+      gCtx.font = '11px monospace';
+      gCtx.fillText('ERR: ' + err.message, 8, 20);
+    } catch(e2) {}
+  }
   gAnimId = requestAnimationFrame(gameLoop);
 }
 
