@@ -189,6 +189,21 @@
   .chat-input-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:430px; background:var(--surface); border-top:1.5px solid #2e2b45; padding:10px 14px 24px; display:flex; gap:8px; z-index:100; }
   .chat-input { flex:1; background:var(--card); border:1.5px solid #2e2b45; border-radius:24px; padding:10px 16px; font-size:14px; font-family:'Nunito',sans-serif; color:var(--text); outline:none; font-weight:600; }
   .chat-send-btn { width:42px; height:42px; background:linear-gradient(135deg,var(--accent4),#2d6aff); border:none; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  /* ── VEBLEN ── */
+  .veblen-card { border:2px solid #ffd93d!important; box-shadow:0 0 16px rgba(255,217,61,.35),inset 0 0 10px rgba(255,217,61,.07); }
+  .veblen-card .col-card-img::after { content:'⭐ SANTO GRIAL'; position:absolute; bottom:6px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#ffd93d,#ff9900); color:#1a1200; font-size:8px; font-weight:900; padding:2px 8px; border-radius:20px; white-space:nowrap; }
+  .veblen-badge { background:linear-gradient(135deg,#ffd93d,#ff9900); color:#1a1200; font-size:9px; font-weight:900; padding:2px 8px; border-radius:20px; text-transform:uppercase; }
+  /* ── BÓVEDA ── */
+  .boveda-item { background:var(--card); border-radius:14px; padding:12px; border:1.5px solid #2e2b45; display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .boveda-status { font-size:9px; font-weight:800; padding:2px 8px; border-radius:20px; text-transform:uppercase; }
+  .boveda-status.terminado { background:#1a3a1a; color:#6bcb77; border:1px solid #6bcb77; }
+  .boveda-status.proceso { background:#1a1a3a; color:#4d96ff; border:1px solid #4d96ff; }
+  .boveda-status.prestado { background:#3a1a1a; color:#ff6b6b; border:1px solid #ff6b6b; }
+  /* ── FORO ── */
+  .foro-post { background:var(--card); border-radius:14px; padding:13px; border:1.5px solid #2e2b45; margin-bottom:8px; cursor:pointer; }
+  .foro-region-chip { font-size:9px; font-weight:800; padding:2px 8px; border-radius:20px; background:#1e1840; color:#c77dff; border:1px solid #c77dff; display:inline-block; margin-bottom:6px; }
+  /* ── GAME SOUNDS CONTROL ── */
+  #g-sound-btn { background:#1e1840; border:1px solid #7c5cff; border-radius:8px; padding:4px 10px; color:#c77dff; font-size:11px; font-weight:700; cursor:pointer; }
   /* SPLASH */
   #screen-splash { background:var(--bg); align-items:center; justify-content:center; flex-direction:column; gap:20px; }
   .splash-logo { font-family:"Fredoka One",cursive; font-size:42px; text-align:center; background:linear-gradient(135deg,var(--accent2),var(--accent1)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
@@ -216,6 +231,14 @@
   .ob-skip { flex:1; padding:13px; background:var(--card); border:1.5px solid #2e2b45; border-radius:13px; color:var(--muted); font-family:"Fredoka One",cursive; font-size:15px; cursor:pointer; }
   .ob-next { flex:2; padding:13px; background:linear-gradient(135deg,var(--accent2),var(--accent1)); border:none; border-radius:13px; color:#1a1200; font-family:"Fredoka One",cursive; font-size:16px; cursor:pointer; transition:transform 0.2s; }
   .ob-next:hover { transform:translateY(-2px); }
+  .foro-rpill { padding:7px 14px; border-radius:50px; font-size:12px; font-weight:800; cursor:pointer; border:1.5px solid #2e2b45; background:var(--card); color:var(--muted); transition:all 0.2s; }
+  .foro-rpill.sel { background:linear-gradient(135deg,#7c5cff,#c77dff); color:#fff; border-color:transparent; }
+  .foro-tipo-chip { font-size:9px; font-weight:800; padding:2px 8px; border-radius:20px; display:inline-block; }
+  .foro-tipo-venta { background:#1a2a1a; color:#6bcb77; border:1px solid #6bcb77; }
+  .foro-tipo-intercambio { background:#1a1040; color:#c77dff; border:1px solid #c77dff; }
+  .foro-tipo-busco { background:#1a2a3a; color:#4d96ff; border:1px solid #4d96ff; }
+  .foro-tipo-evento { background:#2a2a00; color:#ffd93d; border:1px solid #ffd93d; }
+  .foro-tipo-pregunta { background:#2a1a1a; color:#ff6b6b; border:1px solid #ff6b6b; }
 </style>
 </head>
 <body>
@@ -323,14 +346,14 @@
   <div class="grid" id="items-grid">
     <div class="loading"><div class="spinner"></div></div>
   </div>
-  <div id="duelo-fab" style="position:fixed;bottom:75px;left:16px;z-index:100;display:none">
+  <div id="duelo-fab" style="position:fixed;bottom:75px;right:16px;z-index:100;display:none">
     <button onclick="showDuelo()" style="background:linear-gradient(135deg,#ff6b6b,#c77dff);border:none;border-radius:50px;padding:10px 16px;font-size:13px;font-weight:800;color:#fff;cursor:pointer;box-shadow:0 4px 15px rgba(199,125,255,.4)">⚔️ Duelo</button>
   </div>
   <nav class="bottom-nav">
     <button class="nav-btn active" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
     <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
-    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
-    <button class="nav-btn" onclick="showScreen('screen-planes')"><span>⭐</span><span>Planes</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-foro')"><span>📍</span><span>Foro</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-boveda')"><span>🗄️</span><span>Bóveda</span></button>
     <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
   </nav>
 </div>
@@ -456,6 +479,11 @@
     <div class="form-field">
       <label class="form-label">📍 Ubicación (opcional)</label>
       <input class="form-input" id="f-ubicacion" type="text" placeholder="Ej: Ciudad de México, Guadalajara, Monterrey…">
+    </div>
+    <div class="form-field">
+      <label class="form-label">💰 Precio estimado (MXN, opcional)</label>
+      <input class="form-input" id="f-precio" type="number" placeholder="Ej: 2500 — piezas >$2000 reciben ⭐ SANTO GRIAL">
+      <div style="font-size:10px;color:#ffd93d;margin-top:4px">⭐ Las piezas con valor >$2,000 MXN se marcan automáticamente como Pieza Veblen / Grail</div>
     </div>
     <button class="submit-btn" id="btn-submit" onclick="submitPieza()">Publicar aporte 🚀</button>
   </div>
@@ -642,6 +670,23 @@
       <div class="stat-box"><div class="stat-val" id="p-aportes">0</div><div class="stat-lbl">Mis aportes</div></div>
       <div class="stat-box"><div class="stat-val" id="p-total">0</div><div class="stat-lbl">Comunidad</div></div>
     </div>
+    <!-- VEBLEN STATUS CARD -->
+    <div id="veblen-status-card" style="background:linear-gradient(135deg,#1a1200,#2a1a00);border:1.5px solid #ffd93d;border-radius:14px;padding:14px;margin-bottom:14px;display:none">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:28px">⭐</span>
+        <div>
+          <div style="font-weight:900;font-size:14px;color:#ffd93d">Coleccionista Veblen</div>
+          <div style="font-size:11px;color:#c8a800">Ranking de Estatus</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:22px;font-weight:900;color:#ffd93d" id="p-status-pts">0</div>
+          <div style="font-size:10px;color:#c8a800">puntos</div>
+        </div>
+      </div>
+      <div style="background:#2a1a00;border-radius:8px;padding:8px;font-size:11px;color:#c8a800">
+        <div id="p-veblen-rank">🥇 Rank: — <span id="p-veblen-count" style="font-size:10px"></span></div>
+      </div>
+    </div>
     <div style="font-size:14px;font-weight:800;margin-bottom:10px">Mis aportes recientes</div>
     <div id="my-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
     <button class="submit-btn" style="margin-bottom:10px" onclick="showScreen('screen-planes')">⭐ Ver planes Premium</button>
@@ -773,15 +818,150 @@
   <button onclick="document.getElementById('duelo-modal').style.display='none'" style="margin-top:20px;background:#2e2b45;border:none;border-radius:10px;padding:10px 24px;color:var(--muted);font-weight:700;cursor:pointer">Cerrar</button>
 </div>
 
+<!-- BÓVEDA COSPLAY -->
+<div class="screen" id="screen-boveda">
+  <div class="topbar">
+    <div class="logo">🗄️ La <span>Bóveda</span></div>
+    <button class="back-btn" onclick="showScreen('screen-home')" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">✕</button>
+  </div>
+  <div style="padding:0 20px 100px;flex:1;overflow-y:auto">
+    <div style="background:linear-gradient(135deg,#1a0a2e,#2d1b69);border-radius:14px;padding:14px;margin-bottom:16px;border:1.5px solid #7c5cff">
+      <div style="font-family:'Fredoka One',cursive;font-size:16px;color:#c77dff;margin-bottom:4px">🎭 Tu colección de cosplay</div>
+      <div style="font-size:12px;color:var(--muted);font-weight:600">Props, disfraces y pelucas — privado por defecto</div>
+    </div>
+    <!-- Botón agregar -->
+    <button onclick="showBovedaForm()" style="width:100%;padding:12px;background:linear-gradient(135deg,#7c5cff,#c77dff);border:none;border-radius:14px;color:#fff;font-family:'Fredoka One',cursive;font-size:16px;cursor:pointer;margin-bottom:14px">+ Agregar pieza 🎭</button>
+    <!-- Form nuevo item -->
+    <div id="boveda-form" style="display:none;background:var(--card);border-radius:14px;padding:14px;margin-bottom:14px;border:1.5px solid #7c5cff">
+      <div style="font-size:14px;font-weight:800;margin-bottom:10px;color:#c77dff">Nueva pieza de bóveda</div>
+      <div class="form-field">
+        <label class="form-label">Nombre / Personaje</label>
+        <input class="form-input" id="bov-nombre" placeholder="Ej: Espada de foam Aragorn">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="bov-tipo">
+          <option value="prop">🔧 Prop / Accesorio</option>
+          <option value="disfraz">👘 Disfraz completo</option>
+          <option value="peluca">💈 Peluca</option>
+          <option value="armadura">🛡️ Armadura / Pieza</option>
+          <option value="otro">📦 Otro</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Estado</label>
+        <select class="form-select" id="bov-status">
+          <option value="proceso">En proceso</option>
+          <option value="terminado">Terminado ✅</option>
+          <option value="prestado">Prestado 📦</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Costo total (MXN)</label>
+        <input class="form-input" id="bov-costo" type="number" placeholder="0">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Foto (opcional)</label>
+        <div class="upload-zone" style="height:100px;margin-bottom:0" onclick="document.getElementById('bov-foto-input').click()">
+          <img id="bov-foto-preview" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;display:none;border-radius:var(--radius)">
+          <span style="font-size:20px">📷</span>
+          <input type="file" id="bov-foto-input" accept="image/*" style="display:none" onchange="previewBovedaFoto(event)">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="saveBovedaItem()" style="flex:1;padding:12px;background:#7c5cff;border:none;border-radius:12px;color:#fff;font-weight:800;font-size:14px;cursor:pointer">Guardar 💾</button>
+        <button onclick="document.getElementById('boveda-form').style.display='none'" style="padding:12px 16px;background:var(--surface);border:1.5px solid #2e2b45;border-radius:12px;color:var(--muted);font-weight:700;cursor:pointer">Cancelar</button>
+      </div>
+    </div>
+    <!-- Agrupar en set -->
+    <div id="boveda-set-section" style="display:none;background:var(--card);border-radius:14px;padding:13px;margin-bottom:14px;border:1.5px dashed #7c5cff">
+      <div style="font-size:13px;font-weight:800;color:#c77dff;margin-bottom:8px">🎯 Armar Set Completo</div>
+      <div id="boveda-set-name-wrap">
+        <input class="form-input" id="bov-set-name" placeholder="Nombre del set (ej: Link BOTW)" style="margin-bottom:8px">
+        <button onclick="crearSet()" style="width:100%;padding:10px;background:#2d1b69;border:1px solid #7c5cff;border-radius:10px;color:#c77dff;font-weight:800;font-size:13px;cursor:pointer">Crear set con items seleccionados</button>
+      </div>
+    </div>
+    <!-- Stats -->
+    <div id="boveda-stats" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+      <div class="stat-box"><div class="stat-val" id="bov-count">0</div><div class="stat-lbl">Piezas</div></div>
+      <div class="stat-box"><div class="stat-val" id="bov-done">0</div><div class="stat-lbl">Listas</div></div>
+      <div class="stat-box"><div class="stat-val" id="bov-costo-total" style="font-size:13px">$0</div><div class="stat-lbl">Invertido</div></div>
+    </div>
+    <!-- Lista items -->
+    <div style="font-size:14px;font-weight:800;margin-bottom:10px">Mis piezas</div>
+    <div id="boveda-list"></div>
+    <!-- Compartir -->
+    <button id="bov-share-btn" style="display:none;width:100%;padding:12px;background:var(--card);border:1.5px solid #4d96ff;border-radius:14px;color:#4d96ff;font-weight:800;font-size:14px;cursor:pointer;margin-top:8px" onclick="shareBovedaLink()">🔗 Compartir mi Bóveda</button>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
+    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
+    <button class="nav-btn active"><span>🗄️</span><span>Bóveda</span></button>
+    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
+  </nav>
+</div>
+
+<!-- FORO POR REGIÓN -->
+<div class="screen" id="screen-foro">
+  <div class="topbar">
+    <div class="logo">📍 Foro <span>Región</span></div>
+    <button class="back-btn" onclick="showScreen('screen-home')" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">✕</button>
+  </div>
+  <!-- Selector de región (obligatorio) -->
+  <div id="foro-region-selector" style="padding:20px;background:var(--surface);border-bottom:1.5px solid #2e2b45">
+    <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:var(--muted)">📍 Selecciona tu región</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="foro-region-pills">
+      <button class="foro-rpill" onclick="selectForoRegion('Tijuana')">🌆 Tijuana</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Rosarito')">🏖️ Rosarito</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Mexicali')">🌵 Mexicali</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Ensenada')">⚓ Ensenada</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Otro')">📌 Otro</button>
+    </div>
+  </div>
+  <div style="padding:0 20px 100px;flex:1;overflow-y:auto">
+    <!-- Post nuevo -->
+    <div id="foro-new-post" style="display:none;background:var(--card);border-radius:14px;padding:13px;margin:12px 0;border:1.5px solid #2e2b45">
+      <div style="font-size:13px;font-weight:800;margin-bottom:8px;color:#c77dff" id="foro-region-label">📍 Publicando en: —</div>
+      <textarea class="form-input" id="foro-post-text" rows="2" placeholder="Ej: Cambio Hot Wheels edición especial en Plaza 2000 TJ…" style="resize:none;margin-bottom:8px"></textarea>
+      <div style="display:flex;gap:8px">
+        <select class="form-select" id="foro-post-tipo" style="flex:1">
+          <option value="venta">💰 Venta</option>
+          <option value="intercambio">🔄 Intercambio</option>
+          <option value="busco">🔍 Busco</option>
+          <option value="evento">🎉 Evento</option>
+          <option value="pregunta">❓ Pregunta</option>
+        </select>
+        <button id="foro-post-btn" onclick="postForo()" style="padding:10px 16px;background:#7c5cff;border:none;border-radius:12px;color:#fff;font-weight:800;cursor:pointer">📢 Publicar</button>
+      </div>
+    </div>
+    <!-- Posts lista -->
+    <div id="foro-posts-list">
+      <div style="text-align:center;padding:40px;color:var(--muted)">
+        <div style="font-size:40px;margin-bottom:10px">📍</div>
+        <div style="font-weight:700">Selecciona una región para ver el foro</div>
+      </div>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
+    <button class="nav-btn active"><span>📍</span><span>Foro</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-planes')"><span>⭐</span><span>Planes</span></button>
+    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
+  </nav>
+</div>
+
 <!-- GAME SCREEN -->
 <!-- ARCADE GAME SCREEN -->
-<div class="screen" id="screen-game" style="background:#0d0a1a;display:flex;flex-direction:column;overflow:hidden;position:relative">
+<div class="screen" id="screen-game" style="background:#0d0a1a;display:flex;flex-direction:column;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;max-width:430px;margin:0 auto;z-index:200">
 
   <!-- HUD superior -->
   <div id="g-hud" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#0d0a1a;border-bottom:1px solid #7c5cff;flex-shrink:0;z-index:10">
     <button onclick="stopGame()" style="background:#1e1840;border:1px solid #7c5cff;border-radius:8px;padding:5px 10px;color:#c77dff;font-size:12px;font-weight:700;cursor:pointer">✕ SALIR</button>
     <div id="g-level-title" style="font-family:'Fredoka One',cursive;font-size:13px;color:#ffd93d;letter-spacing:1px;text-align:center">ARCADE CAPTURE — LVL 1</div>
-    <div style="display:flex;gap:10px;align-items:center">
+    <div style="display:flex;gap:6px;align-items:center">
+      <button id="g-sound-btn" onclick="toggleGameSound()">🔇</button>
       <div id="g-lives" style="font-size:16px;letter-spacing:2px">❤️❤️❤️</div>
       <div style="font-size:15px;font-weight:900;color:#ffd93d;min-width:52px;text-align:right">⭐<span id="g-score">0</span></div>
     </div>
@@ -861,7 +1041,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, increment, query, orderBy, serverTimestamp, getDoc, setDoc, arrayUnion, arrayRemove, where, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -1261,12 +1441,22 @@ window.submitPieza = async () => {
       descripcion: document.getElementById('f-desc').value.trim(),
       imageUrl, autorId: currentUser.uid,
       autorNombre: currentUser.displayName||currentUser.email.split('@')[0],
+      precio: Number(document.getElementById('f-precio').value)||0,
       vistas: 0, likes: 0, likedBy: [], createdAt: serverTimestamp()
     });
-    showToast('¡Pieza publicada! 🎉');
+    // Check if Veblen + award status
+    const precioVal = Number(document.getElementById('f-precio').value)||0;
+    const rarezaVal = document.getElementById('f-rareza').value;
+    if (precioVal > 2000 || rarezaVal === 'Legendaria') {
+      try { await updateDoc(doc(db,'usuarios',currentUser.uid),{statusPoints:increment(50)}); } catch(e2){}
+      showToast('⭐ ¡Pieza Veblen! +50 puntos de estatus 🏆');
+    } else {
+      showToast('¡Pieza publicada! 🎉');
+    }
     document.getElementById('f-nombre').value = '';
     document.getElementById('f-desc').value = '';
     document.getElementById('f-año').value = '';
+    document.getElementById('f-precio').value = '';
     for(let i=0;i<3;i++){
       document.getElementById('img-preview-'+i).style.display='none';
       document.getElementById('file-input-'+i).value='';
@@ -1675,6 +1865,30 @@ window.showScreen = (id) => {
       const el = document.getElementById('skin-count');
       if (el) el.textContent = `${unlocked}/6`;
     }, 80);
+    // Load Veblen status points
+    if (currentUser) {
+      getDoc(doc(db,'usuarios',currentUser.uid)).then(snap => {
+        if (!snap.exists()) return;
+        const data = snap.data();
+        const pts = data.statusPoints || 0;
+        if (pts > 0) {
+          const card = document.getElementById('veblen-status-card');
+          if (card) card.style.display = 'block';
+          const ptsEl = document.getElementById('p-status-pts');
+          if (ptsEl) ptsEl.textContent = pts;
+          // Rank title
+          const rankEl = document.getElementById('p-veblen-rank');
+          if (rankEl) {
+            let rank = 'Cazador de Grails';
+            if (pts >= 500) rank = '💠 Leyenda Veblen';
+            else if (pts >= 200) rank = '👑 Maestro Coleccionista';
+            else if (pts >= 100) rank = '⭐ Coleccionista Veblen';
+            else if (pts >= 50) rank = '🔥 Aspirante Veblen';
+            rankEl.textContent = rank + ` · ${Math.floor(pts/50)} pieza${Math.floor(pts/50)!==1?'s':''} Veblen`;
+          }
+        }
+      }).catch(()=>{});
+    }
   }
   // Home ranking
   if (id === 'screen-home') {
@@ -1901,48 +2115,64 @@ const GAME_CATS = [
 // ══════════════════════════════════════════════════
 // SKINS COLECCIONABLES
 // ══════════════════════════════════════════════════
+// SKINS REDISEÑADAS — FINAL V1
+// bgType: 'cyber' (cyberpunk default), 'gameboy', 'snes', 'arcade'
+// portalColor: neon color for capture portal
 const SKINS = [
   {
     id:'base', name:'BASE', desc:'Esquina inicial', ptsReq:0, icon:'🕹️',
     panel:'#1a1828', panelBorder:'#ffd93d',
     btnColor:'#ffd93d', btnShadow:'#b89a00', btnText:'#0d0a1a',
     joystickBase:'#2e2b45', joystickBorder:'#7c5cff', joystickKnob:'radial-gradient(circle at 35% 35%,#9b7dff,#5c3db0)',
-    labelColor:'#ffd93d'
+    labelColor:'#ffd93d',
+    bgType:'cyber', portalColor:'#7c5cff', particleColor:'#c77dff',
+    catchSound:'ding', bgColor1:'#0a0818', bgColor2:'#1a0a30'
   },
   {
-    id:'bloque_boy', name:'BLOQUE-BOY', desc:'50 pts en 1 partida', ptsReq:50, icon:'🎮',
-    panel:'#2a2a2a', panelBorder:'#b5b5b5',
+    id:'bloque_boy', name:'BLOQUE-BOY', desc:'150 pts en 1 partida', ptsReq:150, icon:'🎮',
+    panel:'#1a2a0a', panelBorder:'#44bb44',
     btnColor:'#cc2222', btnShadow:'#880000', btnText:'#fff',
-    joystickBase:'#3a3a3a', joystickBorder:'#b5b5b5', joystickKnob:'radial-gradient(circle at 35% 35%,#d0d0d0,#888)',
-    labelColor:'#b5b5b5'
+    joystickBase:'#0a1a0a', joystickBorder:'#44bb44', joystickKnob:'radial-gradient(circle at 35% 35%,#88ff88,#225522)',
+    labelColor:'#44bb44',
+    bgType:'gameboy', portalColor:'#44bb44', particleColor:'#88ff88',
+    catchSound:'coin', bgColor1:'#0a1a00', bgColor2:'#152a05'
   },
   {
-    id:'super_16', name:'SUPER-16', desc:'100 pts en 1 partida', ptsReq:100, icon:'🟣',
+    id:'super_16', name:'SUPER-16', desc:'300 pts en 1 partida', ptsReq:300, icon:'🟣',
     panel:'#2a1a4a', panelBorder:'#8a5cf0',
     btnColor:'#4488ff', btnShadow:'#2255cc', btnText:'#fff',
     joystickBase:'#3a1a6a', joystickBorder:'#8a5cf0', joystickKnob:'radial-gradient(circle at 35% 35%,#b07aff,#6a2fd0)',
-    labelColor:'#8a5cf0'
+    labelColor:'#8a5cf0',
+    bgType:'snes', portalColor:'#8a5cf0', particleColor:'#c77dff',
+    catchSound:'ding', bgColor1:'#140828', bgColor2:'#200a40'
   },
   {
-    id:'stick_pro', name:'STICK-PRO', desc:'200 pts en 1 partida', ptsReq:200, icon:'🕹️',
+    id:'stick_pro', name:'STICK-PRO', desc:'500 pts en 1 partida', ptsReq:500, icon:'🕹️',
     panel:'#080810', panelBorder:'#00d9ff',
     btnColor:'#00d9ff', btnShadow:'#008899', btnText:'#000',
     joystickBase:'#0a0a20', joystickBorder:'#00d9ff', joystickKnob:'radial-gradient(circle at 35% 35%,#60f0ff,#00aacc)',
-    labelColor:'#00d9ff'
+    labelColor:'#00d9ff',
+    bgType:'arcade', portalColor:'#00d9ff', particleColor:'#60f0ff',
+    catchSound:'arcade', bgColor1:'#000810', bgColor2:'#001020', magnetPull:true
   },
   {
-    id:'golden_tj', name:'GOLDEN-TJ', desc:'350 pts en 1 partida', ptsReq:350, icon:'👑',
+    id:'golden_tj', name:'GOLDEN-TJ', desc:'750 pts en 1 partida', ptsReq:750, icon:'👑',
     panel:'#1a1400', panelBorder:'#ffd93d',
     btnColor:'#ffd93d', btnShadow:'#c8a800', btnText:'#000',
     joystickBase:'#2a2000', joystickBorder:'#ffd93d', joystickKnob:'radial-gradient(circle at 35% 35%,#ffe880,#c8a800)',
-    labelColor:'#ffd93d', glitter:true
+    labelColor:'#ffd93d', glitter:true,
+    bgType:'cyber', portalColor:'#ffd93d', particleColor:'#ffe880',
+    catchSound:'golden', bgColor1:'#0a0800', bgColor2:'#1a1200'
   },
   {
-    id:'platinum_tj', name:'PLATINUM-TJ', desc:'⚡ EXCLUSIVA — #1 Anual TJ', ptsReq:9999, icon:'💠',
-    panel:'#c8c8c8', panelBorder:'#ffffff',
-    btnColor:'#e8e8e8', btnShadow:'#aaaaaa', btnText:'#333',
-    joystickBase:'#d0d0d0', joystickBorder:'#ffffff', joystickKnob:'radial-gradient(circle at 35% 35%,#ffffff,#c0c0c0)',
-    labelColor:'#7c5cff', platinum:true, rainbow:true
+    id:'platinum_veblen', name:'VEBLEN-SKIN', desc:'1100 pts + atrapar 3 Veblen seguidos', ptsReq:1100, icon:'💠',
+    panel:'linear-gradient(135deg,#1a0030,#001a30)', panelBorder:'#ffd93d',
+    btnColor:'#ffd93d', btnShadow:'#c8a800', btnText:'#000',
+    joystickBase:'#1a0030', joystickBorder:'#ffd93d', joystickKnob:'radial-gradient(circle at 35% 35%,#fff,#ffd93d)',
+    labelColor:'#ffd93d', platinum:true, rainbow:true,
+    bgType:'veblen', portalColor:'#ffd93d', particleColor:'#fff',
+    catchSound:'shing', bgColor1:'#08001a', bgColor2:'#001020',
+    veblenChallenge:true  // must catch 3 veblen in a row
   }
 ];
 
@@ -1952,12 +2182,136 @@ const SKINS = [
 let gCanvas, gCtx, gAnimId;
 let gRunning = false, gScore = 0, gLives = 3, gPowerup = false;
 let gBasketX = 0, gBasketW = 72, gBasketY = 0;
-let gFalling = [], gStars = [], gParticles = [];
+let gFalling = [], gStars = [], gParticles = [], gBuildings = [];
 let gMoveDir = 0;  // -1 left, 0 stop, 1 right  (joystick/buttons)
 let gJoyActive = false, gJoyStartX = 0, gJoyCurrentX = 0;
 let gSpeed = 1.5, gSpawnTimer = 0, gFrame = 0;
 let gPowerupInterval = null;
 let gLevel = 1;
+let gCombo = 0, gVeblenCombo = 0;  // veblen row counter for skin unlock
+let gSoundOn = false;  // muted by default
+let gAudioCtx = null;
+let gCatchFlash = 0;  // frames of catch glow on portal
+let gShakeFrames = 0; // miss shake
+
+// ══════════════════════════════════════════════════
+// WEB AUDIO SOUNDS — muted by default
+// ══════════════════════════════════════════════════
+function getAudioCtx() {
+  if (!gAudioCtx) {
+    try { gAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+  }
+  return gAudioCtx;
+}
+function playSound(type) {
+  if (!gSoundOn) return;
+  const ac = getAudioCtx();
+  if (!ac) return;
+  const g = ac.createGain();
+  g.connect(ac.destination);
+  const t = ac.currentTime;
+  try {
+    switch(type) {
+      case 'click': { // UI click
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='square'; o.frequency.value=880;
+        g.gain.setValueAtTime(0.06,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.08);
+        o.start(t); o.stop(t+0.08); break;
+      }
+      case 'vault': { // vault clack
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='sawtooth'; o.frequency.setValueAtTime(200,t); o.frequency.linearRampToValueAtTime(80,t+0.15);
+        g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+        o.start(t); o.stop(t+0.15); break;
+      }
+      case 'shing': { // veblen golden shing
+        [880,1100,1320,1760].forEach((f,i)=>{
+          const o=ac.createOscillator(); o.connect(g);
+          o.type='sine'; o.frequency.value=f;
+          const d=i*0.06;
+          g.gain.setValueAtTime(0,t+d);
+          g.gain.linearRampToValueAtTime(0.12,t+d+0.02);
+          g.gain.exponentialRampToValueAtTime(0.001,t+d+0.25);
+          o.start(t+d); o.stop(t+d+0.25);
+        }); break;
+      }
+      case 'ding': { // normal catch
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='sine'; o.frequency.setValueAtTime(660,t); o.frequency.linearRampToValueAtTime(880,t+0.12);
+        g.gain.setValueAtTime(0.1,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+        o.start(t); o.stop(t+0.18); break;
+      }
+      case 'coin': { // bloque-boy 8-bit coin
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='square'; o.frequency.setValueAtTime(523,t); o.frequency.setValueAtTime(1046,t+0.05);
+        g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+        o.start(t); o.stop(t+0.2); break;
+      }
+      case 'golden': { // golden catch
+        [523,659,784,1046].forEach((f,i)=>{
+          const o=ac.createOscillator(); o.connect(g);
+          o.type='triangle'; o.frequency.value=f;
+          const d=i*0.05;
+          g.gain.setValueAtTime(0.1,t+d);
+          g.gain.exponentialRampToValueAtTime(0.001,t+d+0.2);
+          o.start(t+d); o.stop(t+d+0.2);
+        }); break;
+      }
+      case 'arcade': { // stick-pro arcade
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='sawtooth'; o.frequency.setValueAtTime(440,t); o.frequency.exponentialRampToValueAtTime(880,t+0.1);
+        g.gain.setValueAtTime(0.09,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.15);
+        o.start(t); o.stop(t+0.15); break;
+      }
+      case 'whoosh': { // object falling warning
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='sine'; o.frequency.setValueAtTime(200,t); o.frequency.linearRampToValueAtTime(100,t+0.1);
+        g.gain.setValueAtTime(0.04,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1);
+        o.start(t); o.stop(t+0.1); break;
+      }
+      case 'pof': { // miss
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='sawtooth'; o.frequency.setValueAtTime(200,t); o.frequency.linearRampToValueAtTime(80,t+0.18);
+        g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+        o.start(t); o.stop(t+0.18); break;
+      }
+      case 'combo': { // combo tone
+        const freq = Math.min(440 + gCombo*55, 1400);
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='triangle'; o.frequency.setValueAtTime(freq,t); o.frequency.linearRampToValueAtTime(freq*1.3,t+0.15);
+        g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+        o.start(t); o.stop(t+0.2); break;
+      }
+      case 'gameover': { // retro game over
+        [330,294,262,220].forEach((f,i)=>{
+          const o=ac.createOscillator(); o.connect(g);
+          o.type='square'; o.frequency.value=f;
+          const d=i*0.18;
+          g.gain.setValueAtTime(0.1,t+d);
+          g.gain.exponentialRampToValueAtTime(0.001,t+d+0.15);
+          o.start(t+d); o.stop(t+d+0.15);
+        }); break;
+      }
+      case 'powerup': {
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='square'; o.frequency.value=880;
+        g.gain.setValueAtTime(0.12,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+        o.start(t); o.stop(t+0.4); break;
+      }
+      case 'trap': { // trap object miss penalty
+        const o = ac.createOscillator(); o.connect(g);
+        o.type='sawtooth'; o.frequency.setValueAtTime(300,t); o.frequency.linearRampToValueAtTime(150,t+0.2);
+        g.gain.setValueAtTime(0.14,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.2);
+        o.start(t); o.stop(t+0.2); break;
+      }
+    }
+  } catch(e) {}
+}
+window.toggleGameSound = () => {
+  gSoundOn = !gSoundOn;
+  if (gSoundOn) getAudioCtx();
+  document.getElementById('g-sound-btn').textContent = gSoundOn ? '🔊' : '🔇';
+};
 
 // ── Skin & Scores (localStorage) ──
 function gGetData() {
@@ -2076,6 +2430,20 @@ function getUserMainCat() {
 // ══════════════════════════════════════════════════
 // START / STOP
 // ══════════════════════════════════════════════════
+function buildBuildings(W, H) {
+  gBuildings = [];
+  const count = 7 + Math.floor(Math.random()*4);
+  for (let i=0; i<count; i++) {
+    gBuildings.push({
+      x: (W / count) * i + Math.random() * (W/count*0.5),
+      w: 28 + Math.random()*40,
+      h: 40 + Math.random()*120,
+      windows: Math.floor(Math.random()*8)+2,
+      hue: Math.random() > 0.5 ? 260 : 200
+    });
+  }
+}
+
 window.startGame = () => {
   showScreen('screen-game');
   const skin = gGetActiveSkin();
@@ -2084,12 +2452,14 @@ window.startGame = () => {
 
   gScore = 0; gLives = 3; gRunning = true; gFalling = []; gParticles = [];
   gSpawnTimer = 0; gPowerup = false; gSpeed = 1.5; gFrame = 0; gLevel = 1; gMoveDir = 0;
+  gCombo = 0; gVeblenCombo = 0; gCatchFlash = 0; gShakeFrames = 0;
   document.getElementById('g-score').textContent = '0';
   document.getElementById('g-lives').textContent = '❤️❤️❤️';
-  document.getElementById('g-level-title').textContent = 'ARCADE CAPTURE — LVL 1';
+  document.getElementById('g-level-title').textContent = 'PORTAL CAPTURE — LVL 1';
   document.getElementById('g-gameover').style.display = 'none';
   document.getElementById('g-skin-modal').style.display = 'none';
   document.getElementById('g-powerup-banner').style.display = 'none';
+  document.getElementById('g-sound-btn').textContent = gSoundOn ? '🔊' : '🔇';
 
   gCanvas = document.getElementById('game-canvas');
   gCtx = gCanvas.getContext('2d');
@@ -2101,12 +2471,14 @@ window.startGame = () => {
     gCanvas.height = rect.height;
     gBasketX = gCanvas.width / 2 - gBasketW / 2;
     gBasketY = gCanvas.height - 55;
-    gStars = Array.from({length:70}, () => ({
+    gStars = Array.from({length:80}, () => ({
       x: Math.random() * gCanvas.width,
       y: Math.random() * gCanvas.height,
-      r: Math.random() * 1.2 + 0.3,
-      a: Math.random() * Math.PI * 2
+      r: Math.random() * 1.5 + 0.3,
+      a: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.3 + 0.05
     }));
+    buildBuildings(gCanvas.width, gCanvas.height);
   };
   setTimeout(resizeCanvas, 80);
   initJoystick();
@@ -2122,27 +2494,83 @@ window.stopGame = () => {
   showScreen('screen-home');
 };
 
+// Object types for game
+const GAME_OBJECTS = [
+  // Normal collectibles (draw with shadow+glow)
+  {type:'hotwheels', emoji:'🚗', pts:8, label:'Hot Wheels'},
+  {type:'funko', emoji:'🎭', pts:8, label:'Funko Pop'},
+  {type:'card', emoji:'🃏', pts:10, label:'Carta RARA', holo:true},
+  {type:'canica', emoji:'🔵', pts:6, label:'Canica'},
+  {type:'tazo', emoji:'⭕', pts:6, label:'Tazo'},
+  {type:'lego', emoji:'🧱', pts:7, label:'LEGO'},
+  {type:'dino', emoji:'🦕', pts:7, label:'Dino'},
+  {type:'figura', emoji:'🦸', pts:8, label:'Figura'},
+  {type:'moneda', emoji:'🪙', pts:9, label:'Moneda'},
+];
+const TRAP_OBJECTS = [
+  {type:'trap', emoji:'💀', pts:-10, label:'TRAMPA', isTrap:true},
+  {type:'trap2', emoji:'🕳️', pts:-8, label:'HOYO', isTrap:true},
+  {type:'trap3', emoji:'⚡💥', pts:-5, label:'SHOCK', isTrap:true},
+];
+
 // ══════════════════════════════════════════════════
 // SPAWN
 // ══════════════════════════════════════════════════
 function spawnObject() {
   if (!gCanvas) return;
-  const mainCat = getUserMainCat();
-  let pool = [...GAME_CATS];
-  if (mainCat) {
-    const fav = GAME_CATS.find(c=>c.id===mainCat);
-    if (fav) pool = [...pool, fav, fav, fav];
+  const skin = gGetActiveSkin();
+  const rand = Math.random();
+  let obj;
+
+  if (rand < 0.04) {
+    // Veblen object (1 per ~25 objects)
+    obj = {
+      x: 20 + Math.random() * (gCanvas.width - 40),
+      y: -30,
+      emoji: '⭐',
+      isVeblen: true,
+      pts: 50,
+      speed: gSpeed * 0.7 + 0.3, // slower so you can catch it
+      rot: 0, angle: 0,
+      label: 'VEBLEN'
+    };
+  } else if (rand < 0.10 && gLevel >= 2) {
+    // Trap object appears from level 2
+    const trap = TRAP_OBJECTS[Math.floor(Math.random()*TRAP_OBJECTS.length)];
+    obj = {
+      x: 20 + Math.random() * (gCanvas.width - 40),
+      y: -22,
+      emoji: trap.emoji, pts: trap.pts, isTrap: true,
+      speed: gSpeed + Math.random() * 1.2,
+      rot: (Math.random()-0.5)*0.1, angle: 0,
+      label: trap.label
+    };
+  } else if (rand < 0.17) {
+    // Powerup
+    obj = {
+      x: 20 + Math.random() * (gCanvas.width - 40),
+      y: -22, emoji:'⚡', isPowerup: true, pts: 0,
+      speed: gSpeed + Math.random() * 0.8,
+      rot: 0, angle: 0
+    };
+  } else {
+    // Normal collectible
+    const mainCat = getUserMainCat();
+    let pool = [...GAME_OBJECTS];
+    if (mainCat) {
+      const fav = GAME_CATS.find(c=>c.id===mainCat);
+      if (fav) pool = [...pool, {type:mainCat, emoji:fav.emoji, pts:8}];
+    }
+    const base = pool[Math.floor(Math.random()*pool.length)];
+    obj = {
+      x: 20 + Math.random() * (gCanvas.width - 40),
+      y: -22, emoji: base.emoji, pts: base.pts,
+      speed: gSpeed + Math.random()*0.9,
+      rot: (Math.random()-0.5)*0.05, angle: 0,
+      holo: base.holo || false, label: base.label || ''
+    };
   }
-  const isPowerup = Math.random() < 0.07;
-  const cat = pool[Math.floor(Math.random() * pool.length)];
-  gFalling.push({
-    x: 20 + Math.random() * (gCanvas.width - 40),
-    y: -22,
-    emoji: isPowerup ? '⚡' : cat.emoji,
-    isPowerup,
-    speed: gSpeed + Math.random() * 0.7,
-    rot: (Math.random() - 0.5) * 0.06
-  });
+  gFalling.push(obj);
 }
 
 // ══════════════════════════════════════════════════
@@ -2171,6 +2599,142 @@ function activatePowerup() {
 }
 
 // ══════════════════════════════════════════════════
+// DRAW BACKGROUND (skin-aware parallax)
+// ══════════════════════════════════════════════════
+function drawBackground(W, H, skin) {
+  const bgType = skin.bgType || 'cyber';
+  const c1 = skin.bgColor1 || '#0a0818';
+  const c2 = skin.bgColor2 || '#1a0a30';
+
+  // Sky gradient
+  const grad = gCtx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0, c1);
+  grad.addColorStop(1, c2);
+  gCtx.fillStyle = grad;
+  gCtx.fillRect(0,0,W,H);
+
+  if (bgType === 'gameboy') {
+    // Game Boy green pixel grid
+    gCtx.strokeStyle = 'rgba(68,187,68,0.15)';
+    gCtx.lineWidth = 1;
+    for (let x=0; x<W; x+=8) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
+    for (let y=0; y<H; y+=8) { gCtx.beginPath(); gCtx.moveTo(0,y); gCtx.lineTo(W,y); gCtx.stroke(); }
+    // Pixel stars
+    gStars.forEach(s => {
+      s.a += 0.01;
+      const bright = Math.sin(s.a) > 0 ? 1 : 0;
+      if (bright) { gCtx.fillStyle = 'rgba(68,187,68,0.6)'; gCtx.fillRect(s.x|0,s.y|0,2,2); }
+    });
+  } else if (bgType === 'snes') {
+    // SNES purple neon mode 7-ish grid
+    const horizon = H * 0.55;
+    gCtx.strokeStyle = 'rgba(138,92,240,0.3)';
+    gCtx.lineWidth = 1;
+    // Perspective grid
+    for (let col = 0; col <= 12; col++) {
+      const px = (W/12)*col;
+      gCtx.beginPath(); gCtx.moveTo(px, horizon); gCtx.lineTo(W/2 + (px - W/2)*3, H); gCtx.stroke();
+    }
+    for (let row = 0; row <= 8; row++) {
+      const t = row/8;
+      const py = horizon + (H-horizon)*t*t;
+      gCtx.beginPath(); gCtx.moveTo(0,py); gCtx.lineTo(W,py); gCtx.stroke();
+    }
+    // Moving stars
+    gStars.forEach(s => {
+      s.y += s.speed * 0.5;
+      if (s.y > H) s.y = 0;
+      s.a += 0.02;
+      const a = 0.3 + Math.sin(s.a)*0.3;
+      gCtx.fillStyle = `rgba(176,122,255,${a})`;
+      gCtx.fillRect(s.x|0,s.y|0,s.r*2,s.r*2);
+    });
+  } else if (bgType === 'arcade') {
+    // Arcade cyan scanlines
+    for (let y=0; y<H; y+=4) {
+      gCtx.fillStyle = 'rgba(0,217,255,0.04)';
+      gCtx.fillRect(0,y,W,2);
+    }
+    gCtx.strokeStyle = 'rgba(0,217,255,0.12)';
+    gCtx.lineWidth = 1;
+    for (let x=0; x<W; x+=20) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
+    gStars.forEach(s => {
+      s.y += s.speed * 2;
+      if (s.y > H) { s.y = 0; s.x = Math.random()*W; }
+      gCtx.fillStyle = 'rgba(0,217,255,0.7)';
+      gCtx.fillRect(s.x|0, s.y|0, 1, 3+s.r*2);
+    });
+  } else if (bgType === 'veblen') {
+    // Veblen: dark luxury with golden stars
+    gCtx.strokeStyle = 'rgba(255,217,61,0.08)';
+    gCtx.lineWidth = 1;
+    for (let x=0; x<W; x+=24) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
+    for (let y=0; y<H; y+=24) { gCtx.beginPath(); gCtx.moveTo(0,y); gCtx.lineTo(W,y); gCtx.stroke(); }
+    gStars.forEach(s => {
+      s.a += 0.025;
+      const a = 0.15 + Math.sin(s.a)*0.3;
+      const hue = (gFrame*2 + s.x)%360;
+      gCtx.fillStyle = `hsla(${hue},80%,70%,${a})`;
+      gCtx.fillRect(s.x|0,s.y|0,s.r*3,s.r*3);
+    });
+    // Draw buildings for veblen too (silhouette)
+    drawCyberpunkBuildings(W, H, skin, 0.3);
+  } else {
+    // Default CYBER: parallax city
+    drawCyberpunkBuildings(W, H, skin, 1.0);
+    // Moving stars
+    gStars.forEach(s => {
+      s.a += 0.018;
+      const a = 0.2 + Math.sin(s.a)*0.25;
+      gCtx.fillStyle = `rgba(199,125,255,${a})`;
+      gCtx.fillRect(s.x|0, s.y|0, Math.ceil(s.r*2), Math.ceil(s.r*2));
+    });
+    // Neon perspective grid at bottom
+    const floorY = H * 0.72;
+    gCtx.strokeStyle = `rgba(124,92,255,0.22)`;
+    gCtx.lineWidth = 1;
+    for (let col=0; col<=16; col++) {
+      const px = (W/16)*col;
+      gCtx.beginPath(); gCtx.moveTo(W/2, floorY); gCtx.lineTo(px, H); gCtx.stroke();
+    }
+    for (let row=0; row<=6; row++) {
+      const t = row/6;
+      const py = floorY + (H-floorY)*t*t;
+      gCtx.beginPath(); gCtx.moveTo(0,py); gCtx.lineTo(W,py); gCtx.stroke();
+    }
+  }
+}
+
+function drawCyberpunkBuildings(W, H, skin, alpha) {
+  const floorY = H * 0.68;
+  gBuildings.forEach((b, idx) => {
+    const topY = floorY - b.h;
+    // Parallax: buildings at different speeds
+    const px = (b.x + gFrame * (0.1 + idx*0.02)) % (W + b.w) - b.w/2;
+    const col = b.hue === 260 ? `rgba(40,20,80,${0.7*alpha})` : `rgba(10,30,60,${0.7*alpha})`;
+    gCtx.fillStyle = col;
+    gCtx.fillRect(px|0, topY|0, b.w|0, b.h|0);
+    // Neon edge
+    gCtx.strokeStyle = b.hue === 260 ? `rgba(124,92,255,${0.5*alpha})` : `rgba(0,217,255,${0.4*alpha})`;
+    gCtx.lineWidth = 1;
+    gCtx.strokeRect(px|0, topY|0, b.w|0, b.h|0);
+    // Windows
+    const cols = Math.floor(b.w / 10), rows = Math.floor(b.h / 12);
+    for (let wr=0; wr<Math.min(rows,8); wr++) {
+      for (let wc=0; wc<Math.min(cols,4); wc++) {
+        const wx = px + 4 + wc*10;
+        const wy = topY + 6 + wr*12;
+        const lit = ((gFrame + idx*7 + wr*3 + wc*5) % 60) < 45;
+        if (lit) {
+          gCtx.fillStyle = b.hue === 260 ? `rgba(180,140,255,${0.6*alpha})` : `rgba(0,217,255,${0.5*alpha})`;
+          gCtx.fillRect(wx|0, wy|0, 5, 6);
+        }
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
 // GAME LOOP — 60fps canvas
 // ══════════════════════════════════════════════════
 function gameLoop() {
@@ -2178,81 +2742,162 @@ function gameLoop() {
   gFrame++;
   const W = gCanvas.width, H = gCanvas.height;
   const skin = gGetActiveSkin();
+  const portalColor = skin.portalColor || '#7c5cff';
+  const particleColor = skin.particleColor || '#c77dff';
 
-  // Move basket from dir buttons / joystick
+  // Move basket
   if (gMoveDir !== 0) {
-    gBasketX += gMoveDir * 8;
+    gBasketX += gMoveDir * 9;
     gBasketX = Math.max(0, Math.min(W - gBasketW, gBasketX));
   }
 
+  // Magnet pull (STICK-PRO skin)
+  if (skin.magnetPull) {
+    const cx = gBasketX + gBasketW/2;
+    gFalling.forEach(obj => {
+      if (!obj.isTrap && !obj.isPowerup) {
+        const dist = obj.x - cx;
+        if (Math.abs(dist) < 60 && obj.y > H*0.5) obj.x -= dist * 0.04;
+      }
+    });
+  }
+
   // Level up
-  const newLevel = 1 + Math.floor(gScore / 50);
+  const newLevel = 1 + Math.floor(gScore / 60);
   if (newLevel !== gLevel) {
     gLevel = newLevel;
-    gSpeed = 1.5 + gScore * 0.004;
-    document.getElementById('g-level-title').textContent = `ARCADE CAPTURE — LVL ${gLevel}`;
+    gSpeed = 1.5 + gLevel * 0.35;
+    document.getElementById('g-level-title').textContent = `PORTAL CAPTURE — LVL ${gLevel}`;
   }
 
   // Spawn
   gSpawnTimer++;
-  const spawnRate = Math.max(22, 58 - gLevel * 3);
+  const spawnRate = Math.max(18, 55 - gLevel * 4);
   if (gSpawnTimer >= spawnRate) { spawnObject(); gSpawnTimer = 0; }
 
+  // Shake offset
+  const shakeX = gShakeFrames > 0 ? (Math.random()-0.5)*6 : 0;
+  const shakeY = gShakeFrames > 0 ? (Math.random()-0.5)*4 : 0;
+  if (gShakeFrames > 0) gShakeFrames--;
+  gCtx.save();
+  gCtx.translate(shakeX, shakeY);
+
   // ── DRAW BACKGROUND ──
-  gCtx.fillStyle = '#0a0818';
-  gCtx.fillRect(0, 0, W, H);
+  drawBackground(W, H, skin);
 
-  // Grid floor (rejilla amarilla en piso)
-  const floorY = H - 18;
-  gCtx.strokeStyle = 'rgba(255,217,61,0.18)';
-  gCtx.lineWidth = 1;
-  for (let x = 0; x < W; x += 18) {
-    gCtx.beginPath(); gCtx.moveTo(x, floorY); gCtx.lineTo(x - 30, H); gCtx.stroke();
-  }
-  gCtx.fillStyle = 'rgba(255,217,61,0.06)';
-  gCtx.fillRect(0, floorY, W, H - floorY);
-
-  // Grid lines (pixel art)
-  gCtx.strokeStyle = 'rgba(45,27,105,0.22)';
-  for (let x = 0; x < W; x += 22) { gCtx.beginPath(); gCtx.moveTo(x,0); gCtx.lineTo(x,H); gCtx.stroke(); }
-  for (let y = 0; y < H; y += 22) { gCtx.beginPath(); gCtx.moveTo(0,y); gCtx.lineTo(W,y); gCtx.stroke(); }
-
-  // Stars
-  gStars.forEach(s => {
-    s.a += 0.018;
-    const alpha = 0.25 + Math.sin(s.a) * 0.25;
-    gCtx.fillStyle = `rgba(199,125,255,${alpha})`;
-    gCtx.fillRect(s.x|0, s.y|0, Math.ceil(s.r*2), Math.ceil(s.r*2));
-  });
-
-  // ── FALLING OBJECTS ──
+  // ── FALLING OBJECTS (3D-style with shadow) ──
   for (let i = gFalling.length - 1; i >= 0; i--) {
     const obj = gFalling[i];
     obj.y += obj.speed;
+    if (obj.rot) obj.angle = (obj.angle||0) + obj.rot;
 
     gCtx.save();
-    gCtx.font = '22px serif';
+    gCtx.translate(obj.x|0, obj.y|0);
+    if (obj.angle) gCtx.rotate(obj.angle);
+
+    // Drop shadow
+    gCtx.shadowBlur = 8;
+    gCtx.shadowColor = 'rgba(0,0,0,0.7)';
+    gCtx.shadowOffsetX = 3; gCtx.shadowOffsetY = 3;
+
+    let fontSize = 22;
+    if (obj.isVeblen) {
+      // Veblen: large golden star with glow
+      fontSize = 30;
+      gCtx.shadowBlur = 20;
+      gCtx.shadowColor = '#ffd93d';
+      gCtx.shadowOffsetX = 0; gCtx.shadowOffsetY = 0;
+      // Pulsating scale
+      const scale = 1 + Math.sin(gFrame*0.15)*0.12;
+      gCtx.scale(scale, scale);
+    } else if (obj.isTrap) {
+      gCtx.shadowColor = '#ff6b6b';
+      gCtx.shadowBlur = 12;
+      gCtx.shadowOffsetX = 0; gCtx.shadowOffsetY = 0;
+    } else if (obj.isPowerup) {
+      gCtx.shadowBlur = 14;
+      gCtx.shadowColor = '#ffd93d';
+      gCtx.shadowOffsetX = 0; gCtx.shadowOffsetY = 0;
+    } else if (obj.holo) {
+      // Holographic card shimmer
+      gCtx.shadowBlur = 14;
+      gCtx.shadowColor = `hsl(${(gFrame*6)%360},100%,70%)`;
+      gCtx.shadowOffsetX = 0; gCtx.shadowOffsetY = 0;
+    }
+
+    gCtx.font = `${fontSize}px serif`;
     gCtx.textAlign = 'center';
-    if (obj.isPowerup) { gCtx.shadowBlur = 14; gCtx.shadowColor = '#ffd93d'; }
-    gCtx.fillText(obj.emoji, obj.x|0, obj.y|0);
+    gCtx.textBaseline = 'middle';
+    gCtx.fillText(obj.emoji, 0, 0);
+
+    // Veblen label
+    if (obj.isVeblen) {
+      gCtx.shadowBlur = 0; gCtx.shadowOffsetX = 0; gCtx.shadowOffsetY = 0;
+      gCtx.font = '8px sans-serif';
+      gCtx.fillStyle = '#ffd93d';
+      gCtx.textAlign = 'center';
+      gCtx.fillText('VEBLEN +50', 0, 20);
+    }
     gCtx.restore();
 
     // Catch detection
-    const inX = obj.x > gBasketX - 8 && obj.x < gBasketX + gBasketW + 8;
-    const inY = obj.y >= gBasketY - 8 && obj.y <= gBasketY + 32;
+    const inX = obj.x > gBasketX - 10 && obj.x < gBasketX + gBasketW + 10;
+    const inY = obj.y >= gBasketY - 10 && obj.y <= gBasketY + 34;
     if (inX && inY) {
       gFalling.splice(i, 1);
       if (obj.isPowerup) {
         activatePowerup();
+        playSound('powerup');
         showToast('⚡ ¡Poder x2! 5 segundos');
-      } else {
-        const pts = gPowerup ? 12 : 6;
-        gScore += pts;
+        gCatchFlash = 10;
+      } else if (obj.isTrap) {
+        // Trap: lose points
+        gScore = Math.max(0, gScore + obj.pts);
         document.getElementById('g-score').textContent = gScore;
-        // Catch particle burst
-        for (let p = 0; p < 5; p++) {
-          gParticles.push({ x: obj.x, y: gBasketY, vx:(Math.random()-0.5)*3, vy:-Math.random()*2-1, life:18, color: gPowerup?'#ffd93d':'#c77dff' });
+        gCombo = 0;
+        gShakeFrames = 12;
+        playSound('trap');
+        for (let p=0; p<8; p++) {
+          gParticles.push({x:obj.x, y:gBasketY, vx:(Math.random()-0.5)*4, vy:-Math.random()*3-1, life:20, color:'#ff6b6b'});
         }
+        showToast(`💀 TRAMPA! ${obj.pts} pts`);
+      } else if (obj.isVeblen) {
+        const pts = gPowerup ? obj.pts*2 : obj.pts;
+        gScore += pts;
+        gVeblenCombo++;
+        gCombo++;
+        document.getElementById('g-score').textContent = gScore;
+        playSound('shing');
+        gCatchFlash = 20;
+        // Massive particle burst
+        for (let p=0; p<20; p++) {
+          gParticles.push({x:obj.x, y:gBasketY, vx:(Math.random()-0.5)*6, vy:-Math.random()*4-2, life:30, color:'#ffd93d', size:5+Math.random()*4});
+        }
+        showToast(`⭐ ¡PIEZA VEBLEN! +${pts} pts ${gVeblenCombo>=3?'🏆':''}`);
+        // Check veblen challenge
+        if (gVeblenCombo >= 3) {
+          const d = gGetData();
+          d.veblenChallengeCompleted = true;
+          gSaveData(d);
+          showToast('🏆 ¡Desafío Veblen completado!');
+        }
+      } else {
+        const basePts = obj.pts || 8;
+        const pts = gPowerup ? basePts*2 : basePts;
+        gScore += pts;
+        gCombo++;
+        gVeblenCombo = 0; // veblen combo resets on normal catch
+        document.getElementById('g-score').textContent = gScore;
+        gCatchFlash = 8;
+        // Sound based on skin
+        if (gCombo >= 3) { playSound('combo'); }
+        else { playSound(skin.catchSound || 'ding'); }
+        // Particles
+        const pColor = gPowerup ? '#ffd93d' : particleColor;
+        for (let p=0; p<6; p++) {
+          gParticles.push({x:obj.x, y:gBasketY, vx:(Math.random()-0.5)*4, vy:-Math.random()*3-1, life:20, color:pColor, size:3});
+        }
+        if (gCombo >= 3) showToast(`🔥 x${gCombo} COMBO! +${pts}`);
       }
       continue;
     }
@@ -2260,14 +2905,15 @@ function gameLoop() {
     // Missed
     if (obj.y > H + 12) {
       gFalling.splice(i, 1);
-      if (!obj.isPowerup) {
+      if (!obj.isPowerup && !obj.isTrap) {
         gLives--;
+        gCombo = 0;
+        if (!obj.isVeblen) gVeblenCombo = 0;
+        playSound('pof');
+        gShakeFrames = 8;
         const lv = document.getElementById('g-lives');
         lv.textContent = '❤️'.repeat(Math.max(0,gLives)) + '🖤'.repeat(Math.max(0,3-gLives));
-        // Screen shake flash
-        gCtx.fillStyle = 'rgba(255,107,107,0.22)';
-        gCtx.fillRect(0,0,W,H);
-        if (gLives <= 0) { gameOver(); return; }
+        if (gLives <= 0) { gCtx.restore(); gameOver(); return; }
       }
     }
   }
@@ -2275,36 +2921,79 @@ function gameLoop() {
   // ── PARTICLES ──
   for (let i = gParticles.length - 1; i >= 0; i--) {
     const p = gParticles[i];
-    p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life--;
+    p.x += p.vx; p.y += p.vy; p.vy += 0.15; p.life--;
     if (p.life <= 0) { gParticles.splice(i,1); continue; }
-    gCtx.globalAlpha = p.life / 18;
+    const maxLife = 20;
+    gCtx.globalAlpha = p.life / maxLife;
     gCtx.fillStyle = p.color;
-    gCtx.fillRect(p.x|0, p.y|0, 4, 4);
+    const sz = p.size || 4;
+    gCtx.fillRect(p.x|0, p.y|0, sz, sz);
     gCtx.globalAlpha = 1;
   }
 
-  // ── BASKET ──
-  const mainCat = getUserMainCat();
-  const basketEmoji = mainCat ? (GAME_CATS.find(c=>c.id===mainCat)?.emoji || '🧺') : '🧺';
+  // ── PORTAL DE CAPTURA (basket) ──
+  const cx = gBasketX + gBasketW/2;
+  const cy = gBasketY + 12;
+  const flash = gCatchFlash > 0;
+  if (gCatchFlash > 0) gCatchFlash--;
 
-  // Platinum trail particles
-  if (skin.id === 'platinum_tj' && gFrame % 3 === 0) {
-    gParticles.push({ x: gBasketX + gBasketW/2 + (Math.random()-0.5)*gBasketW, y: gBasketY+10, vx:(Math.random()-0.5)*1.5, vy:-Math.random()*1.5, life:20, color:`hsl(${(gFrame*7)%360},80%,80%)` });
+  // Portal glow outer ring
+  gCtx.save();
+  const portalGlow = gCtx.createRadialGradient(cx,cy,gBasketW*0.3,cx,cy,gBasketW*0.8);
+  const pAlpha = flash ? 0.9 : 0.35 + Math.sin(gFrame*0.08)*0.15;
+  portalGlow.addColorStop(0, portalColor.replace(')',`,${pAlpha})`).replace('rgb','rgba').replace('#', 'rgba(').replace('rgba(','rgba(').replace(/rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i, (m,r,g,b)=>`rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`));
+  // Simpler: just use the color
+  const pColorRgb = flash ? '#ffffff' : portalColor;
+  gCtx.shadowBlur = flash ? 35 : 16;
+  gCtx.shadowColor = pColorRgb;
+  gCtx.strokeStyle = pColorRgb;
+  gCtx.lineWidth = flash ? 4 : 2.5;
+  // Ellipse portal shape
+  gCtx.beginPath();
+  gCtx.ellipse(cx, cy, gBasketW/2+4, 14, 0, 0, Math.PI*2);
+  gCtx.stroke();
+  // Inner portal shimmer
+  gCtx.strokeStyle = flash ? '#ffffff' : `${pColorRgb}88`;
+  gCtx.lineWidth = 1;
+  gCtx.beginPath();
+  gCtx.ellipse(cx, cy, gBasketW/2-6, 8, 0, 0, Math.PI*2);
+  gCtx.stroke();
+
+  // Spinning portal particles
+  if (gFrame % 4 === 0) {
+    const angle = (gFrame * 0.18) % (Math.PI*2);
+    const px2 = cx + Math.cos(angle)*(gBasketW/2+2);
+    const py2 = cy + Math.sin(angle)*12;
+    gParticles.push({x:px2, y:py2, vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5, life:12, color:portalColor, size:2});
   }
 
-  // Basket glow
-  gCtx.save();
-  gCtx.shadowBlur = gPowerup ? 18 : 10;
-  gCtx.shadowColor = gPowerup ? '#ffd93d' : skin.joystickBorder;
-  gCtx.strokeStyle = gPowerup ? '#ffd93d' : skin.joystickBorder;
-  gCtx.lineWidth = 2.5;
-  gCtx.strokeRect(gBasketX, gBasketY - 6, gBasketW, 28);
+  // Platinum trail
+  if (skin.id === 'platinum_veblen' && gFrame % 3 === 0) {
+    gParticles.push({x:cx+(Math.random()-0.5)*gBasketW, y:cy+10, vx:(Math.random()-0.5)*2, vy:-Math.random()*2, life:20, color:`hsl(${(gFrame*7)%360},80%,80%)`, size:3});
+  }
+
+  // Spark effect on catch
+  if (flash) {
+    for (let sp=0; sp<3; sp++) {
+      const angle = Math.random()*Math.PI*2;
+      const dist = 10+Math.random()*20;
+      gParticles.push({x:cx+Math.cos(angle)*dist, y:cy+Math.sin(angle)*dist, vx:Math.cos(angle)*2, vy:Math.sin(angle)*2, life:10, color:'#ffffff', size:2});
+    }
+  }
   gCtx.restore();
 
-  // Basket emoji
-  gCtx.font = '26px serif';
-  gCtx.textAlign = 'center';
-  gCtx.fillText(basketEmoji, gBasketX + gBasketW/2, gBasketY + 16);
+  // ── COMBO DISPLAY ──
+  if (gCombo >= 3) {
+    gCtx.save();
+    gCtx.font = `bold ${10+gCombo}px 'Nunito',sans-serif`;
+    gCtx.fillStyle = gCombo >= 5 ? '#ffd93d' : '#c77dff';
+    gCtx.textAlign = 'center';
+    gCtx.shadowBlur = 8; gCtx.shadowColor = gCombo >= 5 ? '#ffd93d' : '#7c5cff';
+    gCtx.fillText(`🔥 x${gCombo}`, cx, gBasketY - 18);
+    gCtx.restore();
+  }
+
+  gCtx.restore(); // end shake
 
   gAnimId = requestAnimationFrame(gameLoop);
 }
@@ -2332,10 +3021,19 @@ async function gameOver() {
   if (finalScore > prevBest) d.mejorPuntuacion = finalScore;
   const newBest = d.mejorPuntuacion;
 
-  // Check skin unlocks (only by best score in one game)
+  // Check skin unlocks (by best score in one game, except Veblen which needs challenge)
   let newSkinUnlocked = null;
   SKINS.forEach(skin => {
-    if (skin.ptsReq < 9999 && newBest >= skin.ptsReq && !prevSkins.includes(skin.id)) {
+    if (prevSkins.includes(skin.id)) return;
+    if (skin.veblenChallenge) {
+      // Unlock only if score >= 1100 AND caught 3 veblen in a row
+      const veblenOk = (d.veblenChallengeCompleted || false);
+      if (newBest >= 1100 && veblenOk) {
+        if (!d.skinsDesbloqueadas) d.skinsDesbloqueadas = ['base'];
+        d.skinsDesbloqueadas.push(skin.id);
+        newSkinUnlocked = skin;
+      }
+    } else if (newBest >= skin.ptsReq) {
       if (!d.skinsDesbloqueadas) d.skinsDesbloqueadas = ['base'];
       d.skinsDesbloqueadas.push(skin.id);
       newSkinUnlocked = skin;
@@ -2495,6 +3193,282 @@ async function loadHomeRanking() {
     }).join('');
   } catch(e) { if(wrap) wrap.style.display='none'; }
 }
+
+// ══════════════════════════════════════════════════
+// MÓDULO VEBLEN — detección, ranking, +50 status
+// ══════════════════════════════════════════════════
+function isVeblenItem(item) {
+  return (item.precio && Number(item.precio) > 2000) || item.exclusiva === true || item.rareza === 'Legendaria';
+}
+
+// Override renderItems to pin Veblen items to top and apply golden frame
+const _origRenderItems = renderItems;
+function renderItems(items) {
+  const veblenItems = items.filter(isVeblenItem);
+  const normalItems = items.filter(i => !isVeblenItem(i));
+  const sorted = [...veblenItems, ...normalItems];
+
+  const grid = document.getElementById('items-grid');
+  document.getElementById('items-count').textContent = `${sorted.length} pieza${sorted.length!==1?'s':''} encontrada${sorted.length!==1?'s':''}`;
+  if (!sorted.length) {
+    grid.innerHTML = '<div class="empty"><div class="big">🔍</div><p>No hay piezas aún.<br>¡Sé el primero en aportar!</p></div>';
+    return;
+  }
+  const allowedCats = userPlan==='pro' ? ALL_CATS.map(c=>c.id) : userPlan==='premium' ? [...CATS_FREE,...CATS_PREMIUM].map(c=>c.id) : CATS_FREE.map(c=>c.id);
+  grid.innerHTML = sorted.map(item => {
+    const locked = !allowedCats.includes(item.categoria);
+    const veblen = isVeblenItem(item);
+    return `
+    <div class="col-card${veblen?' veblen-card':''}" onclick="${locked?`showToast('🔒 Necesitas Premium para ver esta categoría')`:  `openDetail('${item.id}')`}">
+      <div class="col-card-img" style="background:linear-gradient(135deg,#1a1828,#221f35)">
+        ${item.imageUrl ? `<img src="${item.imageUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0">` : `<span style="font-size:48px">${EMOJIS[item.categoria]||'🎴'}</span>`}
+        <div class="col-badge" style="background:${COLORS[item.categoria]||'#4d96ff'}">${item.categoria||'otro'}</div>
+        ${locked?'<div class="lock-overlay">🔒</div>':''}
+        ${veblen?'<div style="position:absolute;bottom:6px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ffd93d,#ff9900);color:#1a1200;font-size:8px;font-weight:900;padding:2px 8px;border-radius:20px;white-space:nowrap;">⭐ SANTO GRIAL</div>':''}
+      </div>
+      <div class="col-card-info">
+        <div class="col-card-name">${locked?'🔒 '+item.nombre:item.nombre}</div>
+        <div class="col-card-meta">
+          <span class="rdot" style="background:${COLORS[item.categoria]||'#4d96ff'}"></span>
+          ${item.marca ? item.marca+' · ' : ''}${item.rareza||'—'}
+          ${veblen?'<span class="veblen-badge" style="margin-left:4px">VEBLEN</span>':''}
+          ${item.precio?`<span style="color:#6bcb77;font-size:10px;margin-left:4px">$${item.precio}</span>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Award +50 status points when user uploads a Veblen piece
+async function checkAwardVeblenStatus(item, userId) {
+  if (!isVeblenItem(item) || !userId) return;
+  try {
+    const userRef = doc(db, 'usuarios', userId);
+    await updateDoc(userRef, { statusPoints: increment(50) });
+    showToast('⭐ ¡Pieza Veblen! +50 puntos de estatus');
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════
+// MÓDULO BÓVEDA — Cosplay Vault
+// ══════════════════════════════════════════════════
+window.showBovedaForm = () => {
+  document.getElementById('boveda-form').style.display = 'flex';
+  document.getElementById('boveda-form').scrollIntoView({behavior:'smooth'});
+};
+window.hideBovedaForm = () => {
+  document.getElementById('boveda-form').style.display = 'none';
+};
+
+window.previewBovedaFoto = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('bov-foto-preview');
+    prev.src = e.target.result;
+    prev.style.display = 'block';
+    prev._dataUrl = e.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.saveBovedaItem = async () => {
+  const user = window._currentUser;
+  if (!user) { showToast('Inicia sesión para guardar en Bóveda'); return; }
+  const name = document.getElementById('bov-nombre').value.trim();
+  const tipo = document.getElementById('bov-tipo').value;
+  const status = document.getElementById('bov-status').value;
+  const costo = document.getElementById('bov-costo').value;
+  if (!name) { showToast('Escribe el nombre del artículo'); return; }
+  const fotoEl = document.getElementById('bov-foto-preview');
+  const fotoUrl = fotoEl?._dataUrl || '';
+  try {
+    await addDoc(collection(db, 'boveda', user.uid, 'items'), {
+      nombre: name, tipo, status, costo: Number(costo)||0,
+      fotoUrl, createdAt: new Date().toISOString()
+    });
+    showToast('✅ Guardado en Bóveda');
+    hideBovedaForm();
+    document.getElementById('bov-nombre').value = '';
+    document.getElementById('bov-costo').value = '';
+    if (fotoEl) { fotoEl.src = ''; fotoEl.style.display = 'none'; fotoEl._dataUrl = ''; }
+    loadBoveda();
+  } catch(e) { showToast('Error al guardar: ' + e.message); }
+};
+
+window.loadBoveda = async () => {
+  const user = window._currentUser;
+  const list = document.getElementById('boveda-list');
+  const stats = document.getElementById('boveda-stats');
+  if (!user) {
+    list.innerHTML = '<div class="empty"><p>Inicia sesión para ver tu Bóveda</p></div>';
+    return;
+  }
+  try {
+    const snap = await getDocs(collection(db, 'boveda', user.uid, 'items'));
+    const items = snap.docs.map(d => ({id:d.id,...d.data()}));
+    // Stats
+    const total = items.reduce((s,i)=>s+(i.costo||0),0);
+    const terminados = items.filter(i=>i.status==='terminado').length;
+    if (stats) stats.innerHTML = `
+      <span>🎭 ${items.length} artículo${items.length!==1?'s':''}</span>
+      <span>✅ ${terminados} terminado${terminados!==1?'s':''}</span>
+      <span>💰 $${total.toLocaleString('es-MX')} MXN total</span>`;
+    if (!items.length) {
+      list.innerHTML = '<div class="empty"><div class="big">🎭</div><p>Tu Bóveda está vacía.<br>¡Agrega tu primer artículo!</p></div>';
+      return;
+    }
+    const tipoEmoji = {prop:'🪄',disfraz:'👘',peluca:'💈',armadura:'⚔️'};
+    list.innerHTML = items.map(item => `
+      <div class="boveda-item">
+        <div style="width:52px;height:52px;border-radius:10px;overflow:hidden;background:#221f35;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+          ${item.fotoUrl ? `<img src="${item.fotoUrl}" style="width:100%;height:100%;object-fit:cover">` : `<span style="font-size:26px">${tipoEmoji[item.tipo]||'🎭'}</span>`}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.nombre}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${tipoEmoji[item.tipo]||'🎭'} ${item.tipo} · $${(item.costo||0).toLocaleString('es-MX')} MXN</div>
+        </div>
+        <span class="boveda-status ${item.status}">${item.status}</span>
+        <button onclick="deleteBovedaItem('${item.id}')" style="background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:4px">🗑️</button>
+      </div>`).join('');
+  } catch(e) { list.innerHTML = '<div class="empty"><p>Error al cargar Bóveda</p></div>'; }
+};
+
+window.deleteBovedaItem = async (itemId) => {
+  const user = window._currentUser;
+  if (!user) return;
+  try {
+    await deleteDoc(doc(db, 'boveda', user.uid, 'items', itemId));
+    showToast('🗑️ Eliminado de Bóveda');
+    loadBoveda();
+  } catch(e) { showToast('Error al eliminar'); }
+};
+
+window.crearSet = () => {
+  showToast('🎭 Función "Armar Set" próximamente');
+};
+
+window.shareBovedaLink = () => {
+  const user = window._currentUser;
+  if (!user) { showToast('Inicia sesión para compartir'); return; }
+  const link = `${location.origin}${location.pathname}?boveda=${user.uid}`;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(() => showToast('🔗 Enlace copiado al portapapeles'));
+  } else {
+    showToast('🔗 ' + link);
+  }
+};
+
+// ══════════════════════════════════════════════════
+// MÓDULO FORO POR REGIÓN
+// ══════════════════════════════════════════════════
+let foroRegion = null;
+
+window.selectForoRegion = (region) => {
+  foroRegion = region;
+  document.querySelectorAll('.foro-rpill').forEach(p => p.classList.remove('sel'));
+  event.target.classList.add('sel');
+  document.getElementById('foro-new-post').style.display = 'block';
+  document.getElementById('foro-region-label').textContent = `📍 Publicando en: ${region}`;
+  loadForo(region);
+};
+
+window.postForo = async () => {
+  const user = window._currentUser;
+  if (!user) { showToast('Inicia sesión para publicar'); return; }
+  if (!foroRegion) { showToast('Selecciona una región primero'); return; }
+  const texto = document.getElementById('foro-post-text').value.trim();
+  const tipo = document.getElementById('foro-post-tipo').value;
+  if (!texto) { showToast('Escribe algo para publicar'); return; }
+  const btn = document.getElementById('foro-post-btn');
+  btn.disabled = true; btn.textContent = 'Publicando...';
+  try {
+    await addDoc(collection(db, 'foro_posts'), {
+      texto, tipo, region: foroRegion,
+      userId: user.uid,
+      userName: user.displayName || 'Coleccionista',
+      userPhoto: user.photoURL || '',
+      createdAt: new Date().toISOString(),
+      likes: 0
+    });
+    document.getElementById('foro-post-text').value = '';
+    showToast('✅ ¡Publicado en el Foro!');
+    loadForo(foroRegion);
+  } catch(e) { showToast('Error al publicar: ' + e.message); }
+  finally { btn.disabled = false; btn.textContent = '📢 Publicar'; }
+};
+
+window.loadForo = async (region) => {
+  const list = document.getElementById('foro-posts-list');
+  if (!region) return;
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">⏳ Cargando...</div>';
+  try {
+    const q = query(
+      collection(db, 'foro_posts'),
+      where('region', '==', region),
+      orderBy('createdAt', 'desc'),
+      limit(40)
+    );
+    const snap = await getDocs(q);
+    const posts = snap.docs.map(d => ({id:d.id,...d.data()}));
+    if (!posts.length) {
+      list.innerHTML = '<div class="empty"><div class="big">📍</div><p>Sé el primero en publicar<br>en esta región</p></div>';
+      return;
+    }
+    const tipoColors = {venta:'foro-tipo-venta',intercambio:'foro-tipo-intercambio',busco:'foro-tipo-busco',evento:'foro-tipo-evento',pregunta:'foro-tipo-pregunta'};
+    const tipoEmoji = {venta:'💰',intercambio:'🔄',busco:'🔍',evento:'📅',pregunta:'❓'};
+    list.innerHTML = posts.map(post => {
+      const fecha = post.createdAt ? new Date(post.createdAt).toLocaleDateString('es-MX',{day:'numeric',month:'short'}) : '';
+      return `
+      <div class="foro-post">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;background:#221f35;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px">
+            ${post.userPhoto ? `<img src="${post.userPhoto}" style="width:100%;height:100%;object-fit:cover">` : '👤'}
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:12px;color:var(--text)">${post.userName||'Coleccionista'}</div>
+            <div style="font-size:10px;color:var(--muted)">${fecha}</div>
+          </div>
+          <span class="foro-region-chip">${post.region}</span>
+          <span class="foro-tipo-chip ${tipoColors[post.tipo]||'foro-tipo-pregunta'}">${tipoEmoji[post.tipo]||'❓'} ${post.tipo}</span>
+        </div>
+        <div style="font-size:14px;color:var(--text);line-height:1.5">${post.texto}</div>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:12px">
+          <button onclick="likeForoPost('${post.id}',this)" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px">❤️ ${post.likes||0}</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="empty"><p>Error al cargar el foro</p></div>';
+  }
+};
+
+window.likeForoPost = async (postId, btn) => {
+  try {
+    await updateDoc(doc(db, 'foro_posts', postId), { likes: increment(1) });
+    // Update UI
+    const cur = parseInt(btn.textContent.replace('❤️ ','')) || 0;
+    btn.textContent = `❤️ ${cur+1}`;
+    btn.style.color = '#ff6b6b';
+  } catch(e) {}
+};
+
+// Hook into showScreen to auto-load Bóveda and reset Foro
+const _origShowScreen = window.showScreen;
+window.showScreen = (id) => {
+  _origShowScreen(id);
+  if (id === 'screen-boveda') {
+    loadBoveda();
+  }
+  if (id === 'screen-foro') {
+    // Reset to region picker each time
+    document.getElementById('foro-new-post').style.display = 'none';
+    foroRegion = null;
+    document.querySelectorAll('.foro-rpill').forEach(p => p.classList.remove('sel'));
+    document.getElementById('foro-posts-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:40px;margin-bottom:10px">📍</div><div style="font-weight:700">Selecciona una región para ver el foro</div></div>';
+  }
+};
 
 // ── INIT ──
 buildPills();
