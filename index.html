@@ -2465,29 +2465,31 @@ window.startGame = () => {
   gCtx = gCanvas.getContext('2d');
 
   const resizeCanvas = () => {
-    const arena = document.getElementById('g-arena');
-    const rect = arena.getBoundingClientRect();
-    const W = rect.width || window.innerWidth;
-    const H = rect.height > 50 ? rect.height : (window.innerHeight - 200);
+    // Use screen dimensions directly — CSS width/height don't set canvas buffer
+    const W = window.innerWidth;
+    // HUD ~56px, panel min 130px = at least 186px used; arena gets the rest
+    const hudH = document.getElementById('g-hud')?.offsetHeight || 56;
+    const panelH = document.getElementById('g-panel')?.offsetHeight || 150;
+    const H = Math.max(200, window.innerHeight - hudH - panelH);
     gCanvas.width = W;
     gCanvas.height = H;
     gBasketX = W / 2 - gBasketW / 2;
     gBasketY = H - 55;
     gStars = Array.from({length:80}, () => ({
-      x: Math.random() * gCanvas.width,
-      y: Math.random() * gCanvas.height,
+      x: Math.random() * W,
+      y: Math.random() * H,
       r: Math.random() * 1.5 + 0.3,
       a: Math.random() * Math.PI * 2,
       speed: Math.random() * 0.3 + 0.05
     }));
-    buildBuildings(gCanvas.width, gCanvas.height);
+    buildBuildings(W, H);
   };
-  resizeCanvas(); // run immediately
-  setTimeout(resizeCanvas, 120); // re-run after layout settles
+  resizeCanvas();
+  setTimeout(resizeCanvas, 200); // re-run after layout fully settles
   initJoystick();
   if (gAnimId) cancelAnimationFrame(gAnimId);
   gAnimId = null;
-  setTimeout(() => { if (gRunning) gameLoop(); }, 150);
+  setTimeout(() => { if (gRunning) gameLoop(); }, 50);
 };
 
 window.stopGame = () => {
@@ -2743,10 +2745,12 @@ function drawCyberpunkBuildings(W, H, skin, alpha) {
 // ══════════════════════════════════════════════════
 function gameLoop() {
   if (!gRunning || !gCanvas) return;
-  // Guard: if canvas has no size yet, retry next frame
+  // If canvas still has no size, force it from window dimensions
   if (gCanvas.width < 10 || gCanvas.height < 10) {
-    gAnimId = requestAnimationFrame(gameLoop);
-    return;
+    gCanvas.width = window.innerWidth;
+    gCanvas.height = Math.max(200, window.innerHeight - 220);
+    gBasketX = gCanvas.width/2 - gBasketW/2;
+    gBasketY = gCanvas.height - 55;
   }
   try {
   gFrame++;
