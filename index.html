@@ -2467,11 +2467,44 @@ function startGlitter(panel, skin) {
 }
 
 // ══════════════════════════════════════════════════
-// ARROW BUTTON CONTROLS (replaces joystick)
+// ARROW BUTTON CONTROLS
 // ══════════════════════════════════════════════════
 function initJoystick() {
-  // Buttons already have onpointerdown/up/cancel inline.
-  // This stub kept so startGame() call doesn't break.
+  const btnL = document.getElementById('g-btn-left');
+  const btnR = document.getElementById('g-btn-right');
+  if (!btnL || !btnR) return;
+
+  function press(dir, btn) {
+    gMoveDir = dir;
+    btn.style.transform = 'scale(.92) translateY(3px)';
+  }
+  function release(btn) {
+    gMoveDir = 0;
+    btn.style.transform = '';
+  }
+
+  // Remove old inline handlers to avoid double-firing
+  btnL.onpointerdown = btnL.onpointerup = btnL.onpointercancel = null;
+  btnR.onpointerdown = btnR.onpointerup = btnR.onpointercancel = null;
+  btnL.ontouchstart = btnL.ontouchend = btnL.ontouchcancel = null;
+  btnR.ontouchstart = btnR.ontouchend = btnR.ontouchcancel = null;
+
+  // Touch events (mobile) — passive:false to allow preventDefault
+  btnL.addEventListener('touchstart', e => { e.preventDefault(); press(-1, btnL); }, {passive:false});
+  btnL.addEventListener('touchend',   e => { e.preventDefault(); release(btnL); },  {passive:false});
+  btnL.addEventListener('touchcancel',e => { release(btnL); }, {passive:false});
+
+  btnR.addEventListener('touchstart', e => { e.preventDefault(); press(1, btnR); }, {passive:false});
+  btnR.addEventListener('touchend',   e => { e.preventDefault(); release(btnR); },  {passive:false});
+  btnR.addEventListener('touchcancel',e => { release(btnR); }, {passive:false});
+
+  // Mouse/pointer (desktop)
+  btnL.addEventListener('pointerdown', () => press(-1, btnL));
+  btnL.addEventListener('pointerup',   () => release(btnL));
+  btnL.addEventListener('pointercancel', () => release(btnL));
+  btnR.addEventListener('pointerdown', () => press(1, btnR));
+  btnR.addEventListener('pointerup',   () => release(btnR));
+  btnR.addEventListener('pointercancel', () => release(btnR));
 }
 
 function getUserMainCat() {
