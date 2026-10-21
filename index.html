@@ -367,9 +367,10 @@
   <div class="detail-wrap">
     <div class="detail-hero" id="d-hero" onclick="openPhotoViewer(0)" style="cursor:pointer">🔵</div>
     <div class="photo-gallery" id="d-gallery" style="display:none"></div>
-    <div style="display:flex;gap:8px;margin-bottom:14px" id="d-action-btns">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap" id="d-action-btns">
       <button class="msg-btn" id="btn-msg" onclick="msgOwner()" style="display:none">💬 Mensaje</button>
       <button class="msg-btn" id="btn-edit-aporte" onclick="openEdit()" style="display:none;border-color:var(--accent2);color:var(--accent2)">✏️ Editar</button>
+      <button class="msg-btn" id="btn-mod-delete" onclick="modDeletePieza()" style="display:none;border-color:#ff6b6b;color:#ff6b6b;background:#1a0808">🗑️ Borrar pieza</button>
     </div>
     <div class="detail-name" id="d-name">—</div>
     <div class="detail-sub" id="d-sub">—</div>
@@ -585,6 +586,33 @@
       <button class="plan-btn" style="background:#2d1b69;color:#c77dff;border:1.5px solid #c77dff;cursor:default" onclick="showToast('🚀 Pagos en app próximamente')">🚀 Próximamente</button>
     </div>
 
+    <!-- ══ FUNCIONES PRÓXIMAMENTE ══ -->
+    <div style="background:var(--card);border-radius:16px;padding:16px;border:1.5px solid #2e2b45;margin-top:8px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🚧 Próximamente en la app</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">🔒</span>
+          <span style="font-size:13px;font-weight:800;color:var(--text)">Foro Regional</span>
+          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+        </button>
+        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">🔒</span>
+          <span style="font-size:13px;font-weight:800;color:var(--text)">Duelos</span>
+          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+        </button>
+        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">🔒</span>
+          <span style="font-size:13px;font-weight:800;color:var(--text)">Skins</span>
+          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+        </button>
+        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">🔒</span>
+          <span style="font-size:13px;font-weight:800;color:var(--text)">Premium</span>
+          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+        </button>
+      </div>
+    </div>
+
   </div>
   <nav class="bottom-nav">
     <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
@@ -651,6 +679,7 @@
       <div class="profile-name" id="p-name">—</div>
       <div class="profile-email" id="p-email">—</div>
       <div class="plan-chip" id="p-plan-chip" style="background:#2e2b45;color:var(--muted)">🆓 Plan Gratis</div>
+      <div id="p-role-badge" style="display:none;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px"></div>
     </div>
     <div class="profile-stats">
       <div class="stat-box"><div class="stat-val" id="p-aportes">0</div><div class="stat-lbl">Mis aportes</div></div>
@@ -1138,6 +1167,8 @@ const COLORS = {canica:'#4d96ff',tazo:'#6bcb77',carta:'#c77dff',auto_escala:'#ff
 let currentUser = null;
 let userPlan = 'free'; // free | premium | pro
 let realUserPlan = 'free'; // stores real plan when in test mode
+let userRole = 'member'; // member | moderator | admin
+let userModCatalog = ''; // e.g. 'gorras', 'tenis', 'playeras', 'accesorios'
 let modoGratis = false;
 let allItems = [];
 let currentCat = 'todos';
@@ -1192,9 +1223,14 @@ onAuthStateChanged(auth, async user => {
     // Load user plan from Firestore
     try {
       const uDoc = await getDoc(doc(db, 'usuarios', user.uid));
-      if (uDoc.exists()) userPlan = uDoc.data().plan || 'free';
-      else userPlan = 'free';
-    } catch(e) { userPlan = 'free'; }
+      if (uDoc.exists()) {
+        userPlan = uDoc.data().plan || 'free';
+        userRole = uDoc.data().role || 'member';
+        userModCatalog = uDoc.data().moderatorCatalog || '';
+      } else {
+        userPlan = 'free'; userRole = 'member'; userModCatalog = '';
+      }
+    } catch(e) { userPlan = 'free'; userRole = 'member'; userModCatalog = ''; }
     realUserPlan = userPlan;
     // Show admin panel if admin
     const adminPanel = document.getElementById('admin-panel');
@@ -1223,6 +1259,26 @@ function updatePlanChip() {
   if (userPlan === 'pro') { chip.style.background='#2d1b69'; chip.style.color='#c77dff'; chip.textContent='👑 Plan Pro'; }
   else if (userPlan === 'premium') { chip.style.background='#1a2a1a'; chip.style.color='#6bcb77'; chip.textContent='⭐ Plan Premium'; }
   else { chip.style.background='#2e2b45'; chip.style.color='var(--muted)'; chip.textContent='🆓 Plan Gratis'; }
+  // Role badge
+  const badge = document.getElementById('p-role-badge');
+  if (!badge) return;
+  const JEFES = {
+    gorras:     {icon:'🧢', label:'JEFE GORRAS',     bg:'#1a1a00', color:'#ffd93d', border:'#ffd93d'},
+    tenis:      {icon:'👟', label:'JEFE TENIS',      bg:'#001a0a', color:'#6bcb77', border:'#6bcb77'},
+    playeras:   {icon:'👕', label:'JEFE PLAYERAS',   bg:'#001020', color:'#4d96ff', border:'#4d96ff'},
+    accesorios: {icon:'💎', label:'JEFE ACCESORIOS', bg:'#1a0030', color:'#c77dff', border:'#c77dff'},
+  };
+  if (userRole === 'admin') {
+    badge.style.cssText = 'display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:#2a1a00;color:#ffd93d;border:1.5px solid #ffd93d';
+    badge.textContent = '👑 FUNDADOR';
+  } else if (userRole === 'moderator' && JEFES[userModCatalog]) {
+    const j = JEFES[userModCatalog];
+    badge.style.cssText = `display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:${j.bg};color:${j.color};border:1.5px solid ${j.border}`;
+    badge.textContent = `${j.icon} ${j.label}`;
+  } else {
+    badge.style.cssText = 'display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:#1a1828;color:#555;border:1.5px solid #2e2b45';
+    badge.textContent = '👤 MIEMBRO';
+  }
 }
 
 // ── LOAD ITEMS ──
@@ -1276,6 +1332,11 @@ window.openDetail = async (id) => {
   const isOwner = currentUser && item.autorId === currentUser.uid;
   document.getElementById('btn-edit-aporte').style.display = isOwner ? '' : 'none';
   document.getElementById('btn-msg').style.display = (!isOwner && currentUser) ? '' : 'none';
+  // Moderator delete button: visible if mod of this item's category (and not owner)
+  const isMod = currentUser && userRole === 'moderator' && userModCatalog && item.categoria && item.categoria.toLowerCase().includes(userModCatalog.toLowerCase());
+  const isAdmin = currentUser && userRole === 'admin';
+  const modBtn = document.getElementById('btn-mod-delete');
+  if (modBtn) modBtn.style.display = ((isMod || isAdmin) && !isOwner) ? '' : 'none';
   document.getElementById('d-name').textContent = item.nombre;
   if (item.marca) {
     document.getElementById('d-marca').textContent = '🏷️ ' + item.marca;
@@ -1337,6 +1398,53 @@ window.addComment = async () => {
     // Scroll to comments
     document.querySelector('.comments-wrap').scrollIntoView({behavior:'smooth',block:'end'});
   } catch(e) { showToast('Error al comentar'); }
+};
+
+window.modDeletePieza = async () => {
+  if (!currentUser || (userRole !== 'moderator' && userRole !== 'admin')) return;
+  const item = allItems.find(i => i.id === currentDetailId);
+  if (!item) return;
+  // Pick reason
+  const razones = ['Spam', 'Repetida', 'No es de TJ'];
+  const razonHTML = razones.map((r,i) => `<button onclick="confirmModDelete('${r}')" style="display:block;width:100%;padding:12px;margin-bottom:8px;background:#1a1828;border:1.5px solid #2e2b45;border-radius:10px;color:var(--text);font-weight:700;font-size:14px;cursor:pointer;text-align:left">${r}</button>`).join('');
+  // Show inline modal
+  const existing = document.getElementById('mod-delete-modal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'mod-delete-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:#0d0a1a;border:2px solid #ff6b6b;border-radius:16px;padding:20px;width:100%;max-width:320px">
+      <div style="font-size:16px;font-weight:900;color:#ff6b6b;margin-bottom:6px">🗑️ Borrar pieza</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Selecciona la razón del borrado:</div>
+      ${razonHTML}
+      <button onclick="document.getElementById('mod-delete-modal').remove()" style="width:100%;padding:10px;background:none;border:1.5px solid #2e2b45;border-radius:10px;color:var(--muted);font-weight:700;cursor:pointer">Cancelar</button>
+    </div>`;
+  document.body.appendChild(modal);
+};
+
+window.confirmModDelete = async (razon) => {
+  const modal = document.getElementById('mod-delete-modal');
+  if (modal) modal.remove();
+  if (!currentDetailId) return;
+  try {
+    await deleteDoc(doc(db, 'piezas', currentDetailId));
+    // Log in Firestore for audit
+    try {
+      await addDoc(collection(db, 'mod_logs'), {
+        piezaId: currentDetailId,
+        moderatorId: currentUser.uid,
+        moderatorNombre: currentUser.displayName || currentUser.email,
+        razon,
+        moderatorCatalog: userModCatalog,
+        timestamp: serverTimestamp()
+      });
+    } catch(e) {}
+    allItems = allItems.filter(i => i.id !== currentDetailId);
+    renderItems(allItems);
+    showScreen('screen-home');
+    showToast(`🗑️ Pieza borrada: ${razon}`);
+  } catch(e) { showToast('Error al borrar: ' + e.message); }
 };
 
 window.toggleLike = async () => {
@@ -3244,6 +3352,24 @@ window.hideBovedaForm = () => {
   document.getElementById('boveda-form').style.display = 'none';
 };
 
+function showBovedaLimit() {
+  // Ocultar form y mostrar banner de límite
+  document.getElementById('boveda-form').style.display = 'none';
+  const list = document.getElementById('boveda-list');
+  const banner = document.createElement('div');
+  banner.id = 'boveda-limit-banner';
+  banner.style.cssText = 'background:linear-gradient(135deg,#2d1b69,#1a0a30);border:2px solid #c77dff;border-radius:14px;padding:18px;text-align:center;margin-bottom:14px';
+  banner.innerHTML = `
+    <div style="font-size:32px;margin-bottom:8px">🔒</div>
+    <div style="font-weight:900;font-size:15px;color:#c77dff;margin-bottom:6px">Llegaste al límite gratis</div>
+    <div style="font-size:13px;color:#a78bca;margin-bottom:14px">Solo puedes guardar <b style="color:#fff">3 piezas</b> con el plan gratis.<br>Desbloquea piezas ilimitadas con Premium.</div>
+    <button onclick="showScreen('screen-planes')" style="background:linear-gradient(135deg,#7c5cff,#c77dff);border:none;border-radius:10px;padding:11px 22px;color:#fff;font-weight:900;font-size:14px;cursor:pointer;width:100%">🚀 Ver Pase Premium $39</button>
+    <button onclick="document.getElementById('boveda-limit-banner').remove()" style="margin-top:8px;background:none;border:none;color:#666;font-size:12px;cursor:pointer;width:100%">Cerrar</button>
+  `;
+  // Insertar al principio de la lista
+  if (list.firstChild) { list.insertBefore(banner, list.firstChild); } else { list.appendChild(banner); }
+}
+
 window.previewBovedaFoto = (event) => {
   const file = event.target.files[0];
   if (!file) return;
@@ -3260,6 +3386,14 @@ window.previewBovedaFoto = (event) => {
 window.saveBovedaItem = async () => {
   const user = currentUser;
   if (!user) { showToast('Inicia sesión para guardar en Bóveda'); return; }
+  // Límite 3 piezas para plan gratis
+  if (userPlan === 'free') {
+    const countSnap = await getDocs(collection(db, 'boveda', user.uid, 'items'));
+    if (countSnap.size >= 3) {
+      showBovedaLimit();
+      return;
+    }
+  }
   const name = document.getElementById('bov-nombre').value.trim();
   const tipo = document.getElementById('bov-tipo').value;
   const status = document.getElementById('bov-status').value;
@@ -3292,6 +3426,16 @@ window.loadBoveda = async () => {
   try {
     const snap = await getDocs(collection(db, 'boveda', user.uid, 'items'));
     const items = snap.docs.map(d => ({id:d.id,...d.data()}));
+    // Mostrar indicador de límite si plan gratis con 3+ piezas
+    const limitWarn = document.getElementById('boveda-limit-warn');
+    if (limitWarn) limitWarn.remove();
+    if (userPlan === 'free' && items.length >= 3) {
+      const warn = document.createElement('div');
+      warn.id = 'boveda-limit-warn';
+      warn.style.cssText = 'background:#1a0a30;border:1.5px solid #7c5cff;border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:12px';
+      warn.innerHTML = `<span style="font-size:20px">🔒</span><div style="flex:1;font-size:12px;color:#a78bca"><b style="color:#c77dff">Bóveda llena (3/3)</b><br>Activa Premium para guardar más</div><button onclick="showScreen('screen-planes')" style="background:#7c5cff;border:none;border-radius:8px;padding:6px 10px;color:#fff;font-size:11px;font-weight:800;cursor:pointer">Ver plan</button>`;
+      if (list.firstChild) list.insertBefore(warn, list.firstChild); else list.appendChild(warn);
+    }
     // Stats
     const total = items.reduce((s,i)=>s+(i.costo||0),0);
     const terminados = items.filter(i=>i.status==='terminado').length;
