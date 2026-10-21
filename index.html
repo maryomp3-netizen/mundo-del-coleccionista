@@ -2996,10 +2996,6 @@ function gameLoop() {
 
   // Portal glow outer ring
   gCtx.save();
-  const portalGlow = gCtx.createRadialGradient(cx,cy,gBasketW*0.3,cx,cy,gBasketW*0.8);
-  const pAlpha = flash ? 0.9 : 0.35 + Math.sin(gFrame*0.08)*0.15;
-  portalGlow.addColorStop(0, portalColor.replace(')',`,${pAlpha})`).replace('rgb','rgba').replace('#', 'rgba(').replace('rgba(','rgba(').replace(/rgba\(([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i, (m,r,g,b)=>`rgba(${parseInt(r,16)},${parseInt(g,16)},${parseInt(b,16)}`));
-  // Simpler: just use the color
   const pColorRgb = flash ? '#ffffff' : portalColor;
   gCtx.shadowBlur = flash ? 35 : 16;
   gCtx.shadowColor = pColorRgb;
