@@ -2540,11 +2540,14 @@ window.startGame = () => {
     buildBuildings(W, H);
   };
   resizeCanvas();
-  setTimeout(resizeCanvas, 200); // re-run after layout fully settles
   initJoystick();
   if (gAnimId) cancelAnimationFrame(gAnimId);
   gAnimId = null;
-  setTimeout(() => { if (gRunning) gameLoop(); }, 50);
+  // Wait for layout to settle fully before starting loop
+  setTimeout(() => {
+    resizeCanvas();
+    setTimeout(() => { if (gRunning) gameLoop(); }, 50);
+  }, 200);
 };
 
 window.stopGame = () => {
@@ -3053,14 +3056,14 @@ function gameLoop() {
   gCtx.restore(); // end shake
 
   } catch(err) {
-    // Draw error message on canvas so we can debug
     try {
       gCtx.fillStyle = '#ff6b6b';
       gCtx.font = '11px monospace';
       gCtx.fillText('ERR: ' + err.message, 8, 20);
     } catch(e2) {}
+  } finally {
+    if (gRunning) gAnimId = requestAnimationFrame(gameLoop);
   }
-  gAnimId = requestAnimationFrame(gameLoop);
 }
 
 // ══════════════════════════════════════════════════
