@@ -1009,18 +1009,19 @@
   <div id="g-panel" style="flex-shrink:0;height:35%;min-height:130px;max-height:200px;background:#1a1828;border-top:2px dashed #ffd93d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;z-index:10">
     <!-- Skin label -->
     <div id="g-skin-label" style="font-size:10px;font-weight:800;letter-spacing:2px;color:#ffd93d;text-transform:uppercase;margin-bottom:2px">BASE</div>
-    <!-- Botones y joystick -->
-    <div style="display:flex;align-items:center;justify-content:center;gap:20px;width:100%">
+    <!-- Botones IZQUIERDA / DERECHA -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:24px;width:100%">
       <!-- Botón IZQUIERDA -->
-      <button id="g-btn-left" onpointerdown="gMoveDir=-1" onpointerup="gMoveDir=0" onpointercancel="gMoveDir=0"
-        style="width:56px;height:56px;border-radius:50%;background:#ffd93d;border:none;font-size:22px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 4px 0 #b89a00,0 6px 12px rgba(255,217,61,.3);active:transform:translateY(2px);touch-action:none;user-select:none">←</button>
-      <!-- Joystick central -->
-      <div id="g-joystick-base" style="width:70px;height:70px;border-radius:50%;background:#2e2b45;border:3px solid #7c5cff;display:flex;align-items:center;justify-content:center;position:relative;touch-action:none">
-        <div id="g-joystick-knob" style="width:36px;height:36px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#9b7dff,#5c3db0);border:2px solid #c77dff;position:absolute;cursor:grab;touch-action:none;box-shadow:0 2px 8px rgba(124,92,255,.5)"></div>
+      <button id="g-btn-left" onpointerdown="gMoveDir=-1;this.style.transform='scale(.92) translateY(3px)'" onpointerup="gMoveDir=0;this.style.transform=''" onpointercancel="gMoveDir=0;this.style.transform=''"
+        style="width:90px;height:70px;border-radius:18px;background:#ffd93d;border:none;font-size:32px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 5px 0 #b89a00,0 8px 18px rgba(255,217,61,.35);touch-action:none;user-select:none;transition:transform .08s;display:flex;align-items:center;justify-content:center">◀</button>
+      <!-- Indicador central mini -->
+      <div id="g-joystick-base" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:60px">
+        <div id="g-joystick-knob" style="font-size:11px;font-weight:900;color:#4a4870;letter-spacing:1px;display:none"></div>
+        <div style="font-size:10px;color:#4a4870;font-weight:700;letter-spacing:1px;text-align:center">MOVER</div>
       </div>
       <!-- Botón DERECHA -->
-      <button id="g-btn-right" onpointerdown="gMoveDir=1" onpointerup="gMoveDir=0" onpointercancel="gMoveDir=0"
-        style="width:56px;height:56px;border-radius:50%;background:#ffd93d;border:none;font-size:22px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 4px 0 #b89a00,0 6px 12px rgba(255,217,61,.3);touch-action:none;user-select:none">→</button>
+      <button id="g-btn-right" onpointerdown="gMoveDir=1;this.style.transform='scale(.92) translateY(3px)'" onpointerup="gMoveDir=0;this.style.transform=''" onpointercancel="gMoveDir=0;this.style.transform=''"
+        style="width:90px;height:70px;border-radius:18px;background:#ffd93d;border:none;font-size:32px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 5px 0 #b89a00,0 8px 18px rgba(255,217,61,.35);touch-action:none;user-select:none;transition:transform .08s;display:flex;align-items:center;justify-content:center">▶</button>
     </div>
     <!-- Créditos restantes -->
     <div style="font-size:10px;color:#4a4870;font-weight:700;letter-spacing:1px">CREDIT 00 — COLECCIONISTA</div>
@@ -2430,11 +2431,12 @@ function applyPanelSkin(skin) {
     if (skin.rainbow) btn.style.background = 'linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff)';
   });
 
-  // Joystick
-  const jBase = document.getElementById('g-joystick-base');
-  const jKnob = document.getElementById('g-joystick-knob');
-  if (jBase) { jBase.style.background = skin.joystickBase; jBase.style.borderColor = skin.joystickBorder; }
-  if (jKnob) { jKnob.style.background = skin.joystickKnob; jKnob.style.borderColor = skin.joystickBorder; }
+  // Update button shadow to match new size
+  ['g-btn-left','g-btn-right'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.style.boxShadow = `0 5px 0 ${skin.btnShadow},0 8px 18px rgba(0,0,0,.3)`;
+  });
 
   // Label
   const lbl = document.getElementById('g-skin-label');
@@ -2461,42 +2463,11 @@ function startGlitter(panel, skin) {
 }
 
 // ══════════════════════════════════════════════════
-// JOYSTICK TOUCH CONTROLS
+// ARROW BUTTON CONTROLS (replaces joystick)
 // ══════════════════════════════════════════════════
 function initJoystick() {
-  const knob = document.getElementById('g-joystick-knob');
-  const base = document.getElementById('g-joystick-base');
-  if (!knob || !base) return;
-
-  const onStart = (e) => {
-    e.preventDefault();
-    gJoyActive = true;
-    const touch = e.touches ? e.touches[0] : e;
-    gJoyStartX = touch.clientX;
-    gJoyCurrentX = touch.clientX;
-  };
-  const onMove = (e) => {
-    e.preventDefault();
-    if (!gJoyActive) return;
-    const touch = e.touches ? e.touches[0] : e;
-    gJoyCurrentX = touch.clientX;
-    const dx = gJoyCurrentX - gJoyStartX;
-    const clamp = Math.max(-24, Math.min(24, dx));
-    knob.style.transform = `translateX(${clamp}px)`;
-    gMoveDir = dx < -8 ? -1 : dx > 8 ? 1 : 0;
-  };
-  const onEnd = () => {
-    gJoyActive = false;
-    gMoveDir = 0;
-    knob.style.transform = '';
-  };
-
-  knob.addEventListener('touchstart', onStart, {passive:false});
-  knob.addEventListener('touchmove', onMove, {passive:false});
-  knob.addEventListener('touchend', onEnd);
-  knob.addEventListener('mousedown', onStart);
-  window.addEventListener('mousemove', (e) => { if (gJoyActive) onMove(e); });
-  window.addEventListener('mouseup', onEnd);
+  // Buttons already have onpointerdown/up/cancel inline.
+  // This stub kept so startGame() call doesn't break.
 }
 
 function getUserMainCat() {
