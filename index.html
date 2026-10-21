@@ -1012,7 +1012,9 @@
     <!-- Botones IZQUIERDA / DERECHA -->
     <div style="display:flex;align-items:center;justify-content:center;gap:24px;width:100%">
       <!-- Botón IZQUIERDA -->
-      <button id="g-btn-left" onpointerdown="gMoveDir=-1;this.style.transform='scale(.92) translateY(3px)'" onpointerup="gMoveDir=0;this.style.transform=''" onpointercancel="gMoveDir=0;this.style.transform=''"
+      <button id="g-btn-left"
+        onpointerdown="gMoveDir=-1;this.style.transform='scale(.92) translateY(3px)'" onpointerup="gMoveDir=0;this.style.transform=''" onpointercancel="gMoveDir=0;this.style.transform=''"
+        ontouchstart="gMoveDir=-1;this.style.transform='scale(.92) translateY(3px)';event.preventDefault()" ontouchend="gMoveDir=0;this.style.transform=''" ontouchcancel="gMoveDir=0;this.style.transform=''"
         style="width:90px;height:70px;border-radius:18px;background:#ffd93d;border:none;font-size:32px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 5px 0 #b89a00,0 8px 18px rgba(255,217,61,.35);touch-action:none;user-select:none;transition:transform .08s;display:flex;align-items:center;justify-content:center">◀</button>
       <!-- Indicador central mini -->
       <div id="g-joystick-base" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:60px">
@@ -1020,7 +1022,9 @@
         <div style="font-size:10px;color:#4a4870;font-weight:700;letter-spacing:1px;text-align:center">MOVER</div>
       </div>
       <!-- Botón DERECHA -->
-      <button id="g-btn-right" onpointerdown="gMoveDir=1;this.style.transform='scale(.92) translateY(3px)'" onpointerup="gMoveDir=0;this.style.transform=''" onpointercancel="gMoveDir=0;this.style.transform=''"
+      <button id="g-btn-right"
+        onpointerdown="gMoveDir=1;this.style.transform='scale(.92) translateY(3px)'" onpointerup="gMoveDir=0;this.style.transform=''" onpointercancel="gMoveDir=0;this.style.transform=''"
+        ontouchstart="gMoveDir=1;this.style.transform='scale(.92) translateY(3px)';event.preventDefault()" ontouchend="gMoveDir=0;this.style.transform=''" ontouchcancel="gMoveDir=0;this.style.transform=''"
         style="width:90px;height:70px;border-radius:18px;background:#ffd93d;border:none;font-size:32px;font-weight:900;color:#0d0a1a;cursor:pointer;box-shadow:0 5px 0 #b89a00,0 8px 18px rgba(255,217,61,.35);touch-action:none;user-select:none;transition:transform .08s;display:flex;align-items:center;justify-content:center">▶</button>
     </div>
     <!-- Créditos restantes -->
