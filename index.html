@@ -2208,7 +2208,7 @@ const SKINS = [
     id:'base', name:'BASE', desc:'Esquina inicial', ptsReq:0, icon:'🕹️',
     panel:'#1a1828', panelBorder:'#ffd93d',
     btnColor:'#ffd93d', btnShadow:'#b89a00', btnText:'#0d0a1a',
-    joystickBase:'#2e2b45', joystickBorder:'#7c5cff', joystickKnob:'radial-gradient(circle at 35% 35%,#9b7dff,#5c3db0)',
+    btnStyle:'base', portalStyle:'base',
     labelColor:'#ffd93d',
     bgType:'cyber', portalColor:'#7c5cff', particleColor:'#c77dff',
     catchSound:'ding', bgColor1:'#0a0818', bgColor2:'#1a0a30'
@@ -2217,7 +2217,7 @@ const SKINS = [
     id:'bloque_boy', name:'BLOQUE-BOY', desc:'150 pts en 1 partida', ptsReq:150, icon:'🎮',
     panel:'#1a2a0a', panelBorder:'#44bb44',
     btnColor:'#cc2222', btnShadow:'#880000', btnText:'#fff',
-    joystickBase:'#0a1a0a', joystickBorder:'#44bb44', joystickKnob:'radial-gradient(circle at 35% 35%,#88ff88,#225522)',
+    btnStyle:'retro', portalStyle:'retro',
     labelColor:'#44bb44',
     bgType:'gameboy', portalColor:'#44bb44', particleColor:'#88ff88',
     catchSound:'coin', bgColor1:'#0a1a00', bgColor2:'#152a05'
@@ -2226,7 +2226,7 @@ const SKINS = [
     id:'super_16', name:'SUPER-16', desc:'300 pts en 1 partida', ptsReq:300, icon:'🟣',
     panel:'#2a1a4a', panelBorder:'#8a5cf0',
     btnColor:'#4488ff', btnShadow:'#2255cc', btnText:'#fff',
-    joystickBase:'#3a1a6a', joystickBorder:'#8a5cf0', joystickKnob:'radial-gradient(circle at 35% 35%,#b07aff,#6a2fd0)',
+    btnStyle:'neon', portalStyle:'neon',
     labelColor:'#8a5cf0',
     bgType:'snes', portalColor:'#8a5cf0', particleColor:'#c77dff',
     catchSound:'ding', bgColor1:'#140828', bgColor2:'#200a40'
@@ -2235,7 +2235,7 @@ const SKINS = [
     id:'stick_pro', name:'STICK-PRO', desc:'500 pts en 1 partida', ptsReq:500, icon:'🕹️',
     panel:'#080810', panelBorder:'#00d9ff',
     btnColor:'#00d9ff', btnShadow:'#008899', btnText:'#000',
-    joystickBase:'#0a0a20', joystickBorder:'#00d9ff', joystickKnob:'radial-gradient(circle at 35% 35%,#60f0ff,#00aacc)',
+    btnStyle:'cyber', portalStyle:'cyber',
     labelColor:'#00d9ff',
     bgType:'arcade', portalColor:'#00d9ff', particleColor:'#60f0ff',
     catchSound:'arcade', bgColor1:'#000810', bgColor2:'#001020', magnetPull:true
@@ -2244,7 +2244,7 @@ const SKINS = [
     id:'golden_tj', name:'GOLDEN-TJ', desc:'750 pts en 1 partida', ptsReq:750, icon:'👑',
     panel:'#1a1400', panelBorder:'#ffd93d',
     btnColor:'#ffd93d', btnShadow:'#c8a800', btnText:'#000',
-    joystickBase:'#2a2000', joystickBorder:'#ffd93d', joystickKnob:'radial-gradient(circle at 35% 35%,#ffe880,#c8a800)',
+    btnStyle:'gold', portalStyle:'gold',
     labelColor:'#ffd93d', glitter:true,
     bgType:'cyber', portalColor:'#ffd93d', particleColor:'#ffe880',
     catchSound:'golden', bgColor1:'#0a0800', bgColor2:'#1a1200'
@@ -2253,11 +2253,11 @@ const SKINS = [
     id:'platinum_veblen', name:'VEBLEN-SKIN', desc:'1100 pts + atrapar 3 Veblen seguidos', ptsReq:1100, icon:'💠',
     panel:'linear-gradient(135deg,#1a0030,#001a30)', panelBorder:'#ffd93d',
     btnColor:'#ffd93d', btnShadow:'#c8a800', btnText:'#000',
-    joystickBase:'#1a0030', joystickBorder:'#ffd93d', joystickKnob:'radial-gradient(circle at 35% 35%,#fff,#ffd93d)',
+    btnStyle:'gold', portalStyle:'gold',
     labelColor:'#ffd93d', platinum:true, rainbow:true,
     bgType:'veblen', portalColor:'#ffd93d', particleColor:'#fff',
     catchSound:'shing', bgColor1:'#08001a', bgColor2:'#001020',
-    veblenChallenge:true  // must catch 3 veblen in a row
+    veblenChallenge:true
   }
 ];
 
@@ -2419,27 +2419,58 @@ function applyPanelSkin(skin) {
   panel.style.borderTopColor = skin.panelBorder;
   panel.style.borderTopStyle = skin.rainbow ? 'none' : 'dashed';
 
-  // Rainbow border for platinum
   if (skin.rainbow) {
     panel.style.borderTop = '3px solid transparent';
     panel.style.borderImage = 'linear-gradient(90deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff,#ff6b6b) 1';
   }
 
-  // Buttons
-  ['g-btn-left','g-btn-right'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.style.background = skin.btnColor;
-    btn.style.boxShadow = `0 4px 0 ${skin.btnShadow},0 6px 12px rgba(0,0,0,.3)`;
-    btn.style.color = skin.btnText;
-    if (skin.rainbow) btn.style.background = 'linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff)';
-  });
+  // ── Estilos de botones según btnStyle ──
+  const BSTYLES = {
+    base: (btn, isLeft) => {
+      btn.style.cssText += `;background:#ffd93d;color:#0d0a1a;border:none;border-radius:18px;
+        box-shadow:0 5px 0 #b89a00,0 8px 18px rgba(255,217,61,.35);font-size:32px;`;
+    },
+    neon: (btn, isLeft) => {
+      // Translucent purple neon with glow — Neon Arcade style
+      const c = isLeft ? '◀' : '▶';
+      btn.style.cssText += `;background:rgba(90,40,200,.55);color:#d0aaff;border:2px solid #c77dff;border-radius:18px;
+        box-shadow:0 0 18px #7c5cff,0 0 40px rgba(124,92,255,.4),inset 0 1px 0 rgba(255,255,255,.2);
+        font-size:30px;text-shadow:0 0 12px #c77dff,0 0 24px #7c5cff;`;
+    },
+    cyber: (btn, isLeft) => {
+      // Chrome metallic with blue electric — Cyber TJ style
+      btn.style.cssText += `;background:linear-gradient(145deg,#6a6a7a,#3a3a4a,#8a8a9a);color:#4dd8ff;
+        border:2px solid #00d9ff;border-radius:14px;
+        box-shadow:0 0 14px #00d9ff,0 0 30px rgba(0,217,255,.3),0 4px 0 #003344,inset 0 1px 0 rgba(255,255,255,.3);
+        font-size:30px;text-shadow:0 0 10px #00d9ff,0 0 20px #0088ff;`;
+    },
+    retro: (btn, isLeft) => {
+      // Chunky 8-bit pixel style — Retro Pixel
+      btn.style.cssText += `;background:#cc2222;color:#fff;border:none;border-radius:6px;
+        box-shadow:4px 4px 0 #880000,8px 8px 0 #440000;
+        font-size:28px;image-rendering:pixelated;`;
+    },
+    gold: (btn, isLeft) => {
+      // Golden ornate — Coleccionista Gold
+      btn.style.cssText += `;background:linear-gradient(145deg,#ffe066,#c8a800,#ffe066,#a07800);color:#3a2000;
+        border:2px solid #ffd93d;border-radius:16px;
+        box-shadow:0 5px 0 #7a5800,0 8px 20px rgba(255,200,0,.5),inset 0 1px 0 rgba(255,255,255,.5);
+        font-size:26px;text-shadow:1px 1px 0 rgba(255,255,255,.4);`;
+    },
+  };
 
-  // Update button shadow to match new size
-  ['g-btn-left','g-btn-right'].forEach(id => {
+  ['g-btn-left','g-btn-right'].forEach((id, i) => {
     const btn = document.getElementById(id);
     if (!btn) return;
-    btn.style.boxShadow = `0 5px 0 ${skin.btnShadow},0 8px 18px rgba(0,0,0,.3)`;
+    // Reset base styles first
+    btn.style.width = '90px'; btn.style.height = '70px';
+    btn.style.cursor = 'pointer'; btn.style.userSelect = 'none';
+    btn.style.touchAction = 'none'; btn.style.transition = 'transform .08s';
+    btn.style.display = 'flex'; btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center'; btn.style.fontWeight = '900';
+    const styleFn = BSTYLES[skin.btnStyle] || BSTYLES.base;
+    styleFn(btn, i === 0);
+    if (skin.rainbow) btn.style.background = 'linear-gradient(135deg,#ff6b6b,#ffd93d,#6bcb77,#4d96ff,#c77dff)';
   });
 
   // Label
@@ -3033,44 +3064,138 @@ function gameLoop() {
   const cy = gBasketY + 12;
   const flash = gCatchFlash > 0;
   if (gCatchFlash > 0) gCatchFlash--;
-
-  // Portal glow outer ring
-  gCtx.save();
+  const pStyle = skin.portalStyle || 'base';
   const pColorRgb = flash ? '#ffffff' : portalColor;
-  gCtx.shadowBlur = flash ? 35 : 16;
-  gCtx.shadowColor = pColorRgb;
-  gCtx.strokeStyle = pColorRgb;
-  gCtx.lineWidth = flash ? 4 : 2.5;
-  // Ellipse portal shape
-  gCtx.beginPath();
-  gCtx.ellipse(cx, cy, gBasketW/2+4, 14, 0, 0, Math.PI*2);
-  gCtx.stroke();
-  // Inner portal shimmer
-  gCtx.strokeStyle = flash ? '#ffffff' : `${pColorRgb}88`;
-  gCtx.lineWidth = 1;
-  gCtx.beginPath();
-  gCtx.ellipse(cx, cy, gBasketW/2-6, 8, 0, 0, Math.PI*2);
-  gCtx.stroke();
+  gCtx.save();
 
-  // Spinning portal particles
-  if (gFrame % 4 === 0) {
-    const angle = (gFrame * 0.18) % (Math.PI*2);
-    const px2 = cx + Math.cos(angle)*(gBasketW/2+2);
-    const py2 = cy + Math.sin(angle)*12;
-    gParticles.push({x:px2, y:py2, vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5, life:12, color:portalColor, size:2});
+  if (pStyle === 'neon') {
+    // ── Neon Ring: doble toroide morado con glow intenso ──
+    const pulse = 0.7 + Math.sin(gFrame * 0.12) * 0.3;
+    gCtx.shadowBlur = flash ? 50 : 28 * pulse;
+    gCtx.shadowColor = '#c77dff';
+    // Anillo exterior
+    gCtx.strokeStyle = flash ? '#fff' : '#c77dff';
+    gCtx.lineWidth = flash ? 5 : 3.5;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2+8, 16, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    // Anillo interior — doble torus effect
+    gCtx.strokeStyle = flash ? '#fff' : '#7c5cff';
+    gCtx.lineWidth = 2;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy-3, gBasketW/2-4, 9, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    // Partículas girando
+    if (gFrame % 3 === 0) {
+      const a1 = (gFrame * 0.2) % (Math.PI*2);
+      const a2 = a1 + Math.PI;
+      [a1, a2].forEach(a => {
+        gParticles.push({x:cx+Math.cos(a)*(gBasketW/2+6), y:cy+Math.sin(a)*14, vx:(Math.random()-0.5), vy:(Math.random()-0.5), life:18, color:'#c77dff', size:3});
+      });
+    }
+
+  } else if (pStyle === 'cyber') {
+    // ── Cyber TJ: aro cromado con chispas azules eléctricas ──
+    gCtx.shadowBlur = flash ? 45 : 20;
+    gCtx.shadowColor = '#00d9ff';
+    // Aro metálico exterior
+    const metalGrad = gCtx.createLinearGradient(cx-gBasketW/2, cy, cx+gBasketW/2, cy);
+    metalGrad.addColorStop(0, '#6a7080'); metalGrad.addColorStop(0.5, '#c0c8d8'); metalGrad.addColorStop(1, '#6a7080');
+    gCtx.strokeStyle = flash ? '#fff' : metalGrad;
+    gCtx.lineWidth = flash ? 6 : 4;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2+6, 15, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    // Borde eléctrico azul
+    gCtx.strokeStyle = flash ? '#fff' : '#00d9ff';
+    gCtx.lineWidth = 1.5;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2+9, 18, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    // Chispas eléctricas
+    if (gFrame % 2 === 0) {
+      const a = Math.random() * Math.PI * 2;
+      const r = gBasketW/2 + 8 + Math.random()*6;
+      gParticles.push({x:cx+Math.cos(a)*r, y:cy+Math.sin(a)*16, vx:(Math.random()-0.5)*3, vy:(Math.random()-0.5)*3, life:8, color:'#00d9ff', size:2});
+    }
+
+  } else if (pStyle === 'retro') {
+    // ── Retro Arcade: pixelado naranja/verde 8-bit ──
+    gCtx.shadowBlur = flash ? 30 : 0;
+    gCtx.shadowColor = '#44bb44';
+    // Dibuja el portal como rectángulo pixelado con esquinas redondeadas mínimas
+    const pw = gBasketW + 10, ph = 22;
+    const px = cx - pw/2, py = cy - ph/2;
+    gCtx.strokeStyle = flash ? '#fff' : '#44bb44';
+    gCtx.lineWidth = 4;
+    gCtx.strokeRect(px+2, py+2, pw-4, ph-4);
+    // Esquinas de pixel art (cuadraditos)
+    gCtx.fillStyle = flash ? '#fff' : '#88ff88';
+    [[px,py],[px+pw-6,py],[px,py+ph-6],[px+pw-6,py+ph-6]].forEach(([bx,by]) => {
+      gCtx.fillRect(bx, by, 6, 6);
+    });
+    // Partículas cuadradas
+    if (gFrame % 5 === 0) {
+      gParticles.push({x:cx+(Math.random()-0.5)*pw, y:cy-ph/2, vx:(Math.random()-0.5)*2, vy:-Math.random()*2-1, life:14, color:'#88ff88', size:4});
+    }
+
+  } else if (pStyle === 'gold') {
+    // ── Coleccionista Gold: anillo dorado ornamentado con estrellas ──
+    const pulse = 0.8 + Math.sin(gFrame * 0.1) * 0.2;
+    gCtx.shadowBlur = flash ? 50 : 25 * pulse;
+    gCtx.shadowColor = '#ffd93d';
+    // Anillo dorado exterior
+    const goldGrad = gCtx.createLinearGradient(cx-gBasketW/2, cy, cx+gBasketW/2, cy);
+    goldGrad.addColorStop(0, '#c8a800'); goldGrad.addColorStop(0.3, '#ffe066'); goldGrad.addColorStop(0.7, '#ffd93d'); goldGrad.addColorStop(1, '#c8a800');
+    gCtx.strokeStyle = flash ? '#fff' : goldGrad;
+    gCtx.lineWidth = flash ? 6 : 4;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2+6, 15, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    // Anillo ornamentado interior
+    gCtx.strokeStyle = flash ? '#fff' : '#ffe880';
+    gCtx.lineWidth = 1.5;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2-4, 8, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    // Estrellas decorativas girando
+    if (gFrame % 6 === 0) {
+      const a = (gFrame * 0.15) % (Math.PI*2);
+      for (let s=0; s<2; s++) {
+        const sa = a + s * Math.PI;
+        gParticles.push({x:cx+Math.cos(sa)*(gBasketW/2+4), y:cy+Math.sin(sa)*13, vx:0, vy:-0.5, life:20, color:'#ffd93d', size:3, shape:'star'});
+      }
+    }
+    if (skin.id === 'platinum_veblen' && gFrame % 3 === 0) {
+      gParticles.push({x:cx+(Math.random()-0.5)*gBasketW, y:cy+10, vx:(Math.random()-0.5)*2, vy:-Math.random()*2, life:20, color:`hsl(${(gFrame*7)%360},80%,80%)`, size:3});
+    }
+
+  } else {
+    // ── Base: portal morado clásico ──
+    gCtx.shadowBlur = flash ? 35 : 16;
+    gCtx.shadowColor = pColorRgb;
+    gCtx.strokeStyle = pColorRgb;
+    gCtx.lineWidth = flash ? 4 : 2.5;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2+4, 14, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    gCtx.strokeStyle = flash ? '#ffffff' : `${pColorRgb}88`;
+    gCtx.lineWidth = 1;
+    gCtx.beginPath();
+    gCtx.ellipse(cx, cy, gBasketW/2-6, 8, 0, 0, Math.PI*2);
+    gCtx.stroke();
+    if (gFrame % 4 === 0) {
+      const angle = (gFrame * 0.18) % (Math.PI*2);
+      gParticles.push({x:cx+Math.cos(angle)*(gBasketW/2+2), y:cy+Math.sin(angle)*12, vx:(Math.random()-0.5)*1.5, vy:(Math.random()-0.5)*1.5, life:12, color:portalColor, size:2});
+    }
   }
 
-  // Platinum trail
-  if (skin.id === 'platinum_veblen' && gFrame % 3 === 0) {
-    gParticles.push({x:cx+(Math.random()-0.5)*gBasketW, y:cy+10, vx:(Math.random()-0.5)*2, vy:-Math.random()*2, life:20, color:`hsl(${(gFrame*7)%360},80%,80%)`, size:3});
-  }
-
-  // Spark effect on catch
+  // Flash catch burst — todos los estilos
   if (flash) {
-    for (let sp=0; sp<3; sp++) {
+    for (let sp=0; sp<4; sp++) {
       const angle = Math.random()*Math.PI*2;
-      const dist = 10+Math.random()*20;
-      gParticles.push({x:cx+Math.cos(angle)*dist, y:cy+Math.sin(angle)*dist, vx:Math.cos(angle)*2, vy:Math.sin(angle)*2, life:10, color:'#ffffff', size:2});
+      const dist = 10+Math.random()*22;
+      gParticles.push({x:cx+Math.cos(angle)*dist, y:cy+Math.sin(angle)*dist, vx:Math.cos(angle)*2.5, vy:Math.sin(angle)*2.5, life:12, color: pStyle==='gold'?'#ffd93d': pStyle==='cyber'?'#00d9ff': pStyle==='neon'?'#c77dff': '#ffffff', size:3});
     }
   }
   gCtx.restore();
