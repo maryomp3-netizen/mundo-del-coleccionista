@@ -1554,18 +1554,28 @@ window.submitPieza = async () => {
   btn.disabled = false; btn.textContent = 'Publicar aporte 🚀';
 };
 
-async function fileToBase64Small(file) {
+async function fileToBase64Small(file, maxPx = 900, maxBytes = 300000) {
   return new Promise(res => {
-    const canvas = document.createElement('canvas');
+    const url = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => {
-      const size = 400;
-      const ratio = Math.min(size/img.width, size/img.height);
-      canvas.width = img.width*ratio; canvas.height = img.height*ratio;
-      canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
-      res(canvas.toDataURL('image/jpeg',0.7));
+      URL.revokeObjectURL(url);
+      const canvas = document.createElement('canvas');
+      const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
+      canvas.width  = Math.round(img.width  * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      // Calidad adaptiva: empieza en 0.82 y baja hasta quedar ≤ maxBytes
+      let q = 0.82;
+      let data;
+      do {
+        data = canvas.toDataURL('image/jpeg', q);
+        q = Math.round((q - 0.08) * 100) / 100;
+      } while (data.length > maxBytes * 1.37 && q >= 0.30); // base64 ≈ 1.37× bytes
+      res(data);
     };
-    img.src = URL.createObjectURL(file);
+    img.onerror = () => { URL.revokeObjectURL(url); res(''); };
+    img.src = url;
   });
 }
 
@@ -3502,17 +3512,16 @@ function showBovedaLimit() {
   if (list.firstChild) { list.insertBefore(banner, list.firstChild); } else { list.appendChild(banner); }
 }
 
-window.previewBovedaFoto = (event) => {
+window.previewBovedaFoto = async (event) => {
   const file = event.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    const prev = document.getElementById('bov-foto-preview');
-    prev.src = e.target.result;
+  const compressed = await fileToBase64Small(file, 900, 300000);
+  const prev = document.getElementById('bov-foto-preview');
+  if (prev) {
+    prev.src = compressed;
     prev.style.display = 'block';
-    prev._dataUrl = e.target.result;
-  };
-  reader.readAsDataURL(file);
+    prev._dataUrl = compressed;
+  }
 };
 
 window.saveBovedaItem = async () => {
