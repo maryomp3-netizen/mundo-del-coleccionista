@@ -2455,12 +2455,15 @@ window.toggleGameSound = () => {
   document.getElementById('g-sound-btn').textContent = gSoundOn ? '🔊' : '🔇';
 };
 
-// ── Skin & Scores (localStorage) ──
+// ── Skin & Scores (localStorage — por usuario) ──
+function gArcadeKey() {
+  return currentUser ? `arcade_data_${currentUser.uid}` : 'arcade_data_guest';
+}
 function gGetData() {
-  try { return JSON.parse(localStorage.getItem('arcade_data') || '{}'); } catch(e) { return {}; }
+  try { return JSON.parse(localStorage.getItem(gArcadeKey()) || '{}'); } catch(e) { return {}; }
 }
 function gSaveData(d) {
-  try { localStorage.setItem('arcade_data', JSON.stringify(d)); } catch(e) {}
+  try { localStorage.setItem(gArcadeKey(), JSON.stringify(d)); } catch(e) {}
 }
 function gGetActiveSkin() {
   const d = gGetData();
