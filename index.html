@@ -3357,14 +3357,25 @@ async function gameOver() {
     } catch(e) {}
 
     try {
-      const snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('puntaje','desc'), limit(5)));
+      // Ordenar por acumulado anual; deduplicar por userId por docs legacy
+      let snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('anual2026','desc'), limit(10)));
+      if (snap.empty) snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('puntaje','desc'), limit(10)));
       const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
-      const rows = snap.docs.map((dd,i) => {
+      const seen = new Set();
+      const unique = [];
+      for (const d of snap.docs) {
+        const uid = d.data().userId || d.id;
+        if (!seen.has(uid)) { seen.add(uid); unique.push(d); }
+        if (unique.length >= 5) break;
+      }
+      const rows = unique.map((dd,i) => {
         const data = dd.data();
-        const isMe = data.userId === currentUser?.uid;
+        const isMe = data.userId === currentUser?.uid || dd.id === currentUser?.uid;
+        const pts = data.anual2026 || data.puntaje || 0;
+        const nombre = (data.nombre||'Coleccionista').substring(0,16);
         return `<div style="display:flex;justify-content:space-between;${isMe?'color:#ffd93d;font-weight:900':''}">
-          <span>${medals[i]||'·'} ${(data.nombre||'').substring(0,14)}</span>
-          <span>${data.puntaje} pts</span>
+          <span>${medals[i]||'·'} ${nombre}</span>
+          <span>${pts} pts</span>
         </div>`;
       }).join('');
       document.getElementById('g-ranking-rows').innerHTML = rows || '<div>¡Sé el primero! 🏆</div>';
