@@ -3445,20 +3445,35 @@ async function loadHomeRanking() {
   const wrap = document.getElementById('home-ranking-wrap');
   if (!wrap) return;
   try {
-    const snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('puntaje','desc'), limit(5)));
-    if (snap.empty) { wrap.style.display='none'; return; }
+    // Ordenar por puntuación acumulada anual (un doc por usuario = sin duplicados)
+    const snap = await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('anual2026','desc'), limit(5)));
+    // Fallback: si no hay docs con anual2026, usar puntaje
+    const snap2 = snap.empty
+      ? await getDocs(query(collection(db,'puntuaciones_juego'), orderBy('puntaje','desc'), limit(5)))
+      : snap;
+    if (snap2.empty) { wrap.style.display='none'; return; }
     wrap.style.display = '';
 
+    // Deduplicar por userId por si hubiera docs legacy
+    const seen = new Set();
+    const docs = [];
+    for (const d of snap2.docs) {
+      const uid = d.data().userId || d.id;
+      if (!seen.has(uid)) { seen.add(uid); docs.push(d); }
+      if (docs.length >= 5) break;
+    }
+
     // #1 anual (leyenda)
-    const topDoc = snap.docs[0]?.data();
+    const topDoc = docs[0]?.data();
     const legendEl = document.getElementById('home-legend');
     if (legendEl && topDoc) {
+      const pts = topDoc.anual2026 || topDoc.puntaje || 0;
       legendEl.innerHTML = `<div style="font-family:'Fredoka One',cursive;font-size:13px;color:#ffd93d;margin-bottom:4px">👑 LEYENDA TJ 2026</div>
         <div style="display:flex;align-items:center;gap:10px">
           <div style="font-size:28px">🏅</div>
           <div>
             <div style="font-size:14px;font-weight:800">${topDoc.nombre||'Coleccionista'}</div>
-            <div style="font-size:11px;color:#c77dff">${topDoc.anual2026||topDoc.total||0} pts acumulados 2026</div>
+            <div style="font-size:11px;color:#c77dff">${pts} pts acumulados 2026</div>
           </div>
         </div>`;
     }
@@ -3466,12 +3481,14 @@ async function loadHomeRanking() {
     // Top 5 tabla
     const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
     const rowsEl = document.getElementById('home-ranking-rows');
-    if (rowsEl) rowsEl.innerHTML = snap.docs.map((dd,i)=>{
+    if (rowsEl) rowsEl.innerHTML = docs.map((dd,i)=>{
       const data = dd.data();
-      const isMe = currentUser && data.userId===currentUser.uid;
+      const isMe = currentUser && (data.userId===currentUser.uid || dd.id===currentUser.uid);
+      const pts = data.anual2026 || data.puntaje || 0;
+      const nombre = (data.nombre||'Coleccionista').substring(0,18);
       return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1e1840;${isMe?'color:#ffd93d;font-weight:800':''}">
-        <span>${medals[i]||'·'} ${(data.nombre||'').substring(0,16)}</span>
-        <span style="color:${isMe?'#ffd93d':'#c77dff'}">${data.puntaje}</span>
+        <span>${medals[i]||'·'} ${nombre}</span>
+        <span style="color:${isMe?'#ffd93d':'#c77dff'}">${pts}</span>
       </div>`;
     }).join('');
   } catch(e) { if(wrap) wrap.style.display='none'; }
