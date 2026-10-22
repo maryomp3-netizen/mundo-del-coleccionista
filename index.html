@@ -309,6 +309,25 @@
   </div>
 </div>
 
+<!-- MODAL BIENVENIDA -->
+<div id="modal-bienvenida" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px">
+  <div style="background:#12102a;border:2px solid #7c5cff;border-radius:24px;max-width:360px;width:100%;padding:32px 24px;text-align:center;box-shadow:0 0 60px rgba(124,92,255,.4)">
+    <div style="font-size:52px;margin-bottom:8px">🎉</div>
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:#7c5cff;margin-bottom:6px;text-transform:uppercase">Bienvenido a</div>
+    <div style="font-size:22px;font-weight:900;color:#fff;margin-bottom:4px">Mundo del <span style="color:#7c5cff">Coleccionista</span></div>
+    <div id="bienvenida-nombre" style="font-size:14px;color:#888;margin-bottom:24px"></div>
+    <div style="background:#0d0a1a;border-radius:14px;padding:16px;margin-bottom:20px;text-align:left">
+      <div style="font-size:13px;color:#c8c6d8;line-height:1.7">
+        <div style="margin-bottom:8px">🧢 <strong style="color:#fff">Explora el catálogo</strong> — descubre piezas de la comunidad TJ</div>
+        <div style="margin-bottom:8px">📸 <strong style="color:#fff">Aporta tus piezas</strong> — comparte lo que tienes</div>
+        <div style="margin-bottom:8px">🔒 <strong style="color:#fff">Tu Bóveda privada</strong> — guarda lo que no quieres perder de vista</div>
+        <div>🕹️ <strong style="color:#fff">Juega y desbloquea skins</strong> — gana puntos en el arcade</div>
+      </div>
+    </div>
+    <button onclick="cerrarBienvenida()" style="width:100%;padding:14px;background:linear-gradient(135deg,#7c5cff,#5a3adf);border:none;border-radius:14px;color:#fff;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 4px 20px rgba(124,92,255,.4)">¡Entrar a la comunidad! 🚀</button>
+  </div>
+</div>
+
 <!-- HOME -->
 <div class="screen" id="screen-home">
   <div class="topbar">
@@ -1233,7 +1252,19 @@ onAuthStateChanged(auth, async user => {
         userRole = uDoc.data().role || 'member';
         userModCatalog = uDoc.data().moderatorCatalog || '';
       } else {
+        // Usuario nuevo — guardar doc base y mostrar bienvenida
         userPlan = 'free'; userRole = 'member'; userModCatalog = '';
+        try {
+          await setDoc(doc(db, 'usuarios', user.uid), {
+            plan: 'free', role: 'member', email: user.email,
+            nombre: user.displayName || 'Coleccionista',
+            joinedAt: new Date().toISOString()
+          });
+        } catch(e) {}
+        const bNombre = document.getElementById('bienvenida-nombre');
+        if (bNombre) bNombre.textContent = user.displayName ? `¡Hola, ${user.displayName.split(' ')[0]}! 👋` : '¡Hola, coleccionista! 👋';
+        const modal = document.getElementById('modal-bienvenida');
+        if (modal) { modal.style.display = 'flex'; }
       }
     } catch(e) { userPlan = 'free'; userRole = 'member'; userModCatalog = ''; }
     realUserPlan = userPlan;
@@ -1497,11 +1528,23 @@ window.submitPieza = async () => {
   if (!currentUser) { showToast('Inicia sesión primero 👆'); showScreen('screen-auth'); return; }
   const nombre = document.getElementById('f-nombre').value.trim();
   if (!nombre) { showToast('Escribe el nombre de la pieza'); return; }
-  // Check upload limit for free plan
-  if (userPlan === 'free') {
+  // Límite diario de subidas por plan
+  const DAILY_LIMIT = { free: 3, premium: 10, pro: Infinity };
+  const limit = DAILY_LIMIT[userPlan] ?? 3;
+  if (limit !== Infinity) {
     const myItems = allItems.filter(i => i.autorId === currentUser.uid);
-    const thisMonth = myItems.filter(i => { if (!i.createdAt?.toDate) return false; const d = i.createdAt.toDate(); const now = new Date(); return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); });
-    if (thisMonth.length >= 10) { showToast('Plan Gratis: máx 10 aportes/mes. ¡Mejora tu plan!'); showScreen('screen-planes'); return; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayCount = myItems.filter(i => {
+      if (!i.createdAt?.toDate) return false;
+      const d = i.createdAt.toDate(); d.setHours(0,0,0,0);
+      return d.getTime() === today.getTime();
+    }).length;
+    if (todayCount >= limit) {
+      const nombres = { free: 'Gratis', premium: 'Premium', pro: 'Pro' };
+      showToast(`Plan ${nombres[userPlan]}: máx ${limit} aportes/día. ¡Vuelve mañana!`);
+      if (userPlan === 'free') showScreen('screen-planes');
+      return;
+    }
   }
   const btn = document.getElementById('btn-submit');
   btn.disabled = true; btn.textContent = 'Publicando…';
@@ -1994,6 +2037,10 @@ window.showToast = (msg) => {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
+};
+window.cerrarBienvenida = () => {
+  const modal = document.getElementById('modal-bienvenida');
+  if (modal) modal.style.display = 'none';
 };
 function timeAgo(date) {
   const diff = Date.now()-date.getTime(), mins = Math.floor(diff/60000);
