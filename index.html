@@ -609,25 +609,25 @@
     <div style="background:var(--card);border-radius:16px;padding:16px;border:1.5px solid #2e2b45;margin-top:8px">
       <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">🚧 Próximamente en la app</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
-          <span style="font-size:24px">🔒</span>
+        <button onclick="showScreen('screen-foro')" style="background:#12102a;border:1.5px solid #7c5cff;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">📍</span>
           <span style="font-size:13px;font-weight:800;color:var(--text)">Foro Regional</span>
-          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+          <span style="font-size:10px;color:#7c5cff">¡Disponible!</span>
         </button>
-        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
-          <span style="font-size:24px">🔒</span>
+        <button onclick="showScreen('screen-duelos')" style="background:#12102a;border:1.5px solid #ff6b6b;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">⚔️</span>
           <span style="font-size:13px;font-weight:800;color:var(--text)">Duelos</span>
-          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+          <span style="font-size:10px;color:#ff6b6b">¡Disponible!</span>
         </button>
-        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
-          <span style="font-size:24px">🔒</span>
+        <button onclick="showScreen('screen-skins-store')" style="background:#12102a;border:1.5px solid #ffd93d;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">🎨</span>
           <span style="font-size:13px;font-weight:800;color:var(--text)">Skins</span>
-          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+          <span style="font-size:10px;color:#ffd93d">¡Disponible!</span>
         </button>
-        <button onclick="showToast('🔒 Disponible en 6 meses')" style="background:#12102a;border:1.5px solid #2e2b45;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
-          <span style="font-size:24px">🔒</span>
-          <span style="font-size:13px;font-weight:800;color:var(--text)">Premium</span>
-          <span style="font-size:10px;color:var(--muted)">Próximamente</span>
+        <button onclick="showScreen('screen-mi-plan')" style="background:#12102a;border:1.5px solid #6bcb77;border-radius:12px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer">
+          <span style="font-size:24px">⭐</span>
+          <span style="font-size:13px;font-weight:800;color:var(--text)">Mi Plan</span>
+          <span style="font-size:10px;color:#6bcb77">¡Disponible!</span>
         </button>
       </div>
     </div>
@@ -1090,6 +1090,96 @@
     <div style="font-size:12px;color:#a7a9be;margin-bottom:20px" id="g-skin-unlock-desc">Actívala en tu Perfil</div>
     <button onclick="document.getElementById('g-skin-modal').style.display='none'" style="background:#7c5cff;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:800;color:#fff;cursor:pointer">¡GENIAL! 🎉</button>
   </div>
+</div>
+
+<!-- ══ SCREEN: DUELOS ══ -->
+<div class="screen" id="screen-duelos">
+  <div class="topbar">
+    <div class="logo">⚔️ <span>Duelos</span></div>
+    <button class="back-btn" onclick="showScreen('screen-planes')" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">✕</button>
+  </div>
+  <div style="padding:16px 16px 100px;flex:1;overflow-y:auto">
+    <div style="background:linear-gradient(135deg,#1a0808,#2a0808);border:2px solid #ff6b6b;border-radius:16px;padding:16px;margin-bottom:16px;text-align:center">
+      <div style="font-size:32px;margin-bottom:6px">⚔️</div>
+      <div style="font-size:16px;font-weight:900;color:#ff6b6b">DUELOS DE PIEZAS</div>
+      <div style="font-size:12px;color:#888;margin-top:4px">Vota cuál pieza es más valiosa</div>
+    </div>
+    <div id="duelo-card" style="background:var(--card);border-radius:16px;padding:16px;border:1.5px solid #2e2b45;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:800;color:var(--muted);text-align:center;margin-bottom:12px;letter-spacing:1px">¿CUÁL VALE MÁS?</div>
+      <div style="display:flex;gap:10px;align-items:stretch" id="duelo-vs-row">
+        <div style="color:#888;text-align:center;padding:40px 0;width:100%">Cargando duelo...</div>
+      </div>
+      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)" id="duelo-votos-info"></div>
+    </div>
+    <div style="background:var(--card);border-radius:16px;padding:16px;border:1.5px solid #2e2b45">
+      <div style="font-size:12px;font-weight:800;color:#ff6b6b;margin-bottom:12px">🏆 HISTORIAL DE DUELOS</div>
+      <div id="duelo-historial" style="font-size:13px;color:var(--muted)">Cargando...</div>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
+    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
+    <button class="nav-btn active"><span>⭐</span><span>Planes</span></button>
+    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
+  </nav>
+</div>
+
+<!-- ══ SCREEN: SKINS STORE ══ -->
+<div class="screen" id="screen-skins-store">
+  <div class="topbar">
+    <div class="logo">🎨 <span>Skins</span></div>
+    <button class="back-btn" onclick="showScreen('screen-planes')" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">✕</button>
+  </div>
+  <div style="padding:16px 16px 100px;flex:1;overflow-y:auto">
+    <div style="background:linear-gradient(135deg,#1a1400,#2a2000);border:2px solid #ffd93d;border-radius:16px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:36px" id="ss-active-icon">🕹️</div>
+      <div>
+        <div style="font-size:11px;color:#888;font-weight:700">SKIN ACTIVA</div>
+        <div style="font-size:16px;font-weight:900;color:#ffd93d" id="ss-active-name">BASE</div>
+        <div style="font-size:11px;color:#888" id="ss-pts-total">⭐ 0 pts acumulados</div>
+      </div>
+    </div>
+    <div id="ss-grid" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
+    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
+    <button class="nav-btn active"><span>⭐</span><span>Planes</span></button>
+    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
+  </nav>
+</div>
+
+<!-- ══ SCREEN: MI PLAN ══ -->
+<div class="screen" id="screen-mi-plan">
+  <div class="topbar">
+    <div class="logo">⭐ <span>Mi Plan</span></div>
+    <button class="back-btn" onclick="showScreen('screen-planes')" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">✕</button>
+  </div>
+  <div style="padding:16px 16px 100px;flex:1;overflow-y:auto">
+    <div id="mp-header" style="background:var(--card);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;border:2px solid #2e2b45"></div>
+    <div style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;border:1.5px solid #2e2b45">
+      <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:12px;letter-spacing:1px">📊 USO HOY</div>
+      <div id="mp-uso-hoy" style="font-size:14px;color:var(--text)">Cargando...</div>
+    </div>
+    <div style="background:var(--card);border-radius:16px;padding:16px;margin-bottom:16px;border:1.5px solid #2e2b45">
+      <div style="font-size:12px;font-weight:800;color:var(--muted);margin-bottom:12px;letter-spacing:1px">✅ BENEFICIOS DE TU PLAN</div>
+      <div id="mp-beneficios"></div>
+    </div>
+    <div style="background:#0d1a0d;border:1.5px solid #6bcb77;border-radius:16px;padding:16px;text-align:center">
+      <div style="font-size:13px;color:#6bcb77;font-weight:800;margin-bottom:8px">¿Quieres subir de plan?</div>
+      <div style="font-size:12px;color:#888;margin-bottom:12px">Contáctanos para activar Premium o Pro</div>
+      <a href="mailto:mundocoleccionista.tj@gmail.com?subject=Quiero subir mi plan" style="display:inline-block;background:#6bcb77;color:#000;font-weight:900;border-radius:12px;padding:12px 24px;font-size:14px;text-decoration:none">📧 Contactar admin</a>
+    </div>
+  </div>
+  <nav class="bottom-nav">
+    <button class="nav-btn" onclick="showScreen('screen-home')"><span>🏠</span><span>Inicio</span></button>
+    <button class="nav-btn" onclick="showScreen('screen-upload')"><span>➕</span><span>Aportar</span></button>
+    <button class="nav-btn" onclick="goChats()"><span>💬</span><span>Chats</span></button>
+    <button class="nav-btn active"><span>⭐</span><span>Planes</span></button>
+    <button class="nav-btn" onclick="goProfile()"><span>👤</span><span>Perfil</span></button>
+  </nav>
 </div>
 
 <script type="module">
@@ -2185,30 +2275,20 @@ async function loadDescubreHoy() {
   } catch(e) { console.log('descubre error', e); }
 }
 
-// ── DUELO ──
+// ── DUELO (modal legacy — reemplazado por screen-duelos) ──
 let dueloItems = [];
 window.showDuelo = async () => {
-  const modal = document.getElementById('duelo-modal');
-  modal.style.display = 'flex';
-  const cards = document.getElementById('duelo-cards');
-  cards.innerHTML = '<div style="color:var(--muted);text-align:center;width:100%">Cargando...</div>';
-
-  try {
-    const snap = await getDocs(query(collection(db, 'piezas'), limit(30)));
-    const items = snap.docs.map(d=>({id:d.id,...d.data()})).filter(i=>i.imageUrls?.[0]||i.imageUrl||i.fotos?.[0]);
-    if (items.length < 2) { cards.innerHTML = '<div style="color:var(--muted)">No hay suficientes piezas aún</div>'; return; }
-    const shuffled = items.sort(()=>Math.random()-.5);
-    dueloItems = [shuffled[0], shuffled[1]];
-    renderDuelo();
-  } catch(e) { cards.innerHTML = '<div style="color:var(--muted)">Error cargando</div>'; }
+  // Redirigir al nuevo screen
+  showScreen('screen-duelos');
 };
 
-function renderDuelo() {
+function _renderDueloLegacy() {
   const cards = document.getElementById('duelo-cards');
+  if (!cards) return;
   cards.innerHTML = dueloItems.map((item, idx) => {
     const img = item.imageUrls?.[0] || item.imageUrl || item.fotos?.[0] || '';
     const emoji = EMOJIS[item.categoria] || '🎴';
-    return `<div onclick="votarDuelo(${idx})" style="flex:1;border-radius:14px;background:var(--card);overflow:hidden;cursor:pointer;border:2px solid #2e2b45;transition:transform .15s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform=''">
+    return `<div onclick="_votarDueloLegacy(${idx})" style="flex:1;border-radius:14px;background:var(--card);overflow:hidden;cursor:pointer;border:2px solid #2e2b45;transition:transform .15s" onmousedown="this.style.transform='scale(.97)'" onmouseup="this.style.transform=''">
       <div style="height:150px;background:#1e1c30;display:flex;align-items:center;justify-content:center;font-size:${img?'0':'50'}px;overflow:hidden">
         ${img ? `<img src="${img}" style="width:100%;height:100%;object-fit:cover">` : emoji}
       </div>
@@ -2221,12 +2301,12 @@ function renderDuelo() {
   }).join('<div style="display:flex;align-items:center;font-size:24px;font-weight:900;color:var(--accent1)">VS</div>');
 }
 
-window.votarDuelo = async (idx) => {
+window._votarDueloLegacy = async (idx) => {
   const winner = dueloItems[idx];
-  document.getElementById('duelo-pct-0').style.display = '';
-  document.getElementById('duelo-pct-1').style.display = '';
-  document.getElementById('duelo-pct-0').textContent = idx === 0 ? '🏆 +1' : '';
-  document.getElementById('duelo-pct-1').textContent = idx === 1 ? '🏆 +1' : '';
+  const p0 = document.getElementById('duelo-pct-0');
+  const p1 = document.getElementById('duelo-pct-1');
+  if (p0) { p0.style.display = ''; p0.textContent = idx === 0 ? '🏆 +1' : ''; }
+  if (p1) { p1.style.display = ''; p1.textContent = idx === 1 ? '🏆 +1' : ''; }
 
   try {
     await setDoc(doc(db, 'duelos', winner.id), {
@@ -2236,7 +2316,7 @@ window.votarDuelo = async (idx) => {
   } catch(e) {}
 
   showToast('✅ ¡Voto registrado!');
-  setTimeout(() => showDuelo(), 1500);
+  setTimeout(() => showScreen('screen-duelos'), 1500);
 };
 
 // ═══════════════════════════════════════
@@ -3814,6 +3894,288 @@ window.showScreen = (id) => {
     foroRegion = null;
     document.querySelectorAll('.foro-rpill').forEach(p => p.classList.remove('sel'));
     document.getElementById('foro-posts-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:40px;margin-bottom:10px">📍</div><div style="font-weight:700">Selecciona una región para ver el foro</div></div>';
+  }
+  if (id === 'screen-duelos') loadDuelos();
+  if (id === 'screen-skins-store') loadSkinsStore();
+  if (id === 'screen-mi-plan') loadMiPlan();
+};
+
+// ══════════════════════════════════════════════════
+// MÓDULO DUELOS
+// ══════════════════════════════════════════════════
+let dueloActual = null;
+
+window.loadDuelos = async () => {
+  const vsRow = document.getElementById('duelo-vs-row');
+  const histDiv = document.getElementById('duelo-historial');
+  const infoDiv = document.getElementById('duelo-votos-info');
+  if (!vsRow) return;
+
+  vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">⏳ Cargando duelo...</div>';
+  infoDiv.textContent = '';
+
+  try {
+    // Cargar duelos activos de Firestore
+    const { collection, query, where, orderBy, limit, getDocs, doc, getDoc, updateDoc, increment, addDoc, serverTimestamp }
+      = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+    // Buscar un duelo activo aleatorio
+    const duelosRef = collection(db, 'duelos');
+    const qActivos = query(duelosRef, where('activo', '==', true), limit(5));
+    const snap = await getDocs(qActivos);
+
+    if (snap.empty) {
+      // No hay duelos — crear uno automático con piezas del catálogo
+      await crearDueloAuto();
+      return;
+    }
+
+    // Elegir uno al azar
+    const docs = snap.docs;
+    const elegido = docs[Math.floor(Math.random() * docs.length)];
+    dueloActual = { id: elegido.id, ...elegido.data() };
+
+    renderDuelo(dueloActual);
+
+    // Cargar historial (duelos cerrados recientes)
+    const qHist = query(duelosRef, where('activo', '==', false), orderBy('creadoAt', 'desc'), limit(5));
+    const snapH = await getDocs(qHist);
+    if (snapH.empty) {
+      histDiv.innerHTML = '<div style="color:var(--muted);font-size:13px">Aún no hay duelos completados.</div>';
+    } else {
+      histDiv.innerHTML = snapH.docs.map(d => {
+        const data = d.data();
+        const ganador = (data.votosA || 0) >= (data.votosB || 0) ? data.nombreA : data.nombreB;
+        const total = (data.votosA || 0) + (data.votosB || 0);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e1b30">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#fff">🏆 ${ganador || 'Sin nombre'}</div>
+            <div style="font-size:11px;color:var(--muted)">${total} votos totales</div>
+          </div>
+          <div style="font-size:10px;color:#7c5cff">${data.votosA || 0} vs ${data.votosB || 0}</div>
+        </div>`;
+      }).join('');
+    }
+  } catch(e) {
+    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Error al cargar duelos</div>';
+  }
+};
+
+async function crearDueloAuto() {
+  const vsRow = document.getElementById('duelo-vs-row');
+  // Usar piezas del catálogo ya cargadas
+  const piezas = allItems.filter(i => i.foto);
+  if (piezas.length < 2) {
+    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Se necesitan al menos 2 piezas en el catálogo para crear duelos.</div>';
+    return;
+  }
+  // Elegir 2 al azar
+  const shuffled = [...piezas].sort(() => Math.random() - 0.5);
+  const [a, b] = shuffled.slice(0, 2);
+  const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  try {
+    const ref = await addDoc(collection(db, 'duelos'), {
+      activo: true, votosA: 0, votosB: 0,
+      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA: a.foto || '',
+      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB: b.foto || '',
+      creadoAt: serverTimestamp()
+    });
+    dueloActual = { id: ref.id, activo: true, votosA: 0, votosB: 0,
+      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA: a.foto || '',
+      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB: b.foto || '' };
+    renderDuelo(dueloActual);
+  } catch(e) {
+    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Error al crear duelo</div>';
+  }
+}
+
+function renderDuelo(d) {
+  const vsRow = document.getElementById('duelo-vs-row');
+  const infoDiv = document.getElementById('duelo-votos-info');
+  const total = (d.votosA || 0) + (d.votosB || 0);
+  const pctA = total ? Math.round((d.votosA / total) * 100) : 50;
+  const pctB = total ? Math.round((d.votosB / total) * 100) : 50;
+
+  const cardStyle = 'flex:1;background:#0d0a1a;border-radius:14px;padding:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:border .2s';
+  vsRow.innerHTML = `
+    <div style="${cardStyle}" onclick="votarDuelo('A')" id="duelo-card-a">
+      ${d.fotoA ? `<img src="${d.fotoA}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px">` : '<div style="height:120px;background:#1a1630;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px">🧢</div>'}
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">${d.nombreA || 'Pieza A'}</div>
+      <div style="font-size:11px;color:#7c5cff">${d.votosA || 0} votos · ${pctA}%</div>
+      <div style="background:#1a1630;border-radius:6px;height:4px;margin-top:6px">
+        <div style="background:#7c5cff;height:4px;border-radius:6px;width:${pctA}%"></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;padding:0 4px;font-weight:900;color:#ff6b6b;font-size:16px">VS</div>
+    <div style="${cardStyle}" onclick="votarDuelo('B')" id="duelo-card-b">
+      ${d.fotoB ? `<img src="${d.fotoB}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px">` : '<div style="height:120px;background:#1a1630;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px">🎽</div>'}
+      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">${d.nombreB || 'Pieza B'}</div>
+      <div style="font-size:11px;color:#ff6b6b">${d.votosB || 0} votos · ${pctB}%</div>
+      <div style="background:#1a1630;border-radius:6px;height:4px;margin-top:6px">
+        <div style="background:#ff6b6b;height:4px;border-radius:6px;width:${pctB}%"></div>
+      </div>
+    </div>`;
+  infoDiv.textContent = total > 0 ? `${total} votos totales • Toca para votar` : 'Sé el primero en votar';
+}
+
+window.votarDuelo = async (lado) => {
+  if (!currentUser) { showToast('Inicia sesión para votar'); return; }
+  if (!dueloActual) return;
+
+  // Revisar si ya votó (localStorage)
+  const voteKey = `duelo_voto_${dueloActual.id}`;
+  if (localStorage.getItem(voteKey)) {
+    showToast('Ya votaste en este duelo 😉'); return;
+  }
+
+  const { doc, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  try {
+    const campo = lado === 'A' ? 'votosA' : 'votosB';
+    await updateDoc(doc(db, 'duelos', dueloActual.id), { [campo]: increment(1) });
+    dueloActual[campo] = (dueloActual[campo] || 0) + 1;
+    localStorage.setItem(voteKey, '1');
+
+    // Highlight ganador temporal
+    const card = document.getElementById(`duelo-card-${lado.toLowerCase()}`);
+    if (card) card.style.border = '2px solid #7c5cff';
+    renderDuelo(dueloActual);
+    showToast(`✅ Votaste por ${lado === 'A' ? dueloActual.nombreA : dueloActual.nombreB}`);
+  } catch(e) { showToast('Error al votar'); }
+};
+
+// ══════════════════════════════════════════════════
+// MÓDULO SKINS STORE
+// ══════════════════════════════════════════════════
+window.loadSkinsStore = () => {
+  const grid = document.getElementById('ss-grid');
+  const activeIcon = document.getElementById('ss-active-icon');
+  const activeName = document.getElementById('ss-active-name');
+  const ptsTotal = document.getElementById('ss-pts-total');
+  if (!grid) return;
+
+  const data = gGetData();
+  const pts = data.anual2026 || data.total || 0;
+  const activeSkin = data.currentSkin || SKINS[0]?.id || 'base';
+  const unlockedSet = new Set(data.unlockedSkins || [SKINS[0]?.id]);
+
+  // Header activo
+  const skinActiva = SKINS.find(s => s.id === activeSkin) || SKINS[0];
+  if (skinActiva) {
+    activeIcon.textContent = skinActiva.icon || '🕹️';
+    activeName.textContent = skinActiva.name || 'BASE';
+  }
+  ptsTotal.textContent = `⭐ ${pts.toLocaleString()} pts acumulados`;
+
+  // Grid de todas las skins
+  grid.innerHTML = SKINS.map(skin => {
+    const unlocked = unlockedSet.has(skin.id);
+    const isActive = skin.id === activeSkin;
+    const threshold = skin.pointsRequired || 0;
+    const progress = threshold > 0 ? Math.min(100, Math.round((pts / threshold) * 100)) : 100;
+
+    return `<div style="background:var(--card);border-radius:14px;padding:14px;border:2px solid ${isActive ? '#ffd93d' : unlocked ? '#7c5cff' : '#2e2b45'};display:flex;align-items:center;gap:14px">
+      <div style="font-size:38px;min-width:50px;text-align:center">${skin.icon || '🕹️'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <div style="font-size:14px;font-weight:900;color:${isActive ? '#ffd93d' : '#fff'}">${skin.name}</div>
+          ${isActive ? '<span style="font-size:10px;background:#ffd93d;color:#000;border-radius:6px;padding:2px 6px;font-weight:800">ACTIVA</span>' : ''}
+          ${!unlocked ? '<span style="font-size:10px;background:#2e2b45;color:#888;border-radius:6px;padding:2px 6px">🔒 BLOQUEADA</span>' : ''}
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${threshold > 0 ? `Requiere ${threshold.toLocaleString()} pts` : 'Skin de inicio'}</div>
+        ${!unlocked ? `<div style="background:#1a1630;border-radius:6px;height:5px"><div style="background:#7c5cff;height:5px;border-radius:6px;width:${progress}%"></div></div>
+        <div style="font-size:10px;color:#7c5cff;margin-top:3px">${pts.toLocaleString()} / ${threshold.toLocaleString()} pts (${progress}%)</div>` : ''}
+      </div>
+      ${unlocked && !isActive ? `<button onclick="activarSkin('${skin.id}')" style="background:#7c5cff;border:none;border-radius:10px;padding:8px 12px;color:#fff;font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap">Usar</button>` : ''}
+    </div>`;
+  }).join('');
+};
+
+window.activarSkin = (skinId) => {
+  const data = gGetData();
+  const unlockedSet = new Set(data.unlockedSkins || [SKINS[0]?.id]);
+  if (!unlockedSet.has(skinId)) { showToast('🔒 Skin bloqueada'); return; }
+  data.currentSkin = skinId;
+  gSaveData(data);
+  const skin = SKINS.find(s => s.id === skinId);
+  showToast(`🎨 Skin activada: ${skin?.name || skinId}`);
+  loadSkinsStore();
+};
+
+// ══════════════════════════════════════════════════
+// MÓDULO MI PLAN
+// ══════════════════════════════════════════════════
+window.loadMiPlan = async () => {
+  const header = document.getElementById('mp-header');
+  const usoHoy = document.getElementById('mp-uso-hoy');
+  const beneficiosDiv = document.getElementById('mp-beneficios');
+  if (!header) return;
+
+  const PLAN_INFO = {
+    free:    { nombre: 'Gratis', icon: '🆓', color: '#888',    desc: 'Plan base de la comunidad' },
+    premium: { nombre: 'Premium', icon: '💜', color: '#7c5cff', desc: 'Para coleccionistas activos' },
+    pro:     { nombre: 'Pro',     icon: '⭐', color: '#ffd93d', desc: 'Acceso completo sin límites' },
+  };
+  const PLAN_BENEFICIOS = {
+    free:    ['3 aportes al catálogo por día', 'Bóveda privada ilimitada', 'Acceso al foro regional', 'Arcade y skins básicas'],
+    premium: ['10 aportes al catálogo por día', 'Todo lo del plan Gratis', 'Skins Premium desbloqueables', 'Acceso a Duelos'],
+    pro:     ['Aportes ilimitados al día', 'Todo lo del plan Premium', 'Todas las skins disponibles', 'Insignia Pro en el perfil'],
+  };
+
+  const plan = userPlan || 'free';
+  const info = PLAN_INFO[plan] || PLAN_INFO.free;
+  const beneficios = PLAN_BENEFICIOS[plan] || PLAN_BENEFICIOS.free;
+
+  header.innerHTML = `
+    <div style="font-size:48px;margin-bottom:8px">${info.icon}</div>
+    <div style="font-size:11px;font-weight:800;letter-spacing:2px;color:${info.color};margin-bottom:4px">PLAN ACTIVO</div>
+    <div style="font-size:24px;font-weight:900;color:#fff;margin-bottom:4px">${info.nombre}</div>
+    <div style="font-size:12px;color:#888">${info.desc}</div>`;
+  header.style.borderColor = info.color;
+
+  beneficiosDiv.innerHTML = beneficios.map(b =>
+    `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1e1b30">
+      <div style="color:#6bcb77;font-size:16px">✅</div>
+      <div style="font-size:13px;color:#c8c6d8">${b}</div>
+    </div>`
+  ).join('');
+
+  // Calcular uso de hoy
+  const DAILY_LIMIT = { free: 3, premium: 10, pro: null };
+  const limite = DAILY_LIMIT[plan];
+  if (!currentUser) { usoHoy.innerHTML = '<div style="color:var(--muted)">Inicia sesión para ver tu uso</div>'; return; }
+
+  if (limite === null) {
+    usoHoy.innerHTML = `<div style="display:flex;align-items:center;gap:10px">
+      <div style="font-size:24px">♾️</div>
+      <div><div style="font-size:14px;font-weight:700;color:#fff">Sin límite de aportes</div>
+      <div style="font-size:12px;color:#888">Tu plan Pro te da acceso ilimitado</div></div></div>`;
+    return;
+  }
+
+  try {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const myItems = allItems.filter(i => {
+      if (i.autorId !== currentUser.uid) return false;
+      if (!i.createdAt?.toDate) return false;
+      const d = i.createdAt.toDate(); d.setHours(0,0,0,0);
+      return d.getTime() === today.getTime();
+    });
+    const usado = myItems.length;
+    const restante = Math.max(0, limite - usado);
+    const pct = Math.round((usado / limite) * 100);
+    const color = pct >= 100 ? '#ff6b6b' : pct >= 70 ? '#ffd93d' : '#6bcb77';
+
+    usoHoy.innerHTML = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;color:#fff">Aportes hoy</div>
+        <div style="font-size:13px;font-weight:800;color:${color}">${usado} / ${limite}</div>
+      </div>
+      <div style="background:#1a1630;border-radius:8px;height:8px;margin-bottom:8px">
+        <div style="background:${color};height:8px;border-radius:8px;width:${pct}%;transition:width .4s"></div>
+      </div>
+      <div style="font-size:12px;color:#888">${restante > 0 ? `Te quedan ${restante} aportes hoy` : '⚠️ Límite alcanzado — regresa mañana'}</div>`;
+  } catch(e) {
+    usoHoy.innerHTML = '<div style="color:var(--muted)">Error al cargar uso</div>';
   }
 };
 
