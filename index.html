@@ -500,10 +500,18 @@
       <label class="form-label">📍 Ubicación (opcional)</label>
       <input class="form-input" id="f-ubicacion" type="text" placeholder="Ej: Ciudad de México, Guadalajara, Monterrey…">
     </div>
-    <div class="form-field">
+    <div class="form-field" id="precio-field" style="display:none">
       <label class="form-label">💰 Precio estimado (MXN, opcional)</label>
       <input class="form-input" id="f-precio" type="number" placeholder="Ej: 2500 — piezas >$2000 reciben ⭐ SANTO GRIAL">
       <div style="font-size:10px;color:#ffd93d;margin-top:4px">⭐ Las piezas con valor >$2,000 MXN se marcan automáticamente como Pieza Veblen / Grail</div>
+    </div>
+    <div id="precio-lock" style="background:#12102a;border:1.5px dashed #7c5cff;border-radius:13px;padding:12px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      <div style="font-size:24px">🔒</div>
+      <div>
+        <div style="font-size:12px;font-weight:800;color:#7c5cff">Precio visible desde Premium</div>
+        <div style="font-size:11px;color:#888">Pon precio a tus piezas y atrae compradores</div>
+      </div>
+      <button onclick="showScreen('screen-planes')" style="margin-left:auto;background:#7c5cff;border:none;border-radius:10px;padding:7px 12px;color:#fff;font-weight:800;font-size:11px;cursor:pointer;white-space:nowrap">Ver planes</button>
     </div>
     <button class="submit-btn" id="btn-submit" onclick="submitPieza()">Publicar aporte 🚀</button>
   </div>
@@ -1303,6 +1311,14 @@ function buildUploadSelect() {
   const cats = userPlan === 'pro' ? ALL_CATS.slice(1) : userPlan === 'premium' ? [...CATS_FREE, ...CATS_PREMIUM].slice(1) : CATS_FREE.slice(1);
   sel.innerHTML = cats.map(c => `<option value="${c.id}">${c.label}${c.sub ? ` – ${c.sub}` : ''}</option>`).join('');
   updateMarcas();
+  // Precio: visible en premium y pro, bloqueado en free
+  const pf = document.getElementById('precio-field');
+  const pl = document.getElementById('precio-lock');
+  if (pf && pl) {
+    const canPrice = userPlan === 'premium' || userPlan === 'pro';
+    pf.style.display = canPrice ? 'block' : 'none';
+    pl.style.display = canPrice ? 'none' : 'flex';
+  }
 }
 
 window.updateMarcas = () => {
@@ -3963,26 +3979,40 @@ window.loadDuelos = async () => {
 
 async function crearDueloAuto() {
   const vsRow = document.getElementById('duelo-vs-row');
-  // Usar piezas del catálogo ya cargadas
-  const piezas = allItems.filter(i => i.foto);
+  const { collection, query, getDocs, limit, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+  // Intentar con allItems primero, sino cargar de Firestore
+  let piezas = allItems.filter(i => i.foto || i.fotos?.[0] || i.imageUrls?.[0]);
   if (piezas.length < 2) {
-    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Se necesitan al menos 2 piezas en el catálogo para crear duelos.</div>';
+    try {
+      vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:20px 0;width:100%">⏳ Buscando piezas...</div>';
+      const snap = await getDocs(query(collection(db, 'piezas'), limit(30)));
+      piezas = snap.docs.map(d => ({id: d.id, ...d.data()}))
+        .filter(i => i.foto || i.fotos?.[0] || i.imageUrls?.[0] || i.imageUrl);
+    } catch(e) {}
+  }
+
+  if (piezas.length < 2) {
+    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">📸 Aún no hay suficientes piezas con foto en el catálogo.<br><br><small>¡Sé el primero en aportar!</small></div>';
     return;
   }
+
   // Elegir 2 al azar
   const shuffled = [...piezas].sort(() => Math.random() - 0.5);
   const [a, b] = shuffled.slice(0, 2);
-  const { collection, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  const fotoA = a.foto || a.fotos?.[0] || a.imageUrls?.[0] || a.imageUrl || '';
+  const fotoB = b.foto || b.fotos?.[0] || b.imageUrls?.[0] || b.imageUrl || '';
+
   try {
     const ref = await addDoc(collection(db, 'duelos'), {
       activo: true, votosA: 0, votosB: 0,
-      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA: a.foto || '',
-      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB: b.foto || '',
+      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA,
+      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB,
       creadoAt: serverTimestamp()
     });
     dueloActual = { id: ref.id, activo: true, votosA: 0, votosB: 0,
-      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA: a.foto || '',
-      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB: b.foto || '' };
+      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA,
+      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB };
     renderDuelo(dueloActual);
   } catch(e) {
     vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Error al crear duelo</div>';
