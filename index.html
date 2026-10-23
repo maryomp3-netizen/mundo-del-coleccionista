@@ -916,12 +916,15 @@
         <label class="form-label">Costo total (MXN)</label>
         <input class="form-input" id="bov-costo" type="number" placeholder="0">
       </div>
-      <div class="form-field">
+      <div class="form-field" id="bov-foto-field">
         <label class="form-label">Foto (opcional)</label>
-        <div class="upload-zone" style="height:100px;margin-bottom:0" onclick="document.getElementById('bov-foto-input').click()">
+        <div class="upload-zone" style="height:100px;margin-bottom:0" onclick="bovFotoClick()">
           <img id="bov-foto-preview" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0;display:none;border-radius:var(--radius)">
-          <span style="font-size:20px">📷</span>
+          <span style="font-size:20px" id="bov-foto-icon">📷</span>
           <input type="file" id="bov-foto-input" accept="image/*" style="display:none" onchange="previewBovedaFoto(event)">
+        </div>
+        <div id="bov-foto-lock" style="display:none;font-size:11px;color:#7c5cff;margin-top:6px;text-align:center">
+          🔒 Foto disponible desde <strong>Premium</strong> — <span style="cursor:pointer;text-decoration:underline" onclick="showScreen('screen-planes')">Ver planes</span>
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
@@ -968,11 +971,14 @@
   <div id="foro-region-selector" style="padding:20px;background:var(--surface);border-bottom:1.5px solid #2e2b45">
     <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:var(--muted)">📍 Selecciona tu región</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap" id="foro-region-pills">
-      <button class="foro-rpill" onclick="selectForoRegion('Tijuana')">🌆 Tijuana</button>
-      <button class="foro-rpill" onclick="selectForoRegion('Rosarito')">🏖️ Rosarito</button>
-      <button class="foro-rpill" onclick="selectForoRegion('Mexicali')">🌵 Mexicali</button>
-      <button class="foro-rpill" onclick="selectForoRegion('Ensenada')">⚓ Ensenada</button>
-      <button class="foro-rpill" onclick="selectForoRegion('Otro')">📌 Otro</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Baja California')">🌮 Baja California</button>
+      <button class="foro-rpill" onclick="selectForoRegion('CDMX')">🏙️ CDMX</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Jalisco')">🌵 Jalisco</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Nuevo León')">🦁 Nuevo León</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Edo. México')">⛰️ Edo. México</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Sonora')">☀️ Sonora</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Veracruz')">⚓ Veracruz</button>
+      <button class="foro-rpill" onclick="selectForoRegion('Otro Estado')">📌 Otro</button>
     </div>
   </div>
   <div style="padding:0 20px 100px;flex:1;overflow-y:auto">
@@ -3622,9 +3628,13 @@ function renderItems(items) {
     grid.innerHTML = '<div class="empty"><div class="big">🔍</div><p>No hay piezas aún.<br>¡Sé el primero en aportar!</p></div>';
     return;
   }
-  const allowedCats = userPlan==='pro' ? ALL_CATS.map(c=>c.id) : userPlan==='premium' ? [...CATS_FREE,...CATS_PREMIUM].map(c=>c.id) : CATS_FREE.map(c=>c.id);
+  // Admin y pro ven todo; premium ve free+premium; free solo free
+  // userRole === 'admin' siempre desbloquea todo
+  const isAdmin = userRole === 'admin';
+  const effectivePlan = isAdmin ? 'pro' : (userPlan || 'free');
+  const allowedCats = effectivePlan==='pro' ? ALL_CATS.map(c=>c.id) : effectivePlan==='premium' ? [...CATS_FREE,...CATS_PREMIUM].map(c=>c.id) : CATS_FREE.map(c=>c.id);
   grid.innerHTML = sorted.map(item => {
-    const locked = !allowedCats.includes(item.categoria);
+    const locked = !isAdmin && !allowedCats.includes(item.categoria);
     const veblen = isVeblenItem(item);
     return `
     <div class="col-card${veblen?' veblen-card':''}" onclick="${locked?`showToast('🔒 Necesitas Premium para ver esta categoría')`:  `openDetail('${item.id}')`}">
@@ -3662,10 +3672,25 @@ async function checkAwardVeblenStatus(item, userId) {
 // ══════════════════════════════════════════════════
 window.showBovedaForm = () => {
   document.getElementById('boveda-form').style.display = 'block';
+  // Foto solo en premium/pro/admin
+  const canPhoto = userPlan === 'premium' || userPlan === 'pro' || userRole === 'admin';
+  const lock = document.getElementById('bov-foto-lock');
+  const icon = document.getElementById('bov-foto-icon');
+  if (lock) lock.style.display = canPhoto ? 'none' : 'block';
+  if (icon) icon.textContent = canPhoto ? '📷' : '🔒';
   document.getElementById('boveda-form').scrollIntoView({behavior:'smooth'});
 };
 window.hideBovedaForm = () => {
   document.getElementById('boveda-form').style.display = 'none';
+};
+window.bovFotoClick = () => {
+  const canPhoto = userPlan === 'premium' || userPlan === 'pro' || userRole === 'admin';
+  if (!canPhoto) {
+    showToast('🔒 Foto en Bóveda disponible desde Premium');
+    showScreen('screen-planes');
+    return;
+  }
+  document.getElementById('bov-foto-input').click();
 };
 
 function showBovedaLimit() {
@@ -3832,7 +3857,7 @@ window.postForo = async () => {
       userId: user.uid,
       userName: user.displayName || 'Coleccionista',
       userPhoto: user.photoURL || '',
-      createdAt: new Date().toISOString(),
+      createdAt: serverTimestamp(),
       likes: 0
     });
     document.getElementById('foro-post-text').value = '';
@@ -3847,14 +3872,19 @@ window.loadForo = async (region) => {
   if (!region) return;
   list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">⏳ Cargando...</div>';
   try {
+    // Sin orderBy para evitar requerir índice compuesto — ordenamos en cliente
     const q = query(
       collection(db, 'foro_posts'),
       where('region', '==', region),
-      orderBy('createdAt', 'desc'),
-      limit(40)
+      limit(50)
     );
     const snap = await getDocs(q);
-    const posts = snap.docs.map(d => ({id:d.id,...d.data()}));
+    const posts = snap.docs.map(d => ({id:d.id,...d.data()}))
+      .sort((a,b) => {
+        const ta = a.createdAt?.seconds || a.createdAt || 0;
+        const tb = b.createdAt?.seconds || b.createdAt || 0;
+        return tb - ta;
+      }).slice(0, 40);
     if (!posts.length) {
       list.innerHTML = '<div class="empty"><div class="big">📍</div><p>Sé el primero en publicar<br>en esta región</p></div>';
       return;
@@ -3953,13 +3983,18 @@ window.loadDuelos = async () => {
 
     renderDuelo(dueloActual);
 
-    // Cargar historial (duelos cerrados recientes)
-    const qHist = query(duelosRef, where('activo', '==', false), orderBy('creadoAt', 'desc'), limit(5));
+    // Cargar historial (sin orderBy para evitar índice compuesto — ordenar en cliente)
+    const qHist = query(duelosRef, where('activo', '==', false), limit(10));
     const snapH = await getDocs(qHist);
     if (snapH.empty) {
       histDiv.innerHTML = '<div style="color:var(--muted);font-size:13px">Aún no hay duelos completados.</div>';
     } else {
-      histDiv.innerHTML = snapH.docs.map(d => {
+      const histDocs = snapH.docs.sort((a,b) => {
+        const ta = a.data().creadoAt?.seconds || 0;
+        const tb = b.data().creadoAt?.seconds || 0;
+        return tb - ta;
+      }).slice(0,5);
+      histDiv.innerHTML = histDocs.map(d => {
         const data = d.data();
         const ganador = (data.votosA || 0) >= (data.votosB || 0) ? data.nombreA : data.nombreB;
         const total = (data.votosA || 0) + (data.votosB || 0);
