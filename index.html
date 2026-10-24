@@ -390,6 +390,7 @@
       <button class="msg-btn" id="btn-msg" onclick="msgOwner()" style="display:none">💬 Mensaje</button>
       <button class="msg-btn" id="btn-edit-aporte" onclick="openEdit()" style="display:none;border-color:var(--accent2);color:var(--accent2)">✏️ Editar</button>
       <button class="msg-btn" id="btn-mod-delete" onclick="modDeletePieza()" style="display:none;border-color:#ff6b6b;color:#ff6b6b;background:#1a0808">🗑️ Borrar pieza</button>
+      <button class="msg-btn" id="btn-export-pdf" onclick="exportarFichaPDF()" style="display:none;border-color:#c77dff;color:#c77dff">📄 Exportar PDF</button>
     </div>
     <div class="detail-name" id="d-name">—</div>
     <div class="detail-sub" id="d-sub">—</div>
@@ -1485,6 +1486,9 @@ window.openDetail = async (id) => {
   const isAdmin = currentUser && userRole === 'admin';
   const modBtn = document.getElementById('btn-mod-delete');
   if (modBtn) modBtn.style.display = ((isMod || isAdmin) && !isOwner) ? '' : 'none';
+  // PDF export: solo Pro y Admin
+  const pdfBtn = document.getElementById('btn-export-pdf');
+  if (pdfBtn) pdfBtn.style.display = (isAdmin || userPlan === 'pro') ? '' : 'none';
   document.getElementById('d-name').textContent = item.nombre;
   if (item.marca) {
     document.getElementById('d-marca').textContent = '🏷️ ' + item.marca;
@@ -1984,6 +1988,13 @@ function getChatId(uid1, uid2) {
 
 window.goChats = async () => {
   if (!currentUser) { showScreen('screen-auth'); return; }
+  // Chats: desde Premium (o moderador/admin)
+  const canChat = userPlan === 'premium' || userPlan === 'pro' || userRole === 'moderator' || userRole === 'admin';
+  if (!canChat) {
+    showToast('🔒 Los chats están disponibles desde Premium');
+    showScreen('screen-planes');
+    return;
+  }
   showScreen('screen-chats');
   loadChatList();
 };
@@ -2067,6 +2078,8 @@ window.sendMessage = async () => {
   const input = document.getElementById('chat-msg-input');
   const texto = input.value.trim();
   if (!texto || !currentChatId || !currentUser) return;
+  const canChat = userPlan === 'premium' || userPlan === 'pro' || userRole === 'moderator' || userRole === 'admin';
+  if (!canChat) { showToast('🔒 Mensajes disponibles desde Premium'); return; }
   input.value = '';
   try {
     await addDoc(collection(db, 'chats', currentChatId, 'mensajes'), {
@@ -3634,7 +3647,8 @@ function renderItems(items) {
   const effectivePlan = isAdmin ? 'pro' : (userPlan || 'free');
   const allowedCats = effectivePlan==='pro' ? ALL_CATS.map(c=>c.id) : effectivePlan==='premium' ? [...CATS_FREE,...CATS_PREMIUM].map(c=>c.id) : CATS_FREE.map(c=>c.id);
   grid.innerHTML = sorted.map(item => {
-    const locked = !isAdmin && !allowedCats.includes(item.categoria);
+    const catNorm = (item.categoria||'').toLowerCase().trim();
+    const locked = !isAdmin && !allowedCats.includes(catNorm);
     const veblen = isVeblenItem(item);
     return `
     <div class="col-card${veblen?' veblen-card':''}" onclick="${locked?`showToast('🔒 Necesitas Premium para ver esta categoría')`:  `openDetail('${item.id}')`}">
@@ -3931,7 +3945,9 @@ window.likeForoPost = async (postId, btn) => {
 const _origShowScreen = window.showScreen;
 window.showScreen = (id) => {
   const isAdminUser = userRole === 'admin';
+  const isModUser = userRole === 'moderator';
   const plan = userPlan || 'free';
+  const hasPremiumAccess = isAdminUser || isModUser || plan === 'premium' || plan === 'pro';
 
   // ── Plan gates ──────────────────────────────────────────
   // Bóveda: solo Pro y Admin
@@ -3942,17 +3958,17 @@ window.showScreen = (id) => {
       return;
     }
   }
-  // Foro: desde Premium
+  // Foro: desde Premium (o moderador/admin)
   if (id === 'screen-foro') {
-    if (!isAdminUser && plan === 'free') {
+    if (!hasPremiumAccess) {
       showToast('🔒 El Foro está disponible desde Premium');
       _origShowScreen('screen-planes');
       return;
     }
   }
-  // Duelos: desde Premium
+  // Duelos: desde Premium (o moderador/admin)
   if (id === 'screen-duelos') {
-    if (!isAdminUser && plan === 'free') {
+    if (!hasPremiumAccess) {
       showToast('🔒 Los Duelos están disponibles desde Premium');
       _origShowScreen('screen-planes');
       return;
@@ -4295,6 +4311,70 @@ window.loadMiPlan = async () => {
       <div style="font-size:12px;color:#888">${restante > 0 ? `Te quedan ${restante} aportes hoy` : '⚠️ Límite alcanzado — regresa mañana'}</div>`;
   } catch(e) {
     usoHoy.innerHTML = '<div style="color:var(--muted)">Error al cargar uso</div>';
+  }
+};
+
+// ══════════════════════════════════════════════════
+// EXPORTAR FICHA PDF (Pro / Admin)
+// ══════════════════════════════════════════════════
+window.exportarFichaPDF = () => {
+  if (userPlan !== 'pro' && userRole !== 'admin') {
+    showToast('🔒 Exportar PDF es exclusivo del plan Pro');
+    showScreen('screen-planes');
+    return;
+  }
+  const item = allItems.find(i => i.id === currentDetailId);
+  if (!item) { showToast('No se encontró la pieza'); return; }
+
+  const imgSrc = item.imageUrl || item.foto || item.fotos?.[0] || item.imageUrls?.[0] || '';
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Ficha: ${item.nombre||'Pieza'}</title>
+<style>
+  body{font-family:Arial,sans-serif;background:#fff;color:#111;margin:0;padding:30px;max-width:600px}
+  h1{font-size:24px;margin-bottom:4px}
+  .sub{color:#666;font-size:13px;margin-bottom:16px}
+  .img-wrap{width:100%;max-height:280px;overflow:hidden;border-radius:12px;margin-bottom:16px;border:1px solid #ddd}
+  .img-wrap img{width:100%;height:280px;object-fit:cover}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .box{border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center}
+  .box b{display:block;font-size:20px;color:#5c35c1}
+  .box span{font-size:11px;color:#888;text-transform:uppercase}
+  .desc{background:#f9f9f9;border-radius:8px;padding:14px;font-size:13px;line-height:1.6;margin-bottom:16px}
+  .footer{font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:10px}
+  .tag{display:inline-block;background:#ede9ff;color:#5c35c1;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;margin-right:5px}
+</style>
+</head><body>
+  ${imgSrc ? `<div class="img-wrap"><img src="${imgSrc}" crossorigin="anonymous"></div>` : ''}
+  <h1>${item.nombre||'Sin nombre'}</h1>
+  <div class="sub">${item.categoria||'—'} · ${item.marca||'—'} · ${item.año||'Año desconocido'}</div>
+  <div>
+    ${item.rareza ? `<span class="tag">${item.rareza}</span>` : ''}
+    ${item.categoria ? `<span class="tag">${item.categoria}</span>` : ''}
+  </div><br>
+  <div class="grid">
+    <div class="box"><b>${item.vistas||0}</b><span>Vistos</span></div>
+    <div class="box"><b>${item.likes||0}</b><span>Likes</span></div>
+    ${item.precio ? `<div class="box"><b>$${item.precio}</b><span>Precio MXN</span></div>` : ''}
+    <div class="box"><b>${item.autorNombre||'Anónimo'}</b><span>Aportado por</span></div>
+  </div>
+  <div class="desc">${item.descripcion||'Sin descripción.'}</div>
+  <div class="footer">Exportado desde Mundo del Coleccionista · mundo-del-coleccionista.vercel.app · Plan Pro</div>
+</body></html>`;
+
+  const blob = new Blob([html], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    setTimeout(() => { win.print(); URL.revokeObjectURL(url); }, 800);
+  } else {
+    // Fallback: descargar como HTML
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ficha-${(item.nombre||'pieza').replace(/\s+/g,'-').toLowerCase()}.html`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    showToast('📄 Ficha descargada — ábrela en tu navegador para imprimir como PDF');
   }
 };
 
