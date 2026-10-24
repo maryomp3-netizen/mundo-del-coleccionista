@@ -1123,7 +1123,7 @@
       <div style="display:flex;gap:10px;align-items:stretch" id="duelo-vs-row">
         <div style="color:#888;text-align:center;padding:40px 0;width:100%">Cargando duelo...</div>
       </div>
-      <div style="text-align:center;margin-top:10px;font-size:11px;color:var(--muted)" id="duelo-votos-info"></div>
+      <div style="display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;margin-top:10px;font-size:11px;color:var(--muted)" id="duelo-votos-info"></div>
     </div>
     <div style="background:var(--card);border-radius:16px;padding:16px;border:1.5px solid #2e2b45">
       <div style="font-size:12px;font-weight:800;color:#ff6b6b;margin-bottom:12px">🏆 HISTORIAL DE DUELOS</div>
@@ -3930,7 +3930,38 @@ window.likeForoPost = async (postId, btn) => {
 // Hook into showScreen to auto-load Bóveda and reset Foro
 const _origShowScreen = window.showScreen;
 window.showScreen = (id) => {
+  const isAdminUser = userRole === 'admin';
+  const plan = userPlan || 'free';
+
+  // ── Plan gates ──────────────────────────────────────────
+  // Bóveda: solo Pro y Admin
+  if (id === 'screen-boveda') {
+    if (!isAdminUser && plan !== 'pro') {
+      showToast('🔒 La Bóveda es exclusiva del plan Pro');
+      _origShowScreen('screen-planes');
+      return;
+    }
+  }
+  // Foro: desde Premium
+  if (id === 'screen-foro') {
+    if (!isAdminUser && plan === 'free') {
+      showToast('🔒 El Foro está disponible desde Premium');
+      _origShowScreen('screen-planes');
+      return;
+    }
+  }
+  // Duelos: desde Premium
+  if (id === 'screen-duelos') {
+    if (!isAdminUser && plan === 'free') {
+      showToast('🔒 Los Duelos están disponibles desde Premium');
+      _origShowScreen('screen-planes');
+      return;
+    }
+  }
+  // ────────────────────────────────────────────────────────
+
   _origShowScreen(id);
+
   if (id === 'screen-boveda') {
     loadBoveda();
   }
@@ -4080,7 +4111,10 @@ function renderDuelo(d) {
         <div style="background:#ff6b6b;height:4px;border-radius:6px;width:${pctB}%"></div>
       </div>
     </div>`;
-  infoDiv.textContent = total > 0 ? `${total} votos totales • Toca para votar` : 'Sé el primero en votar';
+  infoDiv.innerHTML = `
+    <span>${total > 0 ? `${total} votos totales • Toca para votar` : 'Sé el primero en votar'}</span>
+    <button onclick="siguienteDuelo()" style="background:none;border:1.5px solid #2e2b45;border-radius:20px;color:var(--muted);font-size:11px;font-weight:700;padding:4px 12px;cursor:pointer;margin-left:8px">⚡ Nuevo duelo</button>
+  `;
 }
 
 window.votarDuelo = async (lado) => {
@@ -4105,7 +4139,27 @@ window.votarDuelo = async (lado) => {
     if (card) card.style.border = '2px solid #7c5cff';
     renderDuelo(dueloActual);
     showToast(`✅ Votaste por ${lado === 'A' ? dueloActual.nombreA : dueloActual.nombreB}`);
+
+    // Auto-cerrar duelo si supera 10 votos totales
+    const totalNuevo = (dueloActual.votosA || 0) + (dueloActual.votosB || 0);
+    if (totalNuevo >= 10) {
+      try {
+        await updateDoc(doc(db, 'duelos', dueloActual.id), { activo: false });
+      } catch(e) {}
+    }
   } catch(e) { showToast('Error al votar'); }
+};
+
+window.siguienteDuelo = async () => {
+  // Cerrar duelo actual y crear uno nuevo
+  if (dueloActual) {
+    try {
+      const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      await updateDoc(doc(db, 'duelos', dueloActual.id), { activo: false });
+    } catch(e) {}
+    dueloActual = null;
+  }
+  await crearDueloAuto();
 };
 
 // ══════════════════════════════════════════════════
