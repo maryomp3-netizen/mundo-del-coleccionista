@@ -654,7 +654,7 @@
 <!-- CHAT MESSAGES -->
 <div class="screen" id="screen-chat-messages">
   <div class="topbar" style="padding-bottom:10px">
-    <button class="back-btn" onclick="showScreen('screen-chats')" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">←</button>
+    <button class="back-btn" onclick="goChats()" style="background:var(--card);border:none;border-radius:11px;width:34px;height:34px;font-size:15px;cursor:pointer;color:var(--text)">←</button>
     <div class="chat-header-user">
       <div class="chat-header-avatar" id="chat-header-avatar">😊</div>
       <div>
@@ -1390,7 +1390,7 @@ onAuthStateChanged(auth, async user => {
         if (rawRole === 'moderador' || rawRole === 'moderator') userRole = 'moderator';
         else if (rawRole === 'admin') userRole = 'admin';
         else userRole = 'member';
-        userModCatalog = uDoc.data().moderatorCatalog || uDoc.data().moderadorCatalog || '';
+        userModCatalog = uDoc.data().moderatorCatalog || uDoc.data().moderadorCatalog || uDoc.data().moderatorcatalog || '';
       } else {
         // Usuario nuevo — guardar doc base y mostrar bienvenida
         userPlan = 'free'; userRole = 'member'; userModCatalog = '';
@@ -4451,7 +4451,8 @@ window.adminSetUser = async () => {
     const updates = {};
     if (plan) updates.plan = plan;
     if (role) updates.role = role;
-    if (modCat) updates.moderatorCatalog = modCat;
+    // Guardar en ambos formatos para compatibilidad
+    if (modCat) { updates.moderatorCatalog = modCat; updates.moderatorcatalog = modCat; }
     await setDoc(doc(db, 'usuarios', uid), updates, { merge: true });
     if(status) status.textContent = `✅ Actualizado: ${plan||'—'} / ${role||'—'}`;
     document.getElementById('admin-uid-input').value = '';
