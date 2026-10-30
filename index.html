@@ -2003,6 +2003,8 @@ window.uploadAvatar = async (e) => {
 // ── MESSAGE OWNER ──
 window.msgOwner = () => {
   if (!currentUser) { showToast('Inicia sesión para enviar mensajes'); showScreen('screen-auth'); return; }
+  const canChat = userPlan === 'premium' || userPlan === 'pro' || userRole === 'moderator' || userRole === 'admin';
+  if (!canChat) { showToast('🔒 Los mensajes están disponibles desde Premium'); showScreen('screen-planes'); return; }
   const item = allItems.find(i => i.id === currentDetailId);
   if (!item) return;
   openChat(item.autorId, item.autorNombre, null);
@@ -2067,8 +2069,10 @@ window.openChat = async (otherUserId, otherName, existingChatId) => {
   currentChatId = existingChatId || getChatId(currentUser.uid, otherUserId);
   document.getElementById('chat-header-name').textContent = otherName;
   document.getElementById('messages-wrap').innerHTML = '<div style="display:flex;align-items:center;justify-content:center;padding:40px"><div class="spinner"></div></div>';
+  // Resetear avatar antes de cargar (evita mostrar avatar propio)
+  document.getElementById('chat-header-avatar').innerHTML = '👤';
   showScreen('screen-chat-messages');
-  // Load avatar
+  // Load avatar del OTRO usuario
   try {
     const uDoc = await getDoc(doc(db, 'usuarios', otherUserId));
     if (uDoc.exists() && uDoc.data().avatarUrl) {
