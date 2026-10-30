@@ -4046,6 +4046,7 @@ window.showScreen = (id) => {
 // MÓDULO DUELOS
 // ══════════════════════════════════════════════════
 let dueloActual = null;
+let dueloUnsubscribe = null; // listener en tiempo real
 
 window.loadDuelos = async () => {
   const vsRow = document.getElementById('duelo-vs-row');
@@ -4053,98 +4054,152 @@ window.loadDuelos = async () => {
   const infoDiv = document.getElementById('duelo-votos-info');
   if (!vsRow) return;
 
+  // Cancelar listener anterior si existe
+  if (dueloUnsubscribe) { dueloUnsubscribe(); dueloUnsubscribe = null; }
+
   vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">⏳ Cargando duelo...</div>';
   infoDiv.textContent = '';
 
   try {
-    // Cargar duelos activos de Firestore
-    const { collection, query, where, orderBy, limit, getDocs, doc, getDoc, updateDoc, increment, addDoc, serverTimestamp }
+    const { collection, query, where, limit, getDocs, onSnapshot, doc, addDoc, serverTimestamp }
       = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-    // Buscar un duelo activo aleatorio
     const duelosRef = collection(db, 'duelos');
+
+    // Buscar duelo activo
     const qActivos = query(duelosRef, where('activo', '==', true), limit(5));
     const snap = await getDocs(qActivos);
 
     if (snap.empty) {
-      // No hay duelos — crear uno automático con piezas del catálogo
       await crearDueloAuto();
-      return;
-    }
-
-    // Elegir uno al azar
-    const docs = snap.docs;
-    const elegido = docs[Math.floor(Math.random() * docs.length)];
-    dueloActual = { id: elegido.id, ...elegido.data() };
-
-    renderDuelo(dueloActual);
-
-    // Cargar historial (sin orderBy para evitar índice compuesto — ordenar en cliente)
-    const qHist = query(duelosRef, where('activo', '==', false), limit(10));
-    const snapH = await getDocs(qHist);
-    if (snapH.empty) {
-      histDiv.innerHTML = '<div style="color:var(--muted);font-size:13px">Aún no hay duelos completados.</div>';
     } else {
-      const histDocs = snapH.docs.sort((a,b) => {
-        const ta = a.data().creadoAt?.seconds || 0;
-        const tb = b.data().creadoAt?.seconds || 0;
-        return tb - ta;
-      }).slice(0,5);
-      histDiv.innerHTML = histDocs.map(d => {
-        const data = d.data();
-        const ganador = (data.votosA || 0) >= (data.votosB || 0) ? data.nombreA : data.nombreB;
-        const total = (data.votosA || 0) + (data.votosB || 0);
-        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e1b30">
-          <div>
-            <div style="font-size:12px;font-weight:700;color:#fff">🏆 ${ganador || 'Sin nombre'}</div>
-            <div style="font-size:11px;color:var(--muted)">${total} votos totales</div>
-          </div>
-          <div style="font-size:10px;color:#7c5cff">${data.votosA || 0} vs ${data.votosB || 0}</div>
-        </div>`;
-      }).join('');
+      const elegido = snap.docs[Math.floor(Math.random() * snap.docs.length)];
+      dueloActual = { id: elegido.id, ...elegido.data() };
+      // Suscribir en tiempo real para ver votos actualizarse
+      suscribirDueloRealtime(dueloActual.id);
     }
+
+    // Cargar historial
+    cargarHistorialDuelos();
+
   } catch(e) {
     vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Error al cargar duelos</div>';
   }
 };
 
+async function suscribirDueloRealtime(dueloId) {
+  if (dueloUnsubscribe) { dueloUnsubscribe(); dueloUnsubscribe = null; }
+  const { doc, onSnapshot } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  dueloUnsubscribe = onSnapshot(doc(db, 'duelos', dueloId), (snap) => {
+    if (!snap.exists()) return;
+    dueloActual = { id: snap.id, ...snap.data() };
+    renderDuelo(dueloActual);
+    // Si se desactivó (10+ votos), recargar después de 2s para el siguiente
+    if (!dueloActual.activo) {
+      setTimeout(() => { dueloActual = null; crearDueloAuto().then(cargarHistorialDuelos); }, 2000);
+    }
+  });
+}
+
+async function cargarHistorialDuelos() {
+  const histDiv = document.getElementById('duelo-historial');
+  if (!histDiv) return;
+  try {
+    const { collection, query, where, limit, getDocs } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const qHist = query(collection(db, 'duelos'), where('activo', '==', false), limit(15));
+    const snapH = await getDocs(qHist);
+    if (snapH.empty) {
+      histDiv.innerHTML = '<div style="color:var(--muted);font-size:13px">Aún no hay duelos completados.</div>';
+      return;
+    }
+    const histDocs = snapH.docs
+      .sort((a,b) => (b.data().creadoAt?.seconds||0) - (a.data().creadoAt?.seconds||0))
+      .slice(0, 6);
+    histDiv.innerHTML = histDocs.map(d => {
+      const data = d.data();
+      const vA = data.votosA || 0, vB = data.votosB || 0;
+      const total = vA + vB;
+      const empate = vA === vB;
+      const ganador = empate ? '🤝 Empate' : (vA > vB ? `🏆 ${data.nombreA}` : `🏆 ${data.nombreB}`);
+      const pctA = total ? Math.round(vA/total*100) : 50;
+      const pctB = total ? Math.round(vB/total*100) : 50;
+      return `<div style="padding:10px 0;border-bottom:1px solid #1e1b30">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-size:12px;font-weight:700;color:#fff">${ganador}</div>
+          <div style="font-size:10px;color:#555">${total} votos</div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-bottom:5px">${data.nombreA||'A'} vs ${data.nombreB||'B'} · ${data.categoriaA||''}</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <div style="font-size:9px;color:#7c5cff;width:28px;text-align:right">${pctA}%</div>
+          <div style="flex:1;background:#1a1630;border-radius:4px;height:5px">
+            <div style="background:linear-gradient(90deg,#7c5cff,#ff6b6b);height:5px;border-radius:4px;width:${pctA}%"></div>
+          </div>
+          <div style="font-size:9px;color:#ff6b6b;width:28px">${pctB}%</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
 async function crearDueloAuto() {
   const vsRow = document.getElementById('duelo-vs-row');
   const { collection, query, getDocs, limit, addDoc, serverTimestamp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
 
-  // Intentar con allItems primero, sino cargar de Firestore
-  let piezas = allItems.filter(i => i.foto || i.fotos?.[0] || i.imageUrls?.[0]);
+  // Cargar piezas con foto
+  let piezas = allItems.filter(i => i.imageUrls?.[0] || i.imageUrl || i.fotos?.[0] || i.foto);
   if (piezas.length < 2) {
     try {
       vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:20px 0;width:100%">⏳ Buscando piezas...</div>';
-      const snap = await getDocs(query(collection(db, 'piezas'), limit(30)));
+      const snap = await getDocs(query(collection(db, 'piezas'), limit(50)));
       piezas = snap.docs.map(d => ({id: d.id, ...d.data()}))
-        .filter(i => i.foto || i.fotos?.[0] || i.imageUrls?.[0] || i.imageUrl);
+        .filter(i => i.imageUrls?.[0] || i.imageUrl || i.fotos?.[0] || i.foto);
     } catch(e) {}
   }
 
   if (piezas.length < 2) {
-    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">📸 Aún no hay suficientes piezas con foto en el catálogo.<br><br><small>¡Sé el primero en aportar!</small></div>';
+    vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">📸 Aún no hay suficientes piezas con foto.<br><br><small>¡Sé el primero en aportar!</small></div>';
     return;
   }
 
-  // Elegir 2 al azar
-  const shuffled = [...piezas].sort(() => Math.random() - 0.5);
-  const [a, b] = shuffled.slice(0, 2);
-  const fotoA = a.foto || a.fotos?.[0] || a.imageUrls?.[0] || a.imageUrl || '';
-  const fotoB = b.foto || b.fotos?.[0] || b.imageUrls?.[0] || b.imageUrl || '';
+  // Intentar emparejar piezas de la MISMA categoría
+  let a, b;
+  const porCategoria = {};
+  piezas.forEach(p => {
+    const cat = (p.categoria||'').toLowerCase().trim();
+    if (!porCategoria[cat]) porCategoria[cat] = [];
+    porCategoria[cat].push(p);
+  });
+
+  // Categorías con al menos 2 piezas
+  const catsValidas = Object.entries(porCategoria).filter(([,arr]) => arr.length >= 2);
+
+  if (catsValidas.length > 0) {
+    // Elegir categoría al azar y tomar 2 piezas distintas
+    const [cat, arr] = catsValidas[Math.floor(Math.random() * catsValidas.length)];
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    [a, b] = shuffled.slice(0, 2);
+  } else {
+    // Si no hay categorías con 2+, tomar cualquier 2 al azar
+    const shuffled = [...piezas].sort(() => Math.random() - 0.5);
+    [a, b] = shuffled.slice(0, 2);
+  }
+
+  const fotoA = a.imageUrls?.[0] || a.imageUrl || a.fotos?.[0] || a.foto || '';
+  const fotoB = b.imageUrls?.[0] || b.imageUrl || b.fotos?.[0] || b.foto || '';
+  const catA = (a.categoria||'').toLowerCase().trim();
+  const catB = (b.categoria||'').toLowerCase().trim();
 
   try {
     const ref = await addDoc(collection(db, 'duelos'), {
       activo: true, votosA: 0, votosB: 0,
-      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA,
-      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB,
+      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA, categoriaA: catA,
+      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB, categoriaB: catB,
       creadoAt: serverTimestamp()
     });
     dueloActual = { id: ref.id, activo: true, votosA: 0, votosB: 0,
-      idA: a.id, nombreA: a.nombre || 'Pieza A', fotoA,
-      idB: b.id, nombreB: b.nombre || 'Pieza B', fotoB };
-    renderDuelo(dueloActual);
+      idA: a.id, nombreA: a.nombre||'Pieza A', fotoA, categoriaA: catA,
+      idB: b.id, nombreB: b.nombre||'Pieza B', fotoB, categoriaB: catB };
+    suscribirDueloRealtime(ref.id);
   } catch(e) {
     vsRow.innerHTML = '<div style="color:#888;text-align:center;padding:40px 0;width:100%">Error al crear duelo</div>';
   }
@@ -4153,31 +4208,40 @@ async function crearDueloAuto() {
 function renderDuelo(d) {
   const vsRow = document.getElementById('duelo-vs-row');
   const infoDiv = document.getElementById('duelo-votos-info');
-  const total = (d.votosA || 0) + (d.votosB || 0);
-  const pctA = total ? Math.round((d.votosA / total) * 100) : 50;
-  const pctB = total ? Math.round((d.votosB / total) * 100) : 50;
+  if (!vsRow) return;
+  const vA = d.votosA || 0, vB = d.votosB || 0;
+  const total = vA + vB;
+  const pctA = total ? Math.round((vA / total) * 100) : 50;
+  const pctB = total ? Math.round((vB / total) * 100) : 50;
+  const yaVoto = localStorage.getItem(`duelo_voto_${d.id}`);
+  const cat = d.categoriaA || d.categoriaB || '';
 
-  const cardStyle = 'flex:1;background:#0d0a1a;border-radius:14px;padding:12px;text-align:center;cursor:pointer;border:2px solid transparent;transition:border .2s';
+  const cardStyle = (lado) => `flex:1;background:#0d0a1a;border-radius:14px;padding:12px;text-align:center;${yaVoto?'cursor:default':'cursor:pointer'};border:2px solid ${yaVoto&&(yaVoto===lado)?'#7c5cff':'transparent'};transition:border .2s`;
   vsRow.innerHTML = `
-    <div style="${cardStyle}" onclick="votarDuelo('A')" id="duelo-card-a">
-      ${d.fotoA ? `<img src="${d.fotoA}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px">` : '<div style="height:120px;background:#1a1630;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px">🧢</div>'}
-      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">${d.nombreA || 'Pieza A'}</div>
-      <div style="font-size:11px;color:#7c5cff">${d.votosA || 0} votos · ${pctA}%</div>
-      <div style="background:#1a1630;border-radius:6px;height:4px;margin-top:6px">
-        <div style="background:#7c5cff;height:4px;border-radius:6px;width:${pctA}%"></div>
+    <div style="${cardStyle('A')}" onclick="votarDuelo('A')" id="duelo-card-a">
+      ${d.fotoA ? `<img src="${d.fotoA}" style="width:100%;height:130px;object-fit:cover;border-radius:10px;margin-bottom:8px">` : '<div style="height:130px;background:#1a1630;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px">🎴</div>'}
+      <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.3">${d.nombreA || 'Pieza A'}</div>
+      <div style="font-size:13px;font-weight:900;color:#7c5cff;margin-bottom:2px">${vA} voto${vA!==1?'s':''}</div>
+      <div style="font-size:10px;color:#555;margin-bottom:4px">${pctA}%</div>
+      <div style="background:#1a1630;border-radius:6px;height:5px">
+        <div style="background:#7c5cff;height:5px;border-radius:6px;width:${pctA}%;transition:width .4s"></div>
       </div>
     </div>
-    <div style="display:flex;align-items:center;padding:0 4px;font-weight:900;color:#ff6b6b;font-size:16px">VS</div>
-    <div style="${cardStyle}" onclick="votarDuelo('B')" id="duelo-card-b">
-      ${d.fotoB ? `<img src="${d.fotoB}" style="width:100%;height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px">` : '<div style="height:120px;background:#1a1630;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px">🎽</div>'}
-      <div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:4px">${d.nombreB || 'Pieza B'}</div>
-      <div style="font-size:11px;color:#ff6b6b">${d.votosB || 0} votos · ${pctB}%</div>
-      <div style="background:#1a1630;border-radius:6px;height:4px;margin-top:6px">
-        <div style="background:#ff6b6b;height:4px;border-radius:6px;width:${pctB}%"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 6px;gap:4px">
+      <div style="font-weight:900;color:#ff6b6b;font-size:18px">VS</div>
+      ${cat ? `<div style="font-size:8px;color:#555;text-align:center;text-transform:uppercase;letter-spacing:.5px">${cat}</div>` : ''}
+    </div>
+    <div style="${cardStyle('B')}" onclick="votarDuelo('B')" id="duelo-card-b">
+      ${d.fotoB ? `<img src="${d.fotoB}" style="width:100%;height:130px;object-fit:cover;border-radius:10px;margin-bottom:8px">` : '<div style="height:130px;background:#1a1630;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:32px">🎴</div>'}
+      <div style="font-size:12px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.3">${d.nombreB || 'Pieza B'}</div>
+      <div style="font-size:13px;font-weight:900;color:#ff6b6b;margin-bottom:2px">${vB} voto${vB!==1?'s':''}</div>
+      <div style="font-size:10px;color:#555;margin-bottom:4px">${pctB}%</div>
+      <div style="background:#1a1630;border-radius:6px;height:5px">
+        <div style="background:#ff6b6b;height:5px;border-radius:6px;width:${pctB}%;transition:width .4s"></div>
       </div>
     </div>`;
   infoDiv.innerHTML = `
-    <span>${total > 0 ? `${total} votos totales • Toca para votar` : 'Sé el primero en votar'}</span>
+    <span style="color:${total>0?'var(--text)':'var(--muted)'}">${total > 0 ? `${total} voto${total!==1?'s':''} totales · Toca una pieza para votar` : '🗳️ Sé el primero en votar'}</span>
     <button onclick="siguienteDuelo()" style="background:none;border:1.5px solid #2e2b45;border-radius:20px;color:var(--muted);font-size:11px;font-weight:700;padding:4px 12px;cursor:pointer;margin-left:8px">⚡ Nuevo duelo</button>
   `;
 }
@@ -4216,7 +4280,7 @@ window.votarDuelo = async (lado) => {
 };
 
 window.siguienteDuelo = async () => {
-  // Cerrar duelo actual y crear uno nuevo
+  if (dueloUnsubscribe) { dueloUnsubscribe(); dueloUnsubscribe = null; }
   if (dueloActual) {
     try {
       const { doc, updateDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
@@ -4225,6 +4289,7 @@ window.siguienteDuelo = async () => {
     dueloActual = null;
   }
   await crearDueloAuto();
+  cargarHistorialDuelos();
 };
 
 // ══════════════════════════════════════════════════
