@@ -1423,8 +1423,12 @@ onAuthStateChanged(auth, async user => {
       }
     } catch(e) {}
     updatePlanChip();
+    // Re-render items con el plan correcto ya cargado
+    if (allItems.length) renderItems(allItems);
   } else {
     userPlan = 'free';
+    userRole = 'member';
+    if (allItems.length) renderItems(allItems);
   }
   buildPills();
   buildUploadSelect();
@@ -1480,7 +1484,7 @@ window.filterItems = () => applyFilters();
 function applyFilters() {
   const search = document.getElementById('search-input').value.toLowerCase();
   let filtered = allItems;
-  if (currentCat !== 'todos') filtered = filtered.filter(i => i.categoria === currentCat);
+  if (currentCat !== 'todos') filtered = filtered.filter(i => (i.categoria||'').toLowerCase().trim() === currentCat);
   if (search) filtered = filtered.filter(i => i.nombre.toLowerCase().includes(search)||(i.descripcion||'').toLowerCase().includes(search));
   renderItems(filtered);
 }
