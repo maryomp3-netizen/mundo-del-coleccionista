@@ -1451,10 +1451,15 @@ function updatePlanChip() {
   if (userRole === 'admin') {
     badge.style.cssText = 'display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:#2a1a00;color:#ffd93d;border:1.5px solid #ffd93d';
     badge.textContent = '👑 FUNDADOR';
-  } else if (userRole === 'moderator' && JEFES[userModCatalog]) {
+  } else if (userRole === 'moderator') {
     const j = JEFES[userModCatalog];
-    badge.style.cssText = `display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:${j.bg};color:${j.color};border:1.5px solid ${j.border}`;
-    badge.textContent = `${j.icon} ${j.label}`;
+    if (j) {
+      badge.style.cssText = `display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:${j.bg};color:${j.color};border:1.5px solid ${j.border}`;
+      badge.textContent = `${j.icon} ${j.label}`;
+    } else {
+      badge.style.cssText = 'display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:#0d1a2a;color:#4d96ff;border:1.5px solid #4d96ff';
+      badge.textContent = '🛡️ MODERADOR';
+    }
   } else {
     badge.style.cssText = 'display:inline-block;margin-top:6px;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:800;letter-spacing:.5px;background:#1a1828;color:#555;border:1.5px solid #2e2b45';
     badge.textContent = '👤 MIEMBRO';
