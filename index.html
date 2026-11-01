@@ -1484,6 +1484,8 @@ async function loadItems() {
   } catch(e) {
     document.getElementById('items-grid').innerHTML = '<div style="grid-column:span 2;text-align:center;padding:40px;color:var(--muted);font-weight:700">Error cargando datos.</div>';
   }
+  // Notificar al splash que los datos están listos
+  if (window._splashReady) { window._splashReady(); window._splashReady = null; }
 }
 
 // ── FILTER ──
@@ -2248,14 +2250,24 @@ function initApp() {
   // Show splash
   const bar = document.getElementById('splash-bar');
   setTimeout(() => { if(bar) bar.style.width = '100%'; }, 100);
-  setTimeout(() => {
-    const seen = localStorage.getItem('mdc_onboarding_done');
+
+  let splashDone = false;
+  function leaveSplash() {
+    if (splashDone) return;
+    splashDone = true;
+    let seen = false;
+    try { seen = !!localStorage.getItem('mdc_onboarding_done'); } catch(e) { seen = false; }
     if (seen) {
       showScreen('screen-home');
     } else {
       showScreen('screen-onboarding');
     }
-  }, 2000);
+  }
+
+  // Salir del splash en 5s como máximo (fallback para dispositivos lentos)
+  setTimeout(leaveSplash, 5000);
+  // También salir tan pronto como Firebase esté listo (por si tarda menos o más)
+  window._splashReady = leaveSplash;
 }
 
 window.nextSlide = () => {
