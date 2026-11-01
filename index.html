@@ -1477,6 +1477,10 @@ async function loadItems() {
     const snap = await getDocs(q);
     allItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderItems(allItems);
+    // Si no hay piezas, mostrar mensaje vacío en lugar de spinner eterno
+    if (allItems.length === 0) {
+      document.getElementById('items-grid').innerHTML = '<div style="grid-column:span 2;text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">🏺</div><div style="font-weight:700;font-size:16px;margin-bottom:8px">Aún no hay piezas</div><div style="font-size:13px">¡Sé el primero en aportar una pieza a la comunidad!</div></div>';
+    }
   } catch(e) {
     document.getElementById('items-grid').innerHTML = '<div style="grid-column:span 2;text-align:center;padding:40px;color:var(--muted);font-weight:700">Error cargando datos.</div>';
   }
