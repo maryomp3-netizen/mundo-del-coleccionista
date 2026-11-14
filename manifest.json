@@ -1,41 +1,80 @@
 {
   "name": "Mundo del Coleccionista",
   "short_name": "Coleccionista",
-  "id": "com.mundocoleccionista.app",
-  "description": "Identifica y cataloga canicas, tazos y cartas coleccionables con ayuda de la comunidad",
+  "description": "Identifica y cataloga toda clase de coleccionables con ayuda de la comunidad",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f0e17",
+  "background_color": "#0e0c1e",
   "theme_color": "#ffd93d",
   "orientation": "portrait",
-  "scope": "/",
   "lang": "es",
+  "scope": "/",
   "icons": [
     {
-      "src": "https://placehold.co/192x192/ffd93d/0f0e17/png?text=MC",
+      "src": "/icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
-      "src": "https://placehold.co/192x192/ffd93d/0f0e17/png?text=MC",
-      "sizes": "192x192",
+      "src": "/icons/icon-384.png",
+      "sizes": "384x384",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     },
     {
-      "src": "https://placehold.co/512x512/ffd93d/0f0e17/png?text=MC",
+      "src": "/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://placehold.co/512x512/ffd93d/0f0e17/png?text=MC",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any maskable"
     }
   ],
-  "categories": ["lifestyle", "social"],
-  "screenshots": []
+  "screenshots": [
+    {
+      "src": "/icons/screenshot.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["lifestyle", "social", "entertainment"],
+  "shortcuts": [
+    {
+      "name": "Catálogo",
+      "short_name": "Catálogo",
+      "description": "Ver todas las piezas",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ]
 }
