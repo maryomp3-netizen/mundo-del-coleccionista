@@ -481,17 +481,34 @@
       <input class="form-input" id="f-marca-custom" type="text" placeholder="Escribe la marca..." style="display:none;margin-top:8px">
     </div>
     <div class="form-field">
-      <label class="form-label">Rareza</label>
-      <select class="form-select" id="f-rareza">
-        <option value="Común">Común</option>
-        <option value="Poco común">Poco común</option>
-        <option value="Rara">Rara</option>
-        <option value="Legendaria">Legendaria</option>
+      <label class="form-label">Estado de la pieza <span style="color:#ff6b6b">*</span></label>
+      <select class="form-select" id="f-estado">
+        <option value="">— Selecciona el estado —</option>
+        <option value="Menta">🌟 Menta (como nuevo, sin abrir)</option>
+        <option value="Excelente">✨ Excelente (mínimo uso, sin daños)</option>
+        <option value="Bueno">👍 Bueno (uso normal, detalles menores)</option>
+        <option value="Regular">⚠️ Regular (desgaste visible)</option>
+        <option value="Dañado">🔴 Dañado (roturas o falta de piezas)</option>
       </select>
     </div>
     <div class="form-field">
-      <label class="form-label">Año aproximado</label>
-      <input class="form-input" id="f-año" type="text" placeholder="Ej: 1990s, 2000, Desconocido">
+      <label class="form-label">Año aproximado <span style="color:#ff6b6b">*</span></label>
+      <input class="form-input" id="f-año" type="number" placeholder="Ej: 1998, 2005, 2023" min="1900" max="2099">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Número de lote / edición <span style="color:var(--muted)" style="font-size:11px">(opcional)</span></label>
+      <input class="form-input" id="f-lote" type="text" placeholder="Ej: Serie 1, Lote A, Edición especial 2005">
+    </div>
+    <div class="form-field">
+      <label class="form-label">Rareza</label>
+      <select class="form-select" id="f-rareza" disabled style="opacity:0.5">
+        <option value="">Se calculará automáticamente 🔄</option>
+        <option value="Común">📦 Común</option>
+        <option value="Poco común">⭐ Poco común</option>
+        <option value="Rara">🔥 Rara</option>
+        <option value="Legendaria">💎 Legendaria</option>
+      </select>
+      <div id="rareza-preview" style="display:none;margin-top:6px;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:800"></div>
     </div>
     <div class="form-field">
       <label class="form-label">Descripción</label>
@@ -1555,9 +1572,14 @@ window.openDetail = async (id) => {
   document.getElementById('d-desc').textContent = item.descripcion||'Sin descripción.';
   document.getElementById('d-owner').textContent = item.autorNombre||'Anónimo';
   document.getElementById('d-date').textContent = item.createdAt?.toDate ? timeAgo(item.createdAt.toDate()) : 'Recientemente';
+  const rarezaEmoji = item.rareza==='Legendaria'?'💎':item.rareza==='Rara'?'🔥':item.rareza==='Poco común'?'⭐':item.rareza==='Común'?'📦':'';
+  const rarezaColor = item.rareza==='Legendaria'?'#ffd93d':item.rareza==='Rara'?'#ff6b6b':item.rareza==='Poco común'?'#4d96ff':'var(--muted)';
   document.getElementById('d-tags').innerHTML = `
     <span class="tag" style="background:#1e1e2e;color:${COLORS[item.categoria]||'#4d96ff'}">${item.categoria||'otro'}</span>
-    <span class="tag" style="background:#1e1e2e;color:var(--accent2)">${item.rareza||'—'}</span>`;
+    <span class="tag" style="background:#1e1e2e;color:${rarezaColor}">${rarezaEmoji} ${item.rareza||'—'}</span>
+    ${item.numeroUnidad ? `<span class="tag" style="background:#1e1e2e;color:var(--muted)">Unidad #${item.numeroUnidad}</span>` : ''}
+    ${item.estado ? `<span class="tag" style="background:#1e1e2e;color:#6bcb77">${item.estado}</span>` : ''}
+    ${item.lote ? `<span class="tag" style="background:#1e1e2e;color:var(--muted)">Lote: ${item.lote}</span>` : ''}`;
   // Check if liked
   const liked = currentUser && (item.likedBy||[]).includes(currentUser.uid);
   document.getElementById('btn-like').className = `like-btn${liked?' liked':''}`;
@@ -1690,6 +1712,14 @@ window.submitPieza = async () => {
   if (!currentUser) { showToast('Inicia sesión primero 👆'); showScreen('screen-auth'); return; }
   const nombre = document.getElementById('f-nombre').value.trim();
   if (!nombre) { showToast('Escribe el nombre de la pieza'); return; }
+  const estado = document.getElementById('f-estado').value;
+  if (!estado) { showToast('Selecciona el estado de la pieza 👆'); return; }
+  const añoVal = document.getElementById('f-año').value.trim();
+  if (!añoVal) { showToast('Escribe el año aproximado de la pieza'); return; }
+  const marcaVal = (document.getElementById('f-marca').value === 'Otra marca' || document.getElementById('f-marca').value === 'Otro')
+    ? (document.getElementById('f-marca-custom').value.trim() || 'Otra')
+    : document.getElementById('f-marca').value;
+  const categoriaVal = document.getElementById('f-categoria').value;
   // Límite diario de subidas por plan
   const DAILY_LIMIT = { free: 3, premium: 10, pro: Infinity };
   const limit = DAILY_LIMIT[userPlan] ?? 3;
@@ -1719,15 +1749,34 @@ window.submitPieza = async () => {
       }
     }
     const imageUrl = imageUrls[0] || '';
+
+    // ── CALCULAR RAREZA Y NÚMERO DE UNIDAD ──
+    // Buscar cuántas piezas de misma categoría + marca ya existen
+    const similSnap = await getDocs(query(
+      collection(db, 'piezas'),
+      where('categoria', '==', categoriaVal),
+      where('marca', '==', marcaVal)
+    ));
+    const totalSimilares = similSnap.size; // cuántas ya existen antes de agregar esta
+    const numeroUnidad = totalSimilares + 1;
+
+    // Rareza automática basada en cuántas existen
+    let rarezaAuto;
+    if (numeroUnidad <= 5) rarezaAuto = 'Legendaria';
+    else if (numeroUnidad <= 15) rarezaAuto = 'Rara';
+    else if (numeroUnidad <= 50) rarezaAuto = 'Poco común';
+    else rarezaAuto = 'Común';
+
     await addDoc(collection(db, 'piezas'), {
-      nombre, categoria: document.getElementById('f-categoria').value,
-      marca: (document.getElementById('f-marca').value === 'Otra marca' || document.getElementById('f-marca').value === 'Otro') 
-        ? (document.getElementById('f-marca-custom').value.trim() || 'Otra') 
-        : document.getElementById('f-marca').value,
+      nombre, categoria: categoriaVal,
+      marca: marcaVal,
       imageUrls,
       ubicacion: document.getElementById('f-ubicacion').value.trim(),
-      rareza: document.getElementById('f-rareza').value,
-      año: document.getElementById('f-año').value.trim()||'Desconocido',
+      rareza: rarezaAuto,
+      año: añoVal,
+      estado: estado,
+      lote: document.getElementById('f-lote').value.trim() || '',
+      numeroUnidad,
       descripcion: document.getElementById('f-desc').value.trim(),
       imageUrl, autorId: currentUser.uid,
       autorNombre: currentUser.displayName||currentUser.email.split('@')[0],
@@ -1747,6 +1796,10 @@ window.submitPieza = async () => {
     document.getElementById('f-desc').value = '';
     document.getElementById('f-año').value = '';
     document.getElementById('f-precio').value = '';
+    document.getElementById('f-estado').value = '';
+    document.getElementById('f-lote').value = '';
+    const rprev = document.getElementById('rareza-preview');
+    if (rprev) { rprev.style.display='none'; rprev.textContent=''; }
     for(let i=0;i<3;i++){
       document.getElementById('img-preview-'+i).style.display='none';
       document.getElementById('file-input-'+i).value='';
@@ -3724,7 +3777,12 @@ function renderItems(items) {
         <div class="col-card-name">${locked?'🔒 '+item.nombre:item.nombre}</div>
         <div class="col-card-meta">
           <span class="rdot" style="background:${COLORS[catNorm]||'#4d96ff'}"></span>
-          ${item.marca ? item.marca+' · ' : ''}${item.rareza||'—'}
+          ${item.marca ? item.marca+' · ' : ''}${(() => {
+            const r = item.rareza||'';
+            const emoji = r==='Legendaria'?'💎':r==='Rara'?'🔥':r==='Poco común'?'⭐':r==='Común'?'📦':'';
+            return emoji ? `<span style="font-size:10px">${emoji} ${r}</span>` : '—';
+          })()}
+          ${item.numeroUnidad ? `<span style="color:var(--muted);font-size:10px;margin-left:4px">#${item.numeroUnidad}</span>` : ''}
           ${veblen?'<span class="veblen-badge" style="margin-left:4px">VEBLEN</span>':''}
           ${item.precio?`<span style="color:#6bcb77;font-size:10px;margin-left:4px">$${item.precio}</span>`:''}
         </div>
